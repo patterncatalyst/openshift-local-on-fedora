@@ -14,8 +14,8 @@ chapters, live-verified on CRC.
 - [x] Repo + site scaffold (layouts, includes, css, config, Pages workflow)
 - [ ] Hub card on patterncatalyst-workshops-tutorials-list (next to minikube)
 - [ ] `openshift/` scaffold from the lgtm-crc skill
-- [ ] Ch 00 outline
-- [ ] Ch 01 prerequisites + CRC download/subscription/pull secret/sizing
+- [x] Ch 00 outline
+- [~] Ch 01 prerequisites + CRC download/pull secret/sizing (first draft; expand to word target + verify in relay pass)
 - [ ] Ch 02 installation (crc, oc, kubectl)
 - [ ] Ch 03 starting the cluster (crc start, admin context, console)
 - [ ] Ch 04 oc and kubectl (the `⌨️ The oc way` callout convention)
