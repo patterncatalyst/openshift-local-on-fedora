@@ -5,7 +5,7 @@ description: "Set the cluster size, run crc setup, start OpenShift with your pul
 ---
 
 This is the chapter where OpenShift comes up. You set the cluster size you chose
-in Chapter 1, prepare the host with `crc setup`, start the cluster with your pull
+earlier, prepare the host with `crc setup`, start the cluster with your pull
 secret, and then log in two ways: with `oc` on the command line and with the web
 console in a browser.
 
@@ -23,7 +23,7 @@ crc status               # should report "Stopped" before you start
 ## Set the cluster size
 
 The size takes effect only while the cluster is stopped, so set it before the
-first start. Use the target you picked in Chapter 1. For the platform target this
+first start. Use the target you picked earlier. For the platform target this
 guide builds toward:
 
 ```bash
@@ -56,7 +56,7 @@ and you re-run it. Nothing starts yet.
 
 ## Start OpenShift
 
-Start the cluster, pointing `crc` at the pull-secret file you saved in Chapter 1.
+Start the cluster, pointing `crc` at the pull-secret file you saved earlier.
 Pass the *path*; `crc` reads it once and stores it in the VM. You never print its
 contents:
 
@@ -148,6 +148,6 @@ delete a project, the cluster is ready for the chapters that follow.
 
 ## Where this fits
 
-OpenShift is running and you are logged in. Chapter 4 looks at `oc` and `kubectl`
+OpenShift is running and you are logged in. The next chapter looks at `oc` and `kubectl`
 side by side: what they share, where `oc` does more, and how projects relate to
 namespaces, so the deploying chapters that follow read cleanly in either CLI.

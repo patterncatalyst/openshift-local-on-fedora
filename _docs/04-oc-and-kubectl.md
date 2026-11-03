@@ -101,7 +101,7 @@ chapters use them in context:
 
 ```bash
 oc status                 # project summary: Routes, Services, what is not running
-oc get routes             # the host-facing URLs (Chapter 6)
+oc get routes             # the host-facing URLs (the next chapter)
 oc new-app --help         # build-and-deploy from source or an image
 oc adm top nodes          # node CPU/memory, like kubectl top with admin framing
 oc explain route.spec     # schema for OpenShift types, same as kubectl explain
@@ -131,6 +131,6 @@ whole relationship in one exchange: same object, two names, two tools.
 
 ## Where this fits
 
-You know how the two CLIs relate and how projects map to namespaces. Chapter 5
-deploys a first application with `kubectl`, with `oc` callouts for the OpenShift
-shortcuts, and Chapter 6 exposes it to your host with a Route.
+You know how the two CLIs relate and how projects map to namespaces. The next
+chapter deploys a first application with `kubectl`, with `oc` callouts for the
+OpenShift shortcuts, and the one after exposes it to your host with a Route.

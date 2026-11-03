@@ -4,10 +4,10 @@ order: 2
 description: "Install the crc binary, put it on your PATH, and wire up the oc and kubectl clients the cluster ships with."
 ---
 
-Chapter 1 left you with the `crc` archive and a pull secret on disk. This chapter
+You now have the `crc` archive and a pull secret on disk. This chapter
 installs the `crc` binary and sets up the two clients you drive the cluster with:
 `oc`, the OpenShift CLI, and `kubectl`, the Kubernetes CLI. It still does not
-start anything; `crc setup` and `crc start` are Chapter 3.
+start anything; `crc setup` and `crc start` come next.
 
 ## Install the crc binary
 
@@ -44,7 +44,7 @@ MicroShift version: 4.22.13
 ```
 
 The OpenShift version is baked into the CRC release as a *bundle*; you do not
-download it separately. The first `crc setup` in Chapter 3 unpacks that bundle
+download it separately. The first `crc setup` unpacks that bundle
 into `~/.crc`.
 
 ## The oc and kubectl clients
@@ -70,7 +70,7 @@ echo 'eval "$(crc oc-env)"' >> ~/.bashrc
 
 The bundled client is always version-matched to the cluster bundle, which is why
 it is the recommended path. The one caveat: `crc oc-env` resolves the path inside
-`~/.crc`, so the cluster must have been set up at least once (Chapter 3) for it to
+`~/.crc`, so the cluster must have been set up at least once for it to
 point somewhere real.
 
 ### Option B: install standalone oc and kubectl
@@ -123,11 +123,11 @@ command -v kubectl    # path to kubectl (or the oc symlink)
 ```
 
 If `oc` or `kubectl` is missing, you either skipped Option A's `eval` line or have
-not added `~/.local/bin` to `PATH`. Fix that now; Chapter 3 assumes all three
-resolve.
+not added `~/.local/bin` to `PATH`. Fix that now; starting the cluster assumes all
+three resolve.
 
 ## Where this fits
 
-The tools are installed. Chapter 3 sets the cluster size you chose in Chapter 1,
-runs `crc setup` to prepare the host, and `crc start` to bring OpenShift up for
-the first time, then logs you in and opens the web console.
+The tools are installed. Next, you set the cluster size you chose earlier,
+run `crc setup` to prepare the host, and `crc start` to bring OpenShift up for
+the first time, then log in and open the web console.

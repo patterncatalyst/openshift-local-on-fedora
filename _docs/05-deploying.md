@@ -51,9 +51,25 @@ spec:
           image: registry.access.redhat.com/ubi9/httpd-24:latest
           ports:
             - containerPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: web
+  labels:
+    app: web
+spec:
+  selector:
+    app: web
+  ports:
+    - port: 8080
+      targetPort: 8080
 ```
 
-Apply it and watch the Pods come up:
+The manifest declares two objects: the Deployment that runs the Pods and a
+Service named `web` that gives them one stable in-cluster address. The Service is
+what the `curl` later in this chapter reaches, and what the next chapter puts a
+Route in front of. Apply it and watch the Pods come up:
 
 ```bash
 kubectl apply -f httpd-deployment.yaml
@@ -71,11 +87,15 @@ non-root. That is the restricted default in action.
 kubectl get deployment web            # desired/ready replicas
 kubectl get pods -l app=web -o wide   # the two Pods and their node
 kubectl logs deployment/web           # httpd startup logs
-kubectl describe pod -l app=web | grep -A3 'Security Context'   # the assigned UID
+# the UID OpenShift injected into the container:
+kubectl get pod -l app=web -o jsonpath='{.items[0].spec.containers[0].securityContext.runAsUser}{"\n"}'
 ```
 
-The security context shows a UID like `1000700000`, drawn from the project's
-allocated range. You did not set it; OpenShift did.
+That prints a high UID like `1000650000`. It comes from the project's allocated
+range, visible as the `openshift.io/sa.scc.uid-range` annotation on the namespace
+(`1000650000/10000` here: the first UID and the size of the range). You did not
+set it; OpenShift did, and the pod runs under the `restricted-v2` security
+context constraint that enforces it.
 
 > **⌨️ The `oc` way**
 >
@@ -120,18 +140,20 @@ oc new-project deploy-demo 2>/dev/null || oc project deploy-demo
 kubectl apply -f httpd-deployment.yaml
 kubectl rollout status deployment/web                 # waits until ready
 kubectl get pods -l app=web                           # two Running Pods
-# curl the Service from inside the cluster (no Route yet; that is Chapter 6)
-kubectl run curl --image=registry.access.redhat.com/ubi9/ubi-minimal --rm -it --restart=Never -- \
-  curl -s http://web:8080 | head -c 200
+# reach the Service from inside the cluster (no Route yet; that is the next chapter)
+kubectl run curl --image=registry.access.redhat.com/ubi9/ubi-minimal --rm -i --restart=Never -- \
+  curl -s -o /dev/null -w 'HTTP %{http_code}\n' http://web:8080
 oc delete project deploy-demo                          # clean up
 ```
 
-A service name only resolves once a Service exists, so the inline `curl` assumes
-you created one (via `oc new-app`, or a Service object). Exposing that Service to
-your host, rather than reaching it from inside the cluster, is the next chapter.
+The `httpd` image ships an empty document root, so a request to `/` answers
+`HTTP 403`: the server is up and the Service routes to it, which is all this step
+proves. Serving real content is an image or ConfigMap concern, not a cluster one.
+Exposing that Service to your host, rather than reaching it from inside the
+cluster, is the next chapter.
 
 ## Where this fits
 
 You can deploy a workload and you understand why it runs as a random non-root UID.
-Chapter 6 puts a Route in front of the Service so you can reach it from a browser
-on your host, with TLS terminated at the edge.
+The next chapter puts a Route in front of the Service so you can reach it from a
+browser on your host, with TLS terminated at the edge.

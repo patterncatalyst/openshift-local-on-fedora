@@ -6,7 +6,7 @@ description: "Prepare the Fedora host, create a free Red Hat Developer account, 
 
 OpenShift Local (the command is `crc`, short for CodeReady Containers) runs a
 single-node OpenShift 4 cluster inside a local virtual machine. Before you start
-the cluster in Chapter 3, you need three things: a host that can run the VM, a
+the cluster, you need three things: a host that can run the VM, a
 free Red Hat Developer account, and two downloads: the `crc` release and a *pull
 secret*. This chapter gets all of that in place. It installs nothing from the
 cluster yet; that begins in the next chapter.
@@ -28,7 +28,7 @@ Your host must be able to run a KVM virtual machine:
   KVM kernel modules available. If Fedora is itself a VM, the hypervisor must
   expose *nested* virtualization.
 - `libvirt` and `NetworkManager`, which OpenShift Local drives to create the VM
-  and its network. Chapter 3's `crc setup` checks these and sets up what it can;
+  and its network. The `crc setup` step checks these and sets up what it can;
   you do not configure libvirt by hand.
 
 Confirm virtualization is live before going further:
@@ -64,7 +64,7 @@ The download page offers the Linux archive and, on the same page, a **Download
 pull secret** button. Get both. This guide was written against CRC 2.64, which
 bundles OpenShift 4.22; a newer release is fine, and the commands are the same.
 
-Installing the binary itself is Chapter 2. For now, save the archive and the pull
+Installing the binary itself comes next. For now, save the archive and the pull
 secret somewhere you will remember. Keep the pull secret as a file: you pass its
 path to `crc` once, and the cluster stores it. You never need to open it, print
 it, or paste its contents.
@@ -72,8 +72,8 @@ it, or paste its contents.
 > **⌨️ The `oc` way**
 >
 > The download page also carries the matching `oc` and `kubectl` clients, but you
-> do not need to fetch them separately. `crc` ships a bundled `oc`, and Chapter 2
-> puts it on your `PATH` with `crc oc-env`. Install a standalone `oc` only if you
+> do not need to fetch them separately. `crc` ships a bundled `oc`, and installing
+> CRC puts it on your `PATH` with `crc oc-env`. Install a standalone `oc` only if you
 > want it available when the cluster is stopped.
 
 ### Keep the pull secret private
@@ -89,7 +89,7 @@ The pull secret is a credential. Treat it like a password:
 ## Plan the cluster size
 
 OpenShift Local reads its size from `crc config`, and the size only takes effect
-while the cluster is stopped. Decide now which target you want so Chapter 3 can
+while the cluster is stopped. Decide now which target you want so you can
 start the cluster once at the right size.
 
 | Target | CPUs | Memory | Disk | Use it for |
@@ -102,7 +102,7 @@ target is the one to plan for if your host has the headroom. On a smaller host,
 start with the core target and raise it later; the setting is a one-line change
 followed by a restart.
 
-You set these in Chapter 3, right before the first start, with:
+You set these right before the first start, with:
 
 ```bash
 crc config set cpus 12
@@ -116,9 +116,9 @@ itself: the numbers above are what the VM takes, not what your machine has.
 ## Where this fits
 
 You now have a host that can run the VM, an account, the `crc` download, and the
-pull secret, and you have chosen a cluster size. Next, Chapter 2 installs the
-`crc` binary and wires up the `oc` and `kubectl` clients. Chapter 3 runs
-`crc setup` and `crc start` and brings the cluster up for the first time.
+pull secret, and you have chosen a cluster size. Next, you install the `crc`
+binary and wire up the `oc` and `kubectl` clients, then run `crc setup` and
+`crc start` to bring the cluster up for the first time.
 
 ## Checklist
 
