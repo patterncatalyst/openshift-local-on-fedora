@@ -21,11 +21,11 @@ chapters, live-verified on CRC.
 - [~] Ch 04 oc and kubectl (the `⌨️ The oc way` callout convention) (first draft)
 - [~] Ch 05 deploying applications (first draft)
 - [~] Ch 06 Routes and edge TLS (first draft)
-- [ ] Ch 07 Helm on OpenShift (CLI, charts, native Helm integration, Helm operator)
-- [ ] Ch 08 OpenShift Service Mesh (Sail / Service Mesh 3 + Kiali)
-- [ ] Ch 09 Operators (OperatorHub + OLM; house set + Cluster Observability,
-      Node Tuning/Performance, networking)
-- [ ] Ch 10 examples index
+- [~] Ch 07 Helm on OpenShift (first draft)
+- [~] Ch 08 OpenShift Service Mesh (first draft)
+- [~] Ch 09 Operators (OperatorHub + OLM; house set + Cluster Observability,
+      Node Tuning/Performance, networking) (first draft)
+- [~] Ch 10 examples index (first draft)
 - [ ] Diagrams for new/changed chapters
 - [ ] Live verification on CRC; evidence banked here
 - [ ] Voice pass (lgtm-professional-voice, repo root incl. landing pages)
