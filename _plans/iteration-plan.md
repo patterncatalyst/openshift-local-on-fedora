@@ -16,9 +16,9 @@ chapters, live-verified on CRC.
 - [x] `openshift/` scaffold from the lgtm-crc skill
 - [x] Ch 00 outline
 - [~] Ch 01 prerequisites + CRC download/pull secret/sizing (first draft; expand to word target + verify in relay pass)
-- [ ] Ch 02 installation (crc, oc, kubectl)
-- [ ] Ch 03 starting the cluster (crc start, admin context, console)
-- [ ] Ch 04 oc and kubectl (the `⌨️ The oc way` callout convention)
+- [~] Ch 02 installation (crc, oc, kubectl) (first draft)
+- [~] Ch 03 starting the cluster (crc start, admin context, console) (first draft)
+- [~] Ch 04 oc and kubectl (the `⌨️ The oc way` callout convention) (first draft)
 - [ ] Ch 05 deploying applications
 - [ ] Ch 06 Routes and edge TLS
 - [ ] Ch 07 Helm on OpenShift (CLI, charts, native Helm integration, Helm operator)
