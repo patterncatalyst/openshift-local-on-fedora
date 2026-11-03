@@ -20,8 +20,8 @@ chapters, live-verified on CRC.
 - [~] Ch 03 starting the cluster (crc start, admin context, console) (verified live; expand to word target)
 - [~] Ch 04 oc and kubectl (the `⌨️ The oc way` callout convention) (verified live; expand to word target)
 - [~] Ch 05 deploying applications (verified live; 3 corrections applied; expand to word target)
-- [~] Ch 06 Routes and edge TLS (first draft)
-- [~] Ch 07 Helm on OpenShift (first draft)
+- [~] Ch 06 Routes and edge TLS (verified live on pristine cluster; 1 correction; expand to word target)
+- [~] Ch 07 Helm on OpenShift (verified live on pristine cluster; expand to word target)
 - [~] Ch 08 OpenShift Service Mesh (first draft)
 - [~] Ch 09 Operators (OperatorHub + OLM; house set + Cluster Observability,
       Node Tuning/Performance, networking) (first draft)
@@ -53,6 +53,25 @@ client. `api.crc.testing` resolves to 127.0.0.1 (CRC user-mode networking).
      range annotation `1000650000/10000`), not where `describe | grep` looked;
   3. a bare httpd on an empty docroot answers `HTTP 403` (proves reachability),
      so the curl asserts the status code and the prose says so.
+
+### §6-7 verified on a PRISTINE cluster (crc delete && crc start)
+
+Recreated clean before this pass (no `istio-system`, 0 Subscriptions, no
+non-system Routes). Note: `crc delete && crc start` clears cross-project state
+but the node AGE stays ~49d (baked into the bundle snapshot, not reset by
+delete) — age is not a cleanliness signal; namespaces/subs/routes/CRDs are.
+
+- Ch06: `oc new-app` → `oc create route edge --insecure-policy=Redirect` →
+  host `web-route-demo.apps-crc.testing`. `--cacert` (ingress CA from configmap
+  `default-ingress-cert` in `openshift-config-managed`) makes the HTTPS
+  handshake succeed; plain `curl` fails `SSL ... self-signed certificate`.
+  HTTP → 302 redirect. Correction: HTTPS status is **403** (empty httpd
+  docroot), not the `# 200` the draft claimed — the proof is the trusted-CA
+  handshake, not the status code. Fixed.
+- Ch07: helm v4.2.2; `helm install ./openshift/helm/demo` (postgres+kafka off)
+  deploys `demo-service` (+Service +Route); pod runs `restricted-v2` with an
+  OpenShift-assigned `runAsUser` (1000670000); `helm uninstall` clean. No
+  chapter fix needed.
 
 ## Later phases
 

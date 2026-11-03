@@ -104,7 +104,7 @@ you package a chart for others to consume declaratively.
 
 You build a Helm-based operator rather than install a single "Helm operator"; the
 catalog entry you install is the specific operator someone built this way, each
-reconciling its own chart. Chapter 9 covers installing operators from OperatorHub;
+reconciling its own chart. Installing operators from OperatorHub is covered later;
 whether a given Helm-based operator is published there is something to check on the
 live cluster with `oc get packagemanifests -n openshift-marketplace | grep -i helm`.
 
@@ -131,6 +131,6 @@ the chart is OpenShift-ready.
 ## Where this fits
 
 You can package and deploy with Helm, and you have met OpenShift's native Helm
-integration. Chapter 8 installs the OpenShift Service Mesh, the first thing in this
+integration. The next chapter installs the OpenShift Service Mesh, the first thing in this
 guide delivered as an Operator, which leads into the Operators chapter that
 follows.

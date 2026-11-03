@@ -8,7 +8,7 @@ On plain Kubernetes you reach a Service from outside the cluster with a NodePort
 an Ingress. OpenShift has a built-in router and a first-class object for this: the
 **Route**. A Route gives your Service a stable hostname under `apps-crc.testing`
 and, with one setting, terminates TLS at the edge. This chapter exposes the web
-app from Chapter 5 with a Route and verifies it over HTTPS the correct way.
+app you deployed earlier with a Route and verifies it over HTTPS the correct way.
 
 ## Why Routes instead of NodePorts
 
@@ -23,7 +23,7 @@ chapter where `oc` is the primary tool, not a shortcut.
 
 ## Create a Service, then a Route
 
-Start from a running Deployment (Chapter 5) and give it a Service so the Route has
+Start from a running Deployment and give it a Service so the Route has
 something to target:
 
 ```bash
@@ -126,16 +126,19 @@ oc create route edge web --service=web --insecure-policy=Redirect
 oc get configmap default-ingress-cert -n openshift-config-managed \
   -o jsonpath='{.data.ca-bundle\.crt}' > /tmp/crc-ca.crt
 HOST=$(oc get route web -o jsonpath='{.spec.host}')
-curl -sS --cacert /tmp/crc-ca.crt "https://$HOST" -o /dev/null -w '%{http_code}\n'   # 200
-curl -sS "http://$HOST" -o /dev/null -w '%{http_code}\n'                              # 302/308 redirect to https
+curl -sS --cacert /tmp/crc-ca.crt "https://$HOST" -o /dev/null -w '%{http_code}\n'   # 403: empty docroot, handshake trusted
+curl -sS "http://$HOST" -o /dev/null -w '%{http_code}\n'                              # 302 redirect to https
 oc delete project route-demo
 ```
 
-A `200` over HTTPS with the CA trusted, and a redirect from HTTP, confirms the
-Route and edge TLS are working.
+An HTTPS response with the CA trusted (here `403`, from the same empty `httpd`
+docroot) and a redirect from HTTP confirm the Route and edge TLS are working.
+The signal is the trusted-CA handshake succeeding, not the status code: run the
+same `curl` without `--cacert` and it fails with a self-signed-certificate
+error instead.
 
 ## Where this fits
 
-Your Service is reachable from the host over HTTPS with a real hostname. Chapter 7
+Your Service is reachable from the host over HTTPS with a real hostname. The next chapter
 moves from single objects to packaging: deploying with Helm on OpenShift, and
 OpenShift's own Helm integration.

@@ -23,7 +23,7 @@ plane is Istio, and Kiali is the console that visualizes the mesh.
 
 The mesh needs two operators: the Sail operator (package `servicemeshoperator3`)
 for Istio, and `kiali-ossm` for the dashboard. Both install from OperatorHub with a
-pinned version and manual install-plan approval, the pattern Chapter 9 covers in
+pinned version and manual install-plan approval, the pattern covered in depth
 full. The `openshift/platform/` scaffold in this repository installs them for you:
 
 ```bash
@@ -60,7 +60,7 @@ re-roll its workloads so the sidecars are injected:
 ```bash
 oc new-project mesh-demo
 oc label namespace mesh-demo istio.io/rev=default
-oc apply -f httpd-deployment.yaml          # from Chapter 5
+oc apply -f httpd-deployment.yaml          # from the deploying chapter
 oc rollout restart deployment/web          # re-roll so sidecars are injected
 oc get pods -n mesh-demo                    # each Pod now shows 2/2 containers
 ```
@@ -147,7 +147,7 @@ enforcing mTLS.
 
 ## Where this fits
 
-You installed your first two Operators to get the mesh. Chapter 9 steps back to
+You installed your first two Operators to get the mesh. The next chapter steps back to
 Operators themselves: how OperatorHub and OLM work, how to pin a version safely,
 and the specific Operators this guide relies on, including Cluster Observability,
 Node Tuning, and networking.

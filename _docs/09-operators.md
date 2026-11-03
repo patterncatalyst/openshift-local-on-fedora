@@ -8,7 +8,7 @@ An Operator packages the knowledge to run a piece of software on Kubernetes: it
 watches custom resources and reconciles the real objects to match. OpenShift ships
 the Operator Lifecycle Manager (OLM) and a catalog, OperatorHub, so installing one
 is a declarative action rather than a pile of manifests. You already installed two
-Operators for the service mesh in Chapter 8; this chapter explains the machinery
+Operators for the service mesh earlier; this chapter explains the machinery
 and the operators this guide builds on.
 
 ## OperatorHub and OLM
@@ -163,6 +163,6 @@ before deleting, so the cluster returns to empty.
 
 ## Where this fits
 
-You can install any operator safely with a pinned version. Chapter 10 indexes the
+You can install any operator safely with a pinned version. The next chapter indexes the
 runnable examples and their verification status, closing the first part of the
 guide.
