@@ -1,0 +1,99 @@
+# ────────────────────────────────────────────────────────────────────────────
+# Project: openshift-local-on-fedora
+# Site identity, GitHub link target, and baseurl. Build configuration below
+# generally doesn't need changes.
+# ────────────────────────────────────────────────────────────────────────────
+
+# Site identity
+title: "OpenShift Local (CRC) on Fedora"
+description: "Install and use OpenShift Local (CRC) on Fedora with oc, kubectl, Helm, and Operators."
+brand_emoji: "⛵"   # Single emoji that appears next to the title in the header
+
+# GitHub identity for header link and example sourcing
+github_username: "patterncatalyst"
+github_repo: "openshift-local-on-fedora"
+
+# baseurl
+# - On user/org Pages site (USERNAME.github.io): set to ""
+# - On project Pages site (USERNAME.github.io/PROJECT): set to "/PROJECT"
+# - For local dev override at runtime: bundle exec jekyll serve --baseurl ""
+baseurl: "/openshift-local-on-fedora"
+
+# url is set at deploy time; leave blank for GitHub Pages auto-detection
+url: ""
+
+# ────────────────────────────────────────────────────────────────────────────
+# Build configuration — generally don't change these.
+# ────────────────────────────────────────────────────────────────────────────
+
+markdown: kramdown
+kramdown:
+  input: GFM
+  syntax_highlighter: rouge
+
+permalink: pretty
+
+# Collections — _docs and _plans are not Jekyll defaults; this enables them.
+collections:
+  docs:
+    output: true
+    permalink: /docs/:name/
+  plans:
+    output: false
+  example_pages:
+    output: true
+    permalink: /examples/:name/
+  # capstone is the data-mesh-on-OpenShift build, organized as its own
+  # internally-numbered set under a subdirectory. permalink uses :path (not
+  # :name) to preserve the subdirectory, so
+  # _capstone/data-mesh/01-concepts.md → /capstone/data-mesh/01-concepts/.
+  capstone:
+    output: true
+    permalink: /capstone/:path/
+  # appendix is the Kubernetes design-patterns reference worked on OpenShift,
+  # organized as its own internally-numbered set under a subdirectory. permalink
+  # uses :path so _appendix/k8s-patterns/01-predictable-demands.md →
+  # /appendix/k8s-patterns/01-predictable-demands/.
+  appendix:
+    output: true
+    permalink: /appendix/:path/
+
+# Default front-matter — saves typing `layout: tutorial` on every doc.
+defaults:
+  - scope:
+      path: ""
+      type: docs
+    values:
+      layout: tutorial
+      sectionid: docs
+  - scope:
+      path: ""
+      type: plans
+    values:
+      layout: plan
+  - scope:
+      path: ""
+      type: capstone
+    values:
+      layout: tutorial
+      sectionid: capstone
+  - scope:
+      path: ""
+      type: appendix
+    values:
+      layout: tutorial
+      sectionid: appendix
+
+# Files that Jekyll should not process or include in the built site.
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - vendor/
+  - node_modules/
+  - examples/   # ← important: trailing slash; runnable code lives here, not site content
+  - scripts/
+  - openshift/  # CRC scaffold (lib.sh, operators, helm chart, teardown)
+  - README.md
+  - LICENSE
+  - PRD.md
+  - CONTRIBUTING.md

@@ -1,0 +1,58 @@
+---
+layout: default
+title: Home
+---
+
+<section class="hero">
+  <div class="container">
+    <h1 class="hero__title">{{ site.title }}</h1>
+    <p class="hero__sub">{{ site.description }}</p>
+    <div class="hero__cta">
+      <a class="btn btn--primary"
+         href="{{ '/docs/00-outline/' | relative_url }}">Start the tutorial →</a>
+      <a class="btn btn--ghost"
+         href="https://github.com/{{ site.github_username }}/{{ site.github_repo }}"
+         rel="noopener">View on GitHub ↗</a>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <h2 class="section-heading">What you'll learn</h2>
+    <p class="section-sub">
+      How to install OpenShift Local (CRC) on Fedora, run a single-node
+      OpenShift 4 cluster in a local VM, and deploy applications with
+      <code>kubectl</code> and the OpenShift CLI <code>oc</code>. The chapters
+      use <code>kubectl</code> for the shared Kubernetes workflow and add an
+      <strong>oc way</strong> callout wherever OpenShift gives you a shorter or
+      more capable path. Later sections cover Routes and edge TLS, Helm on
+      OpenShift, OpenShift Service Mesh, and installing Operators from
+      OperatorHub.
+    </p>
+
+    {%- comment -%}
+      Section cards are auto-generated from the _docs collection sorted
+      by `order` (the front-matter field on each section file). New
+      sections appear on the homepage just by being published.
+    {%- endcomment -%}
+    <div class="cards">
+      {% assign sections = site.docs | sort: "order" %}
+      {% for section in sections %}
+      <a class="card" href="{{ section.url | relative_url }}">
+        <div class="card__eyebrow">
+          {% if section.order == 0 %}Overview{% else %}Section {{ section.order }}{% endif %}
+        </div>
+        <h3 class="card__title">{{ section.title }}</h3>
+        {% if section.description %}
+        <p class="card__desc">{{ section.description }}</p>
+        {% endif %}
+        <div class="card__meta">
+          {% if section.duration %}<span>{{ section.duration }}</span>{% endif %}
+          <span>Read →</span>
+        </div>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+</section>

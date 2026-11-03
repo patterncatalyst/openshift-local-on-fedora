@@ -1,0 +1,18 @@
+
+# Per-iteration apply/test/diagnose scaffolding (transient, not part of the tutorial)
+/apply-r*.sh
+/test-r*.sh
+/diagnose-*.sh
+
+# Python bytecode
+__pycache__/
+*.pyc
+
+# Jekyll build output
+_site/
+
+# CRC / OpenShift evidence and secrets (never commit)
+openshift/evidence/
+pull-secret*.json
+pull-secret*.txt
+kubeconfig

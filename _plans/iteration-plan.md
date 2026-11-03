@@ -1,0 +1,48 @@
+---
+title: "Iteration plan"
+layout: plan
+---
+
+Internal planning notes (not published; the `plans` collection is
+`output: false`).
+
+## Phase 1 — CRC core (current)
+
+Scaffold + the genuinely-new CRC content and a first slice of mirrored core
+chapters, live-verified on CRC.
+
+- [x] Repo + site scaffold (layouts, includes, css, config, Pages workflow)
+- [ ] Hub card on patterncatalyst-workshops-tutorials-list (next to minikube)
+- [ ] `openshift/` scaffold from the lgtm-crc skill
+- [ ] Ch 00 outline
+- [ ] Ch 01 prerequisites + CRC download/subscription/pull secret/sizing
+- [ ] Ch 02 installation (crc, oc, kubectl)
+- [ ] Ch 03 starting the cluster (crc start, admin context, console)
+- [ ] Ch 04 oc and kubectl (the `⌨️ The oc way` callout convention)
+- [ ] Ch 05 deploying applications
+- [ ] Ch 06 Routes and edge TLS
+- [ ] Ch 07 Helm on OpenShift (CLI, charts, native Helm integration, Helm operator)
+- [ ] Ch 08 OpenShift Service Mesh (Sail / Service Mesh 3 + Kiali)
+- [ ] Ch 09 Operators (OperatorHub + OLM; house set + Cluster Observability,
+      Node Tuning/Performance, networking)
+- [ ] Ch 10 examples index
+- [ ] Diagrams for new/changed chapters
+- [ ] Live verification on CRC; evidence banked here
+- [ ] Voice pass (lgtm-professional-voice, repo root incl. landing pages)
+
+## Later phases
+
+- Remaining core chapters: persistent storage, editor/shell, autoscaling
+  (KEDA → Custom Metrics Autoscaler), alternatives, FAQ, where-to-next.
+- Capstone: a data mesh on OpenShift (mirror the 10-page set).
+- Appendix: the Kubernetes design-patterns set worked entirely on OpenShift,
+  reframed to EX280/DO280, restricted-v2 variants of every manifest.
+- Companion decks (authored last).
+
+## Conventions
+
+- Branch → PR → squash-merge for every change; `rNN.x` tags; notes-only releases.
+- `kubectl` in chapter bodies; `⌨️ The oc way` callout for OpenShift-native paths;
+  `oc`-native where there is no kubectl equivalent (Routes, SCCs, Operators).
+- Verification status defaults to unverified; promote to verified only on a
+  passing live CRC run, with evidence banked here.
