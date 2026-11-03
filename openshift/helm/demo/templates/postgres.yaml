@@ -1,0 +1,77 @@
+{{- if .Values.postgres.enabled }}
+# Postgres on the Red Hat image (sclorg): built for an arbitrary UID, so it
+# runs under restricted-v2 with no runAsUser. Probes use the image's own
+# check-container script.
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ .Release.Name }}-postgres
+  labels:
+    app.kubernetes.io/name: {{ .Release.Name }}-postgres
+    {{- include "chart.labels" . | nindent 4 }}
+spec:
+  serviceName: {{ .Release.Name }}-postgres-rw
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ .Release.Name }}-postgres
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ .Release.Name }}-postgres
+        app.kubernetes.io/part-of: {{ .Release.Name }}
+    spec:
+      containers:
+        - name: postgres
+          image: {{ .Values.postgres.image }}
+          ports:
+            - name: postgres
+              containerPort: 5432
+          env:
+            - name: POSTGRESQL_DATABASE
+              value: {{ .Values.postgres.database | quote }}
+            - name: POSTGRESQL_USER
+              valueFrom:
+                secretKeyRef: {name: {{ .Release.Name }}-postgres-app, key: username}
+            - name: POSTGRESQL_PASSWORD
+              valueFrom:
+                secretKeyRef: {name: {{ .Release.Name }}-postgres-app, key: password}
+          readinessProbe:
+            exec: {command: ["/usr/libexec/check-container"]}
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            exec: {command: ["/usr/libexec/check-container", "--live"]}
+            initialDelaySeconds: 60
+            periodSeconds: 20
+          resources:
+            requests: {cpu: 100m, memory: 256Mi}
+            limits: {memory: 512Mi}
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/pgsql/data
+          {{- include "chart.containerSecurity" . | nindent 10 }}
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: {{ .Values.postgres.storage }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Release.Name }}-postgres-rw
+  labels:
+    app.kubernetes.io/name: {{ .Release.Name }}-postgres
+    {{- include "chart.labels" . | nindent 4 }}
+spec:
+  selector:
+    app.kubernetes.io/name: {{ .Release.Name }}-postgres
+  ports:
+    - name: postgres
+      port: 5432
+      targetPort: postgres
+{{- end }}

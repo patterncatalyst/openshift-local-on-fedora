@@ -1,0 +1,92 @@
+# values.yaml — demo on OpenShift Local.
+#
+# Keep the env contract (ConfigMap keys, Service and Secret names) the same
+# as the project's other runtime (compose/minikube), so the services' %prod
+# configuration works unchanged.
+
+# Images come from the internal registry: build-images.sh pushes ImageStream
+# tags <service>:<imageTag> into the release namespace.
+registry: image-registry.openshift-image-registry.svc:5000
+imageTag: v1
+
+# The ubi10/openjdk-25 S2I image starts the app with run-java.sh, which sets
+# -XX:MaxRAMPercentage from JAVA_MAX_MEM_RATIO (default 80). 50 leaves room
+# for metaspace, threads and buffers inside the limits below. The image
+# ignores JAVA_MAX_RAM_RATIO.
+javaMaxMemRatio: "50"
+
+# Extra keys for the shared ConfigMap (<release>-app-config).
+config: {}
+
+kafka:
+  enabled: true
+  # Kafka CR name (openshift/infra/kafka.yaml); bootstrap <cluster>-kafka-bootstrap:9092
+  cluster: demo
+
+postgres:
+  enabled: true
+  # Red Hat image built for arbitrary UIDs (restricted-v2). Newest UBI first,
+  # exact tag; re-check with skopeo list-tags (references/versions.md).
+  image: registry.redhat.io/rhel10/postgresql-16:10.2-1791491499
+  database: demo
+  username: demo
+  storage: 2Gi
+
+# ── Platform tier (openshift/platform/) ─────────────────────────────────────
+# All off by default: a plain install renders only the core above.
+
+# OpenShift Service Mesh 3. Pods join through the istio.io/rev LABEL (Sail's
+# revisioned injection); namespace mTLS is STRICT, and every service with a
+# Route is PERMISSIVE because the router delivers plaintext to it.
+mesh:
+  enabled: false
+  revision: default
+  canary:
+    enabled: false
+    service: demo-service
+    v2Weight: 10
+
+# Custom Metrics Autoscaler: a Kafka-lag ScaledObject for every service
+# that has a `keda:` block below.
+keda:
+  enabled: false
+
+# Red Hat build of OpenTelemetry: the operator injects the OpenTelemetry
+# Java agent into JVM pods (not native ones); traces go to otel-lgtm here.
+observability:
+  enabled: false
+  lgtmImage: docker.io/grafana/otel-lgtm:0.36.0
+
+# One service as a native executable (platform/build-native.sh pushes
+# <service>-native:<imageTag>).
+native:
+  enabled: false
+  service: demo-service
+
+# Ollama under restricted-v2, plus every service with `ai: true`.
+ai:
+  enabled: false
+  ollamaImage: docker.io/ollama/ollama:0.35.1
+  model: qwen2.5:3b
+  storage: 10Gi
+
+# One Deployment + Service per entry. Keys are the ImageStream names and
+# must match SERVICES in openshift/lib.sh (AI services excepted).
+#   route:           edge-TLS Route (and mesh PERMISSIVE for this service)
+#   routeHealthPath: path capture-evidence.sh checks through the Route
+#   db:              Postgres credentials + a wait-for-postgres init container
+#   javaToolOptions: JVM -D flags the image's Containerfile used to set
+#                    (run-java.sh never reads that Containerfile)
+#   grpcPort:        extra container + Service port
+#   env:             service-specific environment
+#   ai:              deployed only when ai.enabled
+#   probe: tcp       no SmallRye Health extension; probe the HTTP port
+#   instrument:      false to skip Java-agent injection
+#   keda:            {topic, consumerGroup, lagThreshold, minReplicas, maxReplicas}
+services:
+  demo-service:
+    route: true
+    db: true
+    # javaToolOptions: "-Dorg.apache.avro.SERIALIZABLE_PACKAGES=com.example.events.v1"
+    # keda: {topic: example.topic, consumerGroup: demo-service, lagThreshold: "5", maxReplicas: 10}
+    resources: {requests: {cpu: 150m, memory: 320Mi}, limits: {cpu: 750m, memory: 640Mi}}

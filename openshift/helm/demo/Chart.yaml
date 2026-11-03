@@ -1,0 +1,10 @@
+apiVersion: v2
+name: demo
+description: >-
+  OpenShift Local (CRC) on Fedora on OpenShift Local (CRC): the services (images from
+  openshift/build-images.sh), Postgres, edge-TLS Routes, and opt-in platform
+  flags (mesh, keda, observability, ai, native). Kafka comes from the AMQ
+  Streams operator (openshift/install-infra.sh).
+type: application
+version: 0.1.0
+appVersion: "v1"
