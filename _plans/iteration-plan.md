@@ -12,8 +12,8 @@ Scaffold + the genuinely-new CRC content and a first slice of mirrored core
 chapters, live-verified on CRC.
 
 - [x] Repo + site scaffold (layouts, includes, css, config, Pages workflow)
-- [ ] Hub card on patterncatalyst-workshops-tutorials-list (next to minikube)
-- [ ] `openshift/` scaffold from the lgtm-crc skill
+- [x] Hub card on patterncatalyst-workshops-tutorials-list (next to minikube) — merged
+- [x] `openshift/` scaffold from the lgtm-crc skill
 - [x] Ch 00 outline
 - [~] Ch 01 prerequisites + CRC download/pull secret/sizing (first draft; expand to word target + verify in relay pass)
 - [ ] Ch 02 installation (crc, oc, kubectl)
