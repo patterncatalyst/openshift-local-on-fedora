@@ -23,8 +23,8 @@ plane is Istio, and Kiali is the console that visualizes the mesh.
 
 The mesh needs two operators: the Sail operator (package `servicemeshoperator3`)
 for Istio, and `kiali-ossm` for the dashboard. Both install from OperatorHub with a
-pinned version and manual install-plan approval, the pattern covered in depth
-full. The `openshift/platform/` scaffold in this repository installs them for you:
+pinned version and manual install-plan approval, the pattern covered in full by
+the Operators chapter. The `openshift/platform/` scaffold in this repository installs them for you:
 
 ```bash
 ./openshift/platform/install-mesh.sh
