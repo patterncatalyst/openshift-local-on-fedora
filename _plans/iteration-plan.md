@@ -25,8 +25,9 @@ chapters, live-verified on CRC.
 - [~] Ch 08 OpenShift Service Mesh (verified live on pristine cluster; pins
       bumped, control-plane + native-sidecar + mTLS corrections; expand to word target)
 - [~] Ch 09 Operators (OperatorHub + OLM; house set + Cluster Observability,
-      Node Tuning/Performance, networking) (first draft)
-- [~] Ch 10 examples index (first draft)
+      Node Tuning/Performance, networking) (verified live; amq-streams pin
+      bumped; table channels confirmed; expand to word target)
+- [~] Ch 10 examples index (verified: every path it names exists)
 - [ ] Diagrams for new/changed chapters
 - [ ] Live verification on CRC; evidence banked here
 - [ ] Voice pass (lgtm-professional-voice, repo root incl. landing pages)
@@ -96,6 +97,20 @@ delete) — age is not a cleanliness signal; namespaces/subs/routes/CRDs are.
   needs, and the Kiali-graph claim is scoped to "once observability is wired";
   (5) added `openshift/platform/mesh/strict-mtls.yaml` so the chapter references
   a real file. Operators left installed for the Ch09 pass; `mesh-demo` deleted.
+- Ch09: `install_operator` installs `amq-streams` end to end. Pin was stale
+  (`amq-streams-3.2.x` now serves `amqstreams.v3.2.2-5`, was v3.2.1-14, which
+  would hang); bumped in `openshift/infra/amq-streams-subscription.yaml` and the
+  three spots in the chapter. CSV reached `Succeeded`; the `kafka.strimzi.io`
+  CRDs (kafkas, kafkatopics, kafkausers, ...) are present. The other table
+  channels were confirmed live in the catalog and are current: KEDA
+  `openshift-custom-metrics-autoscaler-operator` `stable`, OTel
+  `opentelemetry-product` `stable`, GitOps `openshift-gitops-operator`
+  `gitops-1.22` (the table lists channels only, not CSVs, so no CSV edits).
+- Ch10: index only, no cluster run. Confirmed every path it names exists:
+  `openshift/{lib.sh,install-infra.sh,deploy.sh,build-images.sh,
+  capture-evidence.sh,teardown.sh}`, `openshift/platform/install-platform.sh`,
+  `openshift/helm/demo`, `openshift/infra`, `examples/05-deploying`,
+  `examples/06-routes`. No fix needed.
 
 ## Later phases
 

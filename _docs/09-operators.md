@@ -47,7 +47,7 @@ spec:
   source: redhat-operators
   sourceNamespace: openshift-marketplace
   channel: amq-streams-3.2.x
-  startingCSV: amqstreams.v3.2.1-14
+  startingCSV: amqstreams.v3.2.2-5
   installPlanApproval: Manual
 ```
 
@@ -61,7 +61,7 @@ InstallPlan whose `clusterServiceVersionNames` contains the pinned CSV.
 ```bash
 # install_operator <subscription.yaml> <namespace> <package> <csv>
 install_operator openshift/infra/amq-streams-subscription.yaml \
-  openshift-operators amq-streams amqstreams.v3.2.1-14
+  openshift-operators amq-streams amqstreams.v3.2.2-5
 ```
 
 Always re-check the current CSV before pinning, because the catalog moves:
@@ -152,7 +152,7 @@ require_crc                                          # refuse any non-CRC cluste
 oc get packagemanifest amq-streams -n openshift-marketplace \
   -o jsonpath='{range .status.channels[*]}{.name} {.currentCSV}{"\n"}{end}'
 install_operator openshift/infra/amq-streams-subscription.yaml \
-  openshift-operators amq-streams amqstreams.v3.2.1-14
+  openshift-operators amq-streams amqstreams.v3.2.2-5
 oc get csv -n openshift-operators | grep amqstreams   # Succeeded
 oc get crd | grep kafka.strimzi.io                    # CRDs the operator owns
 ```

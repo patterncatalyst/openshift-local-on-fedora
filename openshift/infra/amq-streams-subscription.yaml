@@ -17,5 +17,5 @@ spec:
   source: redhat-operators
   sourceNamespace: openshift-marketplace
   channel: amq-streams-3.2.x
-  startingCSV: amqstreams.v3.2.1-14
+  startingCSV: amqstreams.v3.2.2-5
   installPlanApproval: Manual
