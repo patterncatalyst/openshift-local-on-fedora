@@ -22,7 +22,8 @@ chapters, live-verified on CRC.
 - [~] Ch 05 deploying applications (verified live; 3 corrections applied; expand to word target)
 - [~] Ch 06 Routes and edge TLS (verified live on pristine cluster; 1 correction; expand to word target)
 - [~] Ch 07 Helm on OpenShift (verified live on pristine cluster; expand to word target)
-- [~] Ch 08 OpenShift Service Mesh (first draft)
+- [~] Ch 08 OpenShift Service Mesh (verified live on pristine cluster; pins
+      bumped, control-plane + native-sidecar + mTLS corrections; expand to word target)
 - [~] Ch 09 Operators (OperatorHub + OLM; house set + Cluster Observability,
       Node Tuning/Performance, networking) (first draft)
 - [~] Ch 10 examples index (first draft)
@@ -72,6 +73,29 @@ delete) — age is not a cleanliness signal; namespaces/subs/routes/CRDs are.
   deploys `demo-service` (+Service +Route); pod runs `restricted-v2` with an
   OpenShift-assigned `runAsUser` (1000670000); `helm uninstall` clean. No
   chapter fix needed.
+- Ch08: mesh operators + control plane installed on the pristine cluster.
+  Pins were stale (would hang the install): the catalog now serves
+  `servicemeshoperator3.v3.4.4` in `stable-3.4` (was v3.4.3) and
+  `kiali-operator.v2.33.1` in `stable` (v2.27.5 gone); bumped both in the two
+  Subscriptions, `install-mesh.sh`, and the Istio manifest comment. OSSM 3.4.4
+  offers Istio v1.26 to v1.30, so the `v1.30.5` pin is valid and is the newest
+  exact release. `IstioCNI` and `Istio` (v1.30.5, revision `default`) reach
+  Ready. Enrolled `mesh-demo` with `istio.io/rev=default`: a fresh deploy into
+  the labeled namespace comes up `2/2` with the Envoy proxy injected as a
+  *native sidecar* (`istio-proxy` is an init container with `istio-validation`,
+  not a normal container, so `.spec.containers` lists only `httpd` while the Pod
+  reads `2/2`). `PeerAuthentication/default` applies and reads back `STRICT`.
+  Chapter corrections: (1) Build/run/observe no longer calls `install-mesh.sh`
+  standalone (that script requires the Helm core via `deploy.sh` and enrolls the
+  `demo` release, not `mesh-demo`); it now runs the verified standalone path
+  (`install_operator` x2 + control plane + enrollment + mTLS) and describes
+  `install-mesh.sh` accurately as the Helm-release path; (2) the by-hand control
+  plane now shows `IstioCNI` + a version-pinned `Istio` (was a version-less
+  `Istio` only); (3) sidecar described as a native sidecar / init container;
+  (4) the canary now includes the `DestinationRule` subsets + `version` labels it
+  needs, and the Kiali-graph claim is scoped to "once observability is wired";
+  (5) added `openshift/platform/mesh/strict-mtls.yaml` so the chapter references
+  a real file. Operators left installed for the Ch09 pass; `mesh-demo` deleted.
 
 ## Later phases
 

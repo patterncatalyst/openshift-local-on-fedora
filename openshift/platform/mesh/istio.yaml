@@ -1,5 +1,5 @@
 # OpenShift Service Mesh 3 control plane (Sail operator). Istio is pinned to
-# an exact release the installed OSSM offers (OSSM 3.4.3: v1.26 to v1.30).
+# an exact release the installed OSSM offers (OSSM 3.4.4: v1.26 to v1.30).
 # Never use a floating `vX.Y-latest`. List what the operator accepts with:
 #   oc get crd istios.sailoperator.io -o json | jq -r '.. | .version? | .enum? // empty | .[]' | sort -uV
 # The Istio CR named "default" serves revision "default": pods join with the

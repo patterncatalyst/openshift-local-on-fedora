@@ -16,5 +16,5 @@ spec:
   source: redhat-operators
   sourceNamespace: openshift-marketplace
   channel: stable
-  startingCSV: kiali-operator.v2.27.5
+  startingCSV: kiali-operator.v2.33.1
   installPlanApproval: Manual

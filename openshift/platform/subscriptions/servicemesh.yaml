@@ -16,5 +16,5 @@ spec:
   source: redhat-operators
   sourceNamespace: openshift-marketplace
   channel: stable-3.4
-  startingCSV: servicemeshoperator3.v3.4.3
+  startingCSV: servicemeshoperator3.v3.4.4
   installPlanApproval: Manual

@@ -12,8 +12,8 @@ source "$(dirname "${BASH_SOURCE[0]}")/../lib.sh"
 PLATFORM="$OPENSHIFT_DIR/platform"
 
 # Newest CSVs in their channels when written; re-check (references/versions.md).
-OSSM_CSV="servicemeshoperator3.v3.4.3"
-KIALI_CSV="kiali-operator.v2.27.5"
+OSSM_CSV="servicemeshoperator3.v3.4.4"
+KIALI_CSV="kiali-operator.v2.33.1"
 
 CANARY=false
 [[ "${1:-}" == "--canary" ]] && CANARY=true

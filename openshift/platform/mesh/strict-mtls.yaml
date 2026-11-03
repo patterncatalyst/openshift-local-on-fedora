@@ -1,0 +1,12 @@
+# STRICT mutual TLS for the mesh-demo namespace: every in-mesh call must be
+# mutually authenticated and encrypted. A Route-facing workload needs a
+# PERMISSIVE port exception (the cluster router speaks plaintext to the Pod);
+# the Helm chart's mesh.enabled path adds that exception for you.
+apiVersion: security.istio.io/v1
+kind: PeerAuthentication
+metadata:
+  name: default
+  namespace: mesh-demo
+spec:
+  mtls:
+    mode: STRICT
