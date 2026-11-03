@@ -19,8 +19,8 @@ chapters, live-verified on CRC.
 - [~] Ch 02 installation (crc, oc, kubectl) (first draft)
 - [~] Ch 03 starting the cluster (crc start, admin context, console) (first draft)
 - [~] Ch 04 oc and kubectl (the `⌨️ The oc way` callout convention) (first draft)
-- [ ] Ch 05 deploying applications
-- [ ] Ch 06 Routes and edge TLS
+- [~] Ch 05 deploying applications (first draft)
+- [~] Ch 06 Routes and edge TLS (first draft)
 - [ ] Ch 07 Helm on OpenShift (CLI, charts, native Helm integration, Helm operator)
 - [ ] Ch 08 OpenShift Service Mesh (Sail / Service Mesh 3 + Kiali)
 - [ ] Ch 09 Operators (OperatorHub + OLM; house set + Cluster Observability,
