@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 380" font-family="'Red Hat Text', system-ui, sans-serif" role="img">
+<defs><marker id="a" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#555"/></marker><marker id="am" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#b8650a"/></marker></defs>
+<rect x="20" y="48" width="860" height="312" rx="12" fill="#fafafa" stroke="#ddd"/>
+<text x="32" y="68" font-size="12" font-weight="700" fill="#888">single-node CRC: who may land on the one node</text>
+<rect x="340" y="135" width="220" height="140" rx="9" fill="#fff8ef" stroke="#e8870c" stroke-width="2"/>
+<text x="450.0" y="188.0" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">crc (only node)</text>
+<text x="450.0" y="205.0" font-size="11.5" fill="#555555" text-anchor="middle">zone=warehouse-a</text>
+<text x="450.0" y="220.0" font-size="11.5" fill="#555555" text-anchor="middle">tier=fulfillment</text>
+<text x="450.0" y="235.0" font-size="11.5" fill="#555555" text-anchor="middle">taint dedicated=fulfillment</text>
+<rect x="40" y="100" width="185" height="64" rx="9" fill="#ffffff" stroke="#111111" stroke-width="2"/>
+<text x="132.5" y="130.0" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">nodeSelector /</text>
+<text x="132.5" y="147.0" font-size="11.5" fill="#555555" text-anchor="middle">nodeAffinity Pod</text>
+<rect x="40" y="250" width="185" height="64" rx="9" fill="#ffffff" stroke="#111111" stroke-width="2"/>
+<text x="132.5" y="287.5" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">tolerating Pod</text>
+<rect x="660" y="108" width="200" height="64" rx="9" fill="#ffffff" stroke="#999999" stroke-width="1.5" stroke-dasharray="6 4"/>
+<text x="760.0" y="138.0" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">intolerant Pod</text>
+<text x="760.0" y="155.0" font-size="11.5" fill="#555555" text-anchor="middle">Pending (repelled)</text>
+<rect x="660" y="248" width="200" height="70" rx="9" fill="#ffffff" stroke="#999999" stroke-width="1.5" stroke-dasharray="6 4"/>
+<text x="760.0" y="281.0" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">2nd replica (anti-affinity)</text>
+<text x="760.0" y="298.0" font-size="11.5" fill="#555555" text-anchor="middle">Pending: no 2nd node</text>
+<path d="M225,150 L340,175" fill="none" stroke="#555" stroke-width="2" marker-end="url(#a)"/>
+<text x="288.5" y="156.5" font-size="11" fill="#ffffff" stroke="#ffffff" stroke-width="3" paint-order="stroke" text-anchor="middle">label match</text>
+<text x="288.5" y="156.5" font-size="11" fill="#555" text-anchor="middle">label match</text>
+<path d="M225,280 L340,235" fill="none" stroke="#555" stroke-width="2" marker-end="url(#a)"/>
+<text x="288.5" y="251.5" font-size="11" fill="#ffffff" stroke="#ffffff" stroke-width="3" paint-order="stroke" text-anchor="middle">tolerates taint</text>
+<text x="288.5" y="251.5" font-size="11" fill="#555" text-anchor="middle">tolerates taint</text>
+<path d="M560,175 L660,140" fill="none" stroke="#b8650a" stroke-width="2" marker-end="url(#am)"/>
+<text x="616.0" y="151.5" font-size="11" fill="#ffffff" stroke="#ffffff" stroke-width="3" paint-order="stroke" text-anchor="middle">repelled</text>
+<text x="616.0" y="151.5" font-size="11" fill="#b8650a" text-anchor="middle">repelled</text>
+<path d="M560,235 L660,280" fill="none" stroke="#b8650a" stroke-width="2" marker-end="url(#am)"/>
+<text x="616.0" y="251.5" font-size="11" fill="#ffffff" stroke="#ffffff" stroke-width="3" paint-order="stroke" text-anchor="middle">no room</text>
+<text x="616.0" y="251.5" font-size="11" fill="#b8650a" text-anchor="middle">no room</text>
+<text x="460" y="32" font-size="11" fill="#888" text-anchor="middle" font-weight="700">Automated Placement on single-node CRC</text>
+</svg>

@@ -1,0 +1,112 @@
+# shipping-service, with the Predictable Demands pattern applied: declared
+# resource requests/limits, a PriorityClass, and two hard requirements (the
+# ConfigMap and PVC from 02 and 03). The securityContext is restricted-v2
+# clean: no runAsUser (OpenShift assigns one from the project's range),
+# runAsNonRoot, no added capabilities, no privilege escalation.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: shipping-service
+  namespace: patterns
+  labels:
+    app.kubernetes.io/name: shipping-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: shipping-service
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: shipping-service
+    spec:
+      priorityClassName: patterns-high-priority
+      securityContext:
+        runAsNonRoot: true
+      containers:
+        - name: shipping-service
+          image: image-registry.openshift-image-registry.svc:5000/patterns/shipping-service:v1
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 8080
+          env:
+            # Hard requirement #1: fails to resolve until shipping-config exists.
+            - name: SERVICE_SCHEMA
+              valueFrom:
+                configMapKeyRef:
+                  name: shipping-config
+                  key: schema
+            - name: PG_HOST
+              value: patterns-postgres.patterns.svc.cluster.local
+            - name: PG_PORT
+              value: "5432"
+            - name: PG_USER
+              valueFrom:
+                secretKeyRef:
+                  name: patterns-postgres-app
+                  key: username
+            - name: PG_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: patterns-postgres-app
+                  key: password
+            - name: PG_DATABASE
+              valueFrom:
+                secretKeyRef:
+                  name: patterns-postgres-app
+                  key: dbname
+          # Predictable Demands: declare exactly what this container needs.
+          # No CPU limit (an unthrottled ceiling avoids CFS throttling under
+          # load); the memory limit still bounds the container for eviction.
+          resources:
+            requests:
+              cpu: 100m
+              memory: 192Mi
+            limits:
+              memory: 512Mi
+          # Hard requirement #2: the Pod stays Pending until shipping-data binds.
+          volumeMounts:
+            - name: shipping-data
+              mountPath: /var/lib/shipping-service
+          startupProbe:
+            httpGet:
+              path: /health
+              port: http
+            failureThreshold: 30
+            periodSeconds: 2
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsNonRoot: true
+            capabilities:
+              drop: ["ALL"]
+            seccompProfile:
+              type: RuntimeDefault
+      volumes:
+        - name: shipping-data
+          persistentVolumeClaim:
+            claimName: shipping-data
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: shipping-service
+  namespace: patterns
+spec:
+  selector:
+    app.kubernetes.io/name: shipping-service
+  ports:
+    - port: 80
+      targetPort: 8080

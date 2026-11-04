@@ -1,0 +1,56 @@
+# An order-service placeholder with nodeAffinity: a required rule (the node
+# must carry tier=fulfillment) and a soft preference (prefer disktype=ssd,
+# weight 10). The required rule behaves like nodeSelector with a richer
+# expression language; the preference only scores among nodes that already
+# satisfy every required rule, and never blocks scheduling on its own.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: order-placeholder
+  namespace: patterns
+  labels:
+    app.kubernetes.io/name: order-placeholder
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: order-placeholder
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: order-placeholder
+    spec:
+      securityContext:
+        runAsNonRoot: true
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: tier
+                    operator: In
+                    values: ["fulfillment"]
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 10
+              preference:
+                matchExpressions:
+                  - key: disktype
+                    operator: In
+                    values: ["ssd"]
+      containers:
+        - name: placeholder
+          image: registry.access.redhat.com/ubi9/ubi-minimal:latest
+          command: ["sleep", "infinity"]
+          resources:
+            requests:
+              cpu: 10m
+              memory: 32Mi
+            limits:
+              memory: 64Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsNonRoot: true
+            capabilities:
+              drop: ["ALL"]
+            seccompProfile:
+              type: RuntimeDefault

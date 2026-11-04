@@ -1,0 +1,77 @@
+# Two otherwise-identical placeholders, both targeting zone=warehouse-a. After
+# the crc node is tainted dedicated=fulfillment:NoSchedule, only the Pod that
+# tolerates the taint may land there. The one without a toleration stays
+# Pending: a taint repels every Pod by default, overriding the node selector
+# match, and only an explicit toleration is an exception to that refusal.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tolerating-placeholder
+  namespace: patterns
+  labels:
+    app.kubernetes.io/name: tolerating-placeholder
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: tolerating-placeholder
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: tolerating-placeholder
+    spec:
+      securityContext:
+        runAsNonRoot: true
+      nodeSelector:
+        zone: warehouse-a
+      tolerations:
+        - key: dedicated
+          operator: Equal
+          value: fulfillment
+          effect: NoSchedule
+      containers:
+        - name: placeholder
+          image: registry.access.redhat.com/ubi9/ubi-minimal:latest
+          command: ["sleep", "infinity"]
+          resources:
+            requests: { cpu: 10m, memory: 32Mi }
+            limits: { memory: 64Mi }
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsNonRoot: true
+            capabilities: { drop: ["ALL"] }
+            seccompProfile: { type: RuntimeDefault }
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: intolerant-placeholder
+  namespace: patterns
+  labels:
+    app.kubernetes.io/name: intolerant-placeholder
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: intolerant-placeholder
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: intolerant-placeholder
+    spec:
+      securityContext:
+        runAsNonRoot: true
+      nodeSelector:
+        zone: warehouse-a
+      containers:
+        - name: placeholder
+          image: registry.access.redhat.com/ubi9/ubi-minimal:latest
+          command: ["sleep", "infinity"]
+          resources:
+            requests: { cpu: 10m, memory: 32Mi }
+            limits: { memory: 64Mi }
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsNonRoot: true
+            capabilities: { drop: ["ALL"] }
+            seccompProfile: { type: RuntimeDefault }

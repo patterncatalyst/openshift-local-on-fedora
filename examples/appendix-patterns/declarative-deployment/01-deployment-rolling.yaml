@@ -1,0 +1,119 @@
+# shipping-service with an explicit RollingUpdate strategy: at most one extra
+# Pod above the replica count (maxSurge), and zero unavailable so capacity
+# never drops below 3 during a rollout. The readinessProbe is what makes this
+# safe: a new Pod only joins the Service's endpoints once it answers /healthz.
+# restricted-v2 clean: no runAsUser, drop ALL caps, RuntimeDefault seccomp.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: shipping-service
+  namespace: patterns
+  labels:
+    app.kubernetes.io/name: shipping-service
+spec:
+  replicas: 3
+  # minReadySeconds paces the rollout: each new Pod must stay ready this long
+  # before the next step, so the router isn't reloading back to back.
+  minReadySeconds: 5
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: shipping-service
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: shipping-service
+    spec:
+      securityContext:
+        runAsNonRoot: true
+      # Graceful drain: on termination the Pod is first removed from the
+      # Service's endpoints, then preStop runs while the container keeps
+      # serving, so the router drains and reloads before the process stops
+      # accepting. Without it, SIGTERM races endpoint removal and a client
+      # mid-rollout sees a connection reset.
+      terminationGracePeriodSeconds: 30
+      containers:
+        - name: shipping-service
+          image: image-registry.openshift-image-registry.svc:5000/patterns/shipping-service:v1
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 8080
+          env:
+            - name: SERVICE_SCHEMA
+              value: shipping
+            - name: PG_HOST
+              value: patterns-postgres.patterns.svc.cluster.local
+            - name: PG_PORT
+              value: "5432"
+            - name: PG_USER
+              valueFrom:
+                secretKeyRef: { name: patterns-postgres-app, key: username }
+            - name: PG_PASSWORD
+              valueFrom:
+                secretKeyRef: { name: patterns-postgres-app, key: password }
+            - name: PG_DATABASE
+              valueFrom:
+                secretKeyRef: { name: patterns-postgres-app, key: dbname }
+          resources:
+            requests:
+              cpu: 100m
+              memory: 192Mi
+            limits:
+              memory: 512Mi
+          startupProbe:
+            httpGet: { path: /health, port: http }
+            failureThreshold: 30
+            periodSeconds: 2
+          livenessProbe:
+            httpGet: { path: /health, port: http }
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          readinessProbe:
+            httpGet: { path: /healthz, port: http }
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          lifecycle:
+            preStop:
+              exec:
+                command: ["sleep", "5"]
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsNonRoot: true
+            capabilities:
+              drop: ["ALL"]
+            seccompProfile:
+              type: RuntimeDefault
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: shipping-service
+  namespace: patterns
+spec:
+  selector:
+    app.kubernetes.io/name: shipping-service
+  ports:
+    - port: 80
+      targetPort: 8080
+---
+# A Route so a curl loop can hit the Service through the router (which
+# load-balances across the ready endpoints) during a rollout.
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: shipping-service
+  namespace: patterns
+spec:
+  to:
+    kind: Service
+    name: shipping-service
+  port:
+    targetPort: 8080
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect

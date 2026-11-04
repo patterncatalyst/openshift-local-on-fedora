@@ -1,0 +1,52 @@
+# A two-replica stand-in for a highly available shipping-service, with a
+# required podAntiAffinity rule: no two Pods matching this label may share a
+# node (topologyKey kubernetes.io/hostname).
+#
+# On a multi-node cluster the two replicas land one per node. On single-node
+# CRC there is only one node, so the rule can't be satisfied twice: the first
+# replica runs, the second stays Pending. That is the rule working, not a
+# failure. It is the honest single-node view of a pattern whose payoff (a node
+# failure can't take out every replica) needs more than one node to show.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: shipping-ha-placeholder
+  namespace: patterns
+  labels:
+    app.kubernetes.io/name: shipping-ha-placeholder
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: shipping-ha-placeholder
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: shipping-ha-placeholder
+    spec:
+      securityContext:
+        runAsNonRoot: true
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchLabels:
+                  app.kubernetes.io/name: shipping-ha-placeholder
+              topologyKey: kubernetes.io/hostname
+      containers:
+        - name: placeholder
+          image: registry.access.redhat.com/ubi9/ubi-minimal:latest
+          command: ["sleep", "infinity"]
+          resources:
+            requests:
+              cpu: 10m
+              memory: 32Mi
+            limits:
+              memory: 64Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsNonRoot: true
+            capabilities:
+              drop: ["ALL"]
+            seccompProfile:
+              type: RuntimeDefault

@@ -1,0 +1,17 @@
+# The second hard requirement: a PersistentVolumeClaim that 04-deployment.yaml
+# mounts. No storageClassName is set, so it uses CRC's default class,
+# crc-csi-hostpath-provisioner. That class binds WaitForFirstConsumer, so the
+# claim stays Pending until a Pod that mounts it is scheduled, then binds. If
+# the Deployment references this claim before it exists, the Pod stays Pending
+# with a "persistentvolumeclaim not found" event.
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: shipping-data
+  namespace: patterns
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 64Mi
