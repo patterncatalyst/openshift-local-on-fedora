@@ -91,10 +91,30 @@ Every other service stays `ClusterIP`-only, reachable in the cluster but with no
 which is the least-exposure habit from the Routes chapter: a Route is a public door, so
 give one only to what needs it.
 
-**The integrated registry.** The images are built inside the cluster and pushed to
-OpenShift's integrated registry, addressed by its in-cluster Service DNS, with no external
-account. This is the registry the starting-the-cluster chapter noted was part of what came
-up; the final project is where it does real work, holding the nine images the mesh runs.
+**The integrated registry, fed by podman.** The seven service images are built on your host
+with **podman**, from multi-stage Containerfiles (a UBI 10 builder stage that resolves the
+Python dependencies into a virtualenv, then a slim non-root runtime stage that copies only
+that venv and the app), and pushed to OpenShift's **integrated registry** over its exposed
+route. The chart then pulls them back by the registry's in-cluster Service DNS, with no
+external registry account. This is the CRC build path, and it differs from the minikube one
+by design: minikube does a local `docker build` and `minikube image load`, while on CRC you
+`podman build`, `podman login` to the integrated registry, and `podman push`. The multi-stage
+split is what keeps the runtime image small and non-root, which is also what lets it run
+cleanly under `restricted-v2`. This is the registry the starting-the-cluster chapter noted was
+part of what came up; the final project is where it does real work, holding the nine images
+the mesh runs.
+
+Podman is not the only tool for this step; the rest of the Red Hat container toolchain does the
+same job and some of it fits even better. **Buildah** builds OCI images from a Containerfile,
+and `podman build` in fact delegates to it, so `buildah bud` is a direct substitute when you
+want the builder on its own, for example in a CI job with no need for podman's run-time half.
+**Skopeo** copies images between registries without pulling them into local storage, which is a
+cleaner way to mirror the Postgres and Kafka images into the integrated registry than the
+pull-tag-push this chapter uses: `skopeo copy docker://docker.io/library/postgres:18.6-alpine
+docker://$REG/datamesh/postgres:18.6-alpine` moves the image registry to registry in one step.
+All three are daemonless and rootless, which is why they suit a local workflow and a locked-down
+CI runner equally; podman is the one this chapter leads with because it covers build, login, and
+push in a single familiar tool.
 
 **Helm, from the Helm chapter.** The chart carries one data-driven `app-deployment.yaml`
 template and describes the seven workloads as entries in `values.yaml`, each with its port,
@@ -128,15 +148,22 @@ The reference architecture's appendix has the full sequence; the shape of it is 
 through-line of this whole guide:
 
 ```bash
-# size and start CRC (platform target for the full tier)
-crc config set memory 32768; crc config set cpus 14; crc config set disk-size 100
+# size and start CRC
+crc config set memory 32768; crc config set cpus 12; crc config set disk-size 100
 crc setup && crc start --pull-secret-file ~/pull-secret.txt
 eval "$(crc oc-env)"
-# build and push the service images to the integrated registry, then:
-helm install datamesh openshift/helm/datamesh -n datamesh --create-namespace
+# expose the integrated registry and log podman in to it
+oc patch configs.imageregistry.operator.openshift.io/cluster \
+  --type merge -p '{"spec":{"defaultRoute":true}}'
+REG=$(oc get route default-route -n openshift-image-registry -o jsonpath='{.spec.host}')
+podman login -u "$(oc whoami)" -p "$(oc whoami -t)" --tls-verify=false "$REG"
+oc new-project datamesh
+# build the 7 images with podman (multi-stage Containerfiles) and push to the registry,
+# mirroring Postgres and Kafka into it too
+./openshift/build-and-push.sh -r "$REG" -n datamesh --mirror-infra
+# deploy the live core
+helm upgrade --install datamesh openshift/helm/datamesh --namespace datamesh
 oc get route graphql-gateway -n datamesh      # the gateway's edge-TLS hostname
-# optional: bring up the platform tier (mesh, autoscaling, observability)
-./openshift/platform/install-platform.sh
 ```
 
 A detail the reference appendix calls out and worth carrying here: on first start the app
