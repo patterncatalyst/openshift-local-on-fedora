@@ -229,6 +229,37 @@ def init_container():
     )
 
 
+def sidecar():
+    g.emit(
+        "appendix-07-sidecar", 900, 300,
+        bands=[{"x": 20, "y": 56, "w": 860, "h": 200,
+                "label": "one Pod, shared network namespace (localhost)",
+                "fill": "#fafafa"}],
+        nodes=[
+            {"x": 90, "y": 96, "w": 720, "h": 46, "style": "accent",
+             "lines": ["probe-tailer  —  restartPolicy: Always (native sidecar)"]},
+            {"x": 210, "y": 168, "w": 480, "h": 46, "style": "box",
+             "lines": ["shipping-service (main container)"]},
+        ],
+        edges=[
+            {"x1": 70, "y1": 236, "x2": 830, "y2": 236, "label": "time"},
+        ],
+        notes=[
+            {"x": 450, "y": 38,
+             "text": "Sidecar: the native sidecar brackets the app's lifetime",
+             "anchor": "middle", "bold": True},
+            {"x": 95, "y": 90, "text": "sidecar starts", "anchor": "start",
+             "size": 10, "color": "#b8650a"},
+            {"x": 215, "y": 162, "text": "app starts", "anchor": "start",
+             "size": 10, "color": "#888"},
+            {"x": 688, "y": 162, "text": "app stops (SIGTERM)", "anchor": "end",
+             "size": 10, "color": "#888"},
+            {"x": 808, "y": 90, "text": "sidecar stops last", "anchor": "end",
+             "size": 10, "color": "#b8650a"},
+        ],
+    )
+
+
 def main():
     predictable_demands()
     declarative_deployment()
@@ -236,6 +267,7 @@ def main():
     managed_lifecycle()
     automated_placement()
     init_container()
+    sidecar()
 
 
 if __name__ == "__main__":

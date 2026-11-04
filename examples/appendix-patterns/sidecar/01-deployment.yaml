@@ -1,0 +1,113 @@
+# shipping-service with probe-tailer as a native sidecar, under restricted-v2.
+# The sidecar is an initContainers entry with restartPolicy: Always: it starts
+# before the main container, runs for the Pod's whole life, and stops only
+# after the main container has stopped. It polls the app over 127.0.0.1 (the
+# two containers share one network namespace) and appends to a shared emptyDir.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: shipping-service
+  namespace: patterns
+  labels:
+    app.kubernetes.io/name: shipping-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: shipping-service
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: shipping-service
+    spec:
+      securityContext:
+        runAsNonRoot: true
+      initContainers:
+        - name: probe-tailer
+          restartPolicy: Always            # native sidecar
+          image: registry.access.redhat.com/ubi10/python-314-minimal:latest
+          command: ["python3", "-c"]
+          args:
+            - |
+              import datetime, time, urllib.request
+              LOG_PATH = "/var/log/shipping-service/probe-tail.log"
+              def probe(path):
+                  try:
+                      with urllib.request.urlopen(f"http://127.0.0.1:8080{path}", timeout=2) as resp:
+                          return resp.status
+                  except Exception as exc:
+                      return f"error:{exc.__class__.__name__}"
+              while True:
+                  ts = datetime.datetime.now(datetime.timezone.utc).isoformat()
+                  with open(LOG_PATH, "a") as f:
+                      f.write(f"{ts} health={probe('/health')} ready={probe('/healthz')}\n")
+                  time.sleep(5)
+          volumeMounts:
+            - name: probe-log
+              mountPath: /var/log/shipping-service
+          resources:
+            requests: { cpu: 20m, memory: 32Mi }
+            limits: { memory: 64Mi }
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsNonRoot: true
+            capabilities: { drop: ["ALL"] }
+            seccompProfile: { type: RuntimeDefault }
+      containers:
+        - name: shipping-service
+          image: image-registry.openshift-image-registry.svc:5000/patterns/shipping-service:v1
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 8080
+          env:
+            - name: SERVICE_SCHEMA
+              value: shipping
+            - name: PG_HOST
+              value: patterns-postgres.patterns.svc.cluster.local
+            - name: PG_PORT
+              value: "5432"
+            - name: PG_USER
+              valueFrom:
+                secretKeyRef: { name: patterns-postgres-app, key: username }
+            - name: PG_PASSWORD
+              valueFrom:
+                secretKeyRef: { name: patterns-postgres-app, key: password }
+            - name: PG_DATABASE
+              valueFrom:
+                secretKeyRef: { name: patterns-postgres-app, key: dbname }
+          resources:
+            requests: { cpu: 100m, memory: 192Mi }
+            limits: { memory: 512Mi }
+          startupProbe:
+            httpGet: { path: /health, port: http }
+            failureThreshold: 30
+            periodSeconds: 2
+          livenessProbe:
+            httpGet: { path: /health, port: http }
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          readinessProbe:
+            httpGet: { path: /healthz, port: http }
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsNonRoot: true
+            capabilities: { drop: ["ALL"] }
+            seccompProfile: { type: RuntimeDefault }
+      volumes:
+        - name: probe-log
+          emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: shipping-service
+  namespace: patterns
+spec:
+  selector:
+    app.kubernetes.io/name: shipping-service
+  ports:
+    - port: 80
+      targetPort: 8080
