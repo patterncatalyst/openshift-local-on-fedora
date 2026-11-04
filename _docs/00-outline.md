@@ -66,6 +66,7 @@ further on your own cluster:
 | 14 | FAQ | Common questions and fixes for OpenShift Local |
 | 15 | Where to go next | Paths onward: certifications, a remote cluster, and the sibling guides |
 | 16 | Examples | Index of the runnable examples and their verification status |
+| 17 | Final project | A seven-service data mesh converging the whole guide on one CRC cluster |
 
 ## What you need
 
