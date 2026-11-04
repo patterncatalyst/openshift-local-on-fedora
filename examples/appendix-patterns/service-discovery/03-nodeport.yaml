@@ -1,0 +1,16 @@
+# NodePort: everything ClusterIP does, plus the same port on every node's IP.
+# Rarely the right external path on OpenShift (a Route is), shown for contrast.
+apiVersion: v1
+kind: Service
+metadata:
+  name: shipping-nodeport
+  namespace: patterns
+spec:
+  type: NodePort
+  selector:
+    app.kubernetes.io/name: shipping-service
+  ports:
+    - name: http
+      port: 80
+      targetPort: 8080
+      nodePort: 30180

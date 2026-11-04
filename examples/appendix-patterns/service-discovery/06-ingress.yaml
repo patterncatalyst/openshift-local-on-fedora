@@ -1,0 +1,20 @@
+# Ingress works on OpenShift: the same ingress router that serves Routes
+# implements it, and OpenShift auto-creates a Route for each Ingress rule.
+# Shown to make the point that Ingress and Route share one dataplane here.
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: shipping-ingress
+  namespace: patterns
+spec:
+  rules:
+    - host: shipping-ingress.apps-crc.testing
+      http:
+        paths:
+          - path: /health
+            pathType: Prefix
+            backend:
+              service:
+                name: shipping-service
+                port:
+                  number: 80

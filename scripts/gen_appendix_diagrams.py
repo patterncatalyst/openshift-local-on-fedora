@@ -324,6 +324,39 @@ def ambassador():
     )
 
 
+def service_discovery():
+    g.emit(
+        "appendix-16-service-discovery", 920, 320,
+        bands=[{"x": 20, "y": 50, "w": 880, "h": 240,
+                "label": "reach a name, never a Pod IP", "fill": "#fafafa"}],
+        nodes=[
+            {"x": 40, "y": 76, "w": 190, "h": 44, "style": "box",
+             "lines": ["ClusterIP (CoreDNS)"]},
+            {"x": 40, "y": 146, "w": 190, "h": 44, "style": "box",
+             "lines": ["Route (edge TLS)"]},
+            {"x": 40, "y": 216, "w": 190, "h": 56, "style": "ghost",
+             "lines": ["NodePort / LoadBalancer", "(LB <pending> on CRC)"]},
+            {"x": 370, "y": 140, "w": 190, "h": 80, "style": "accent",
+             "lines": ["shipping-service Pods", "EndpointSlice: 2 ready"]},
+            {"x": 690, "y": 108, "w": 190, "h": 44, "style": "box",
+             "lines": ["Ingress"]},
+            {"x": 690, "y": 184, "w": 190, "h": 44, "style": "ghost",
+             "lines": ["auto-created Route"]},
+        ],
+        edges=[
+            {"x1": 230, "y1": 98, "x2": 370, "y2": 160, "label": "internal"},
+            {"x1": 230, "y1": 168, "x2": 370, "y2": 180, "label": "external host"},
+            {"x1": 230, "y1": 244, "x2": 370, "y2": 200, "dashed": True},
+            {"x1": 690, "y1": 130, "x2": 690, "y2": 184,
+             "label": "becomes", "amber": True},
+            {"x1": 690, "y1": 206, "x2": 560, "y2": 190},
+        ],
+        notes=[{"x": 460, "y": 34,
+                "text": "Service Discovery: ClusterIP + CoreDNS inside, Route outside, Ingress becomes a Route",
+                "anchor": "middle", "bold": True}],
+    )
+
+
 def stateful_service():
     g.emit(
         "appendix-15-stateful-service", 900, 340,
@@ -534,6 +567,7 @@ def main():
     singleton_service()
     stateless_service()
     stateful_service()
+    service_discovery()
 
 
 if __name__ == "__main__":
