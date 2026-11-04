@@ -1,0 +1,6 @@
+replicaCount: 1
+image: image-registry.openshift-image-registry.svc:5000/patterns/shipping-service:v1
+serviceSchema: shipping
+resources:
+  requests: { cpu: 100m, memory: 192Mi }
+  limits: { memory: 512Mi }

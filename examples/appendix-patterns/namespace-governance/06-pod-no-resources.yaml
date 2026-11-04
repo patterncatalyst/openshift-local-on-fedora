@@ -1,0 +1,20 @@
+# A bare pod with no resources block at all. The LimitRange stamps in its
+# default requests and limits at admission, before the object is stored.
+apiVersion: v1
+kind: Pod
+metadata:
+  name: inventory-defaults-check
+  namespace: patterns
+  labels:
+    app.kubernetes.io/name: inventory-defaults-check
+spec:
+  securityContext:
+    runAsNonRoot: true
+    seccompProfile: { type: RuntimeDefault }
+  containers:
+    - name: demo
+      image: registry.access.redhat.com/ubi9/ubi-minimal:latest
+      command: ["sleep", "3600"]
+      securityContext:
+        allowPrivilegeEscalation: false
+        capabilities: { drop: ["ALL"] }

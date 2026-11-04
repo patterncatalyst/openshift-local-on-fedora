@@ -1,0 +1,13 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: shipping-kustomize
+spec:
+  replicas: 2
+  template:
+    spec:
+      containers:
+        - name: shipping-service
+          resources:
+            requests: { cpu: 200m, memory: 256Mi }
+            limits: { memory: 768Mi }

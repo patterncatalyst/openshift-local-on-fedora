@@ -1,0 +1,16 @@
+# Caps the namespace's aggregate consumption. pods is set tight (3: the
+# disposable Postgres plus two shipping-service replicas) so the worked failure
+# is the pod count. Declaring limits.cpu means every container must end up with
+# a CPU limit, which the LimitRange below supplies for containers that omit one.
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: patterns-quota
+  namespace: patterns
+spec:
+  hard:
+    pods: "3"
+    requests.cpu: "1"
+    requests.memory: "1Gi"
+    limits.cpu: "2"
+    limits.memory: "2Gi"
