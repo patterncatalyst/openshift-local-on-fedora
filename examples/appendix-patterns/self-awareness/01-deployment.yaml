@@ -1,0 +1,121 @@
+# shipping-service with the Self Awareness pattern: Downward API fields as
+# environment variables, plus a downwardAPI volume mounting the Pod's own
+# labels, annotations, and CPU limit as files. restricted-v2 clean.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: shipping-service
+  namespace: patterns
+  labels:
+    app.kubernetes.io/name: shipping-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: shipping-service
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: shipping-service
+        app.kubernetes.io/part-of: fulfillment
+      annotations:
+        patterns.example.com/owner: fulfillment-team
+    spec:
+      securityContext:
+        runAsNonRoot: true
+      containers:
+        - name: shipping-service
+          image: image-registry.openshift-image-registry.svc:5000/patterns/shipping-service:v1
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 8080
+          env:
+            - name: SERVICE_SCHEMA
+              value: shipping
+            - name: PG_HOST
+              value: patterns-postgres.patterns.svc.cluster.local
+            - name: PG_USER
+              valueFrom:
+                secretKeyRef: { name: patterns-postgres-app, key: username }
+            - name: PG_PASSWORD
+              valueFrom:
+                secretKeyRef: { name: patterns-postgres-app, key: password }
+            - name: PG_DATABASE
+              valueFrom:
+                secretKeyRef: { name: patterns-postgres-app, key: dbname }
+            # Downward API: this Pod's own fields as env vars, resolved once at start.
+            - name: POD_NAME
+              valueFrom:
+                fieldRef: { fieldPath: metadata.name }
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef: { fieldPath: metadata.namespace }
+            - name: POD_IP
+              valueFrom:
+                fieldRef: { fieldPath: status.podIP }
+            - name: NODE_NAME
+              valueFrom:
+                fieldRef: { fieldPath: spec.nodeName }
+            # resourceFieldRef reads this container's own declared resources back out.
+            - name: CPU_REQUEST
+              valueFrom:
+                resourceFieldRef:
+                  containerName: shipping-service
+                  resource: requests.cpu
+            - name: MEMORY_LIMIT
+              valueFrom:
+                resourceFieldRef:
+                  containerName: shipping-service
+                  resource: limits.memory
+          resources:
+            requests:
+              cpu: 100m
+              memory: 192Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          startupProbe:
+            httpGet: { path: /health, port: http }
+            failureThreshold: 30
+            periodSeconds: 2
+          readinessProbe:
+            httpGet: { path: /healthz, port: http }
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          volumeMounts:
+            - name: podinfo
+              mountPath: /etc/podinfo
+              readOnly: true
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsNonRoot: true
+            capabilities: { drop: ["ALL"] }
+            seccompProfile: { type: RuntimeDefault }
+      volumes:
+        # downwardAPI volume: labels/annotations change without a restart, so
+        # they're files the kubelet updates in place, not env vars fixed at start.
+        - name: podinfo
+          downwardAPI:
+            items:
+              - path: labels
+                fieldRef: { fieldPath: metadata.labels }
+              - path: annotations
+                fieldRef: { fieldPath: metadata.annotations }
+              - path: cpu_limit
+                resourceFieldRef:
+                  containerName: shipping-service
+                  resource: limits.cpu
+                  divisor: 1m
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: shipping-service
+  namespace: patterns
+spec:
+  selector:
+    app.kubernetes.io/name: shipping-service
+  ports:
+    - port: 80
+      targetPort: 8080

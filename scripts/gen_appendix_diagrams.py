@@ -324,6 +324,36 @@ def ambassador():
     )
 
 
+def self_awareness():
+    g.emit(
+        "appendix-17-self-awareness", 900, 320,
+        bands=[{"x": 20, "y": 52, "w": 860, "h": 236,
+                "label": "the Pod describes itself to its container",
+                "fill": "#fafafa"}],
+        nodes=[
+            {"x": 50, "y": 108, "w": 180, "h": 110, "style": "box",
+             "lines": ["Pod object", "metadata / spec", "status / resources"]},
+            {"x": 380, "y": 82, "w": 230, "h": 56, "style": "ink",
+             "lines": ["env vars (fieldRef /", "resourceFieldRef), once at start"]},
+            {"x": 380, "y": 190, "w": 230, "h": 66, "style": "ink",
+             "lines": ["/etc/podinfo volume", "labels/annotations/cpu",
+                       "updates in place"]},
+            {"x": 690, "y": 118, "w": 170, "h": 90, "style": "accent",
+             "lines": ["container", "shipping-service"]},
+        ],
+        edges=[
+            {"x1": 230, "y1": 130, "x2": 380, "y2": 110, "label": "once at start"},
+            {"x1": 230, "y1": 190, "x2": 380, "y2": 220,
+             "label": "kept current", "amber": True},
+            {"x1": 610, "y1": 110, "x2": 690, "y2": 150},
+            {"x1": 610, "y1": 223, "x2": 690, "y2": 175},
+        ],
+        notes=[{"x": 450, "y": 36,
+                "text": "Self Awareness: the Downward API, as env vars and an updating volume",
+                "anchor": "middle", "bold": True}],
+    )
+
+
 def service_discovery():
     g.emit(
         "appendix-16-service-discovery", 920, 320,
@@ -568,6 +598,7 @@ def main():
     stateless_service()
     stateful_service()
     service_discovery()
+    self_awareness()
 
 
 if __name__ == "__main__":
