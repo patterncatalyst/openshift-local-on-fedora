@@ -1,0 +1,15 @@
+# LoadBalancer: on a cloud this provisions an external load balancer. CRC has
+# no cloud provider, so EXTERNAL-IP stays <pending> indefinitely. On OpenShift
+# the external answer is a Route (05), not a LoadBalancer.
+apiVersion: v1
+kind: Service
+metadata:
+  name: shipping-lb
+  namespace: patterns
+spec:
+  type: LoadBalancer
+  selector:
+    app.kubernetes.io/name: shipping-service
+  ports:
+    - port: 80
+      targetPort: 8080

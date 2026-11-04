@@ -1,0 +1,35 @@
+# Credentials + the nonroot-v2 grant the StatefulSet's Postgres instances need.
+# postgres:17-alpine owns its data as UID 70, which restricted-v2 forbids, so
+# these run under a ServiceAccount bound to the nonroot-v2 SCC, the same scoped
+# exception the other Postgres instances in this appendix use.
+apiVersion: v1
+kind: Secret
+metadata:
+  name: shipment-archive-app
+  namespace: patterns
+type: Opaque
+stringData:
+  username: archive_app
+  password: changeme
+  dbname: archive
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: shipment-archive-infra
+  namespace: patterns
+---
+# CLI equivalent: oc adm policy add-scc-to-user nonroot-v2 -z shipment-archive-infra
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: shipment-archive-nonroot-v2
+  namespace: patterns
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: system:openshift:scc:nonroot-v2
+subjects:
+  - kind: ServiceAccount
+    name: shipment-archive-infra
+    namespace: patterns

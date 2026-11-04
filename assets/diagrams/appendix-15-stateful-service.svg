@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 340" font-family="'Red Hat Text', system-ui, sans-serif" role="img">
+<defs><marker id="a" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#555"/></marker><marker id="am" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#b8650a"/></marker></defs>
+<rect x="20" y="48" width="860" height="272" rx="12" fill="#fafafa" stroke="#ddd"/>
+<text x="32" y="68" font-size="12" font-weight="700" fill="#888">StatefulSet shipment-archive (nonroot-v2)</text>
+<rect x="40" y="120" width="170" height="90" rx="9" fill="#fff8ef" stroke="#e8870c" stroke-width="2"/>
+<text x="125.0" y="155.5" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">headless Service</text>
+<text x="125.0" y="172.5" font-size="11.5" fill="#555555" text-anchor="middle">clusterIP: None</text>
+<text x="125.0" y="187.5" font-size="11.5" fill="#555555" text-anchor="middle">per-Pod DNS</text>
+<rect x="310" y="80" width="200" height="40" rx="9" fill="#ffffff" stroke="#111111" stroke-width="2"/>
+<text x="410.0" y="105.5" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">shipment-archive-0</text>
+<rect x="310" y="142" width="200" height="40" rx="9" fill="#ffffff" stroke="#111111" stroke-width="2"/>
+<text x="410.0" y="167.5" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">shipment-archive-1</text>
+<rect x="310" y="204" width="200" height="40" rx="9" fill="#ffffff" stroke="#111111" stroke-width="2"/>
+<text x="410.0" y="229.5" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">shipment-archive-2</text>
+<rect x="610" y="80" width="240" height="40" rx="9" fill="#f1f5f9" stroke="#64748b" stroke-width="2"/>
+<text x="730.0" y="105.5" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">archive-data-...-0 (PVC)</text>
+<rect x="610" y="142" width="240" height="40" rx="9" fill="#f1f5f9" stroke="#64748b" stroke-width="2"/>
+<text x="730.0" y="167.5" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">archive-data-...-1 (PVC)</text>
+<rect x="610" y="204" width="240" height="40" rx="9" fill="#f1f5f9" stroke="#64748b" stroke-width="2"/>
+<text x="730.0" y="229.5" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">archive-data-...-2 (PVC)</text>
+<path d="M210,150 L310,100" fill="none" stroke="#555" stroke-width="2" marker-end="url(#a)"/>
+<path d="M210,162 L310,162" fill="none" stroke="#555" stroke-width="2" marker-end="url(#a)"/>
+<text x="266.0" y="156.0" font-size="11" fill="#ffffff" stroke="#ffffff" stroke-width="3" paint-order="stroke" text-anchor="middle">DNS per ordinal</text>
+<text x="266.0" y="156.0" font-size="11" fill="#555" text-anchor="middle">DNS per ordinal</text>
+<path d="M210,174 L310,224" fill="none" stroke="#555" stroke-width="2" marker-end="url(#a)"/>
+<path d="M510,100 L610,100" fill="none" stroke="#555" stroke-width="2" marker-end="url(#a)"/>
+<text x="566.0" y="94.0" font-size="11" fill="#ffffff" stroke="#ffffff" stroke-width="3" paint-order="stroke" text-anchor="middle">sticky</text>
+<text x="566.0" y="94.0" font-size="11" fill="#555" text-anchor="middle">sticky</text>
+<path d="M510,162 L610,162" fill="none" stroke="#555" stroke-width="2" marker-end="url(#a)"/>
+<path d="M510,224 L610,224" fill="none" stroke="#555" stroke-width="2" marker-end="url(#a)"/>
+<text x="450" y="32" font-size="11" fill="#888" text-anchor="middle" font-weight="700">Stateful Service: ordinal identity + its own PVC, reattached on restart</text>
+</svg>

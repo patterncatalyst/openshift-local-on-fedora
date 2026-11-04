@@ -1,0 +1,16 @@
+# ClusterIP: a stable virtual IP reachable only inside the cluster, the default
+# and the right type for service-to-service traffic. CoreDNS gives it an A
+# record at shipping-service.patterns.svc.cluster.local.
+apiVersion: v1
+kind: Service
+metadata:
+  name: shipping-service
+  namespace: patterns
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: shipping-service
+  ports:
+    - name: http
+      port: 80
+      targetPort: 8080

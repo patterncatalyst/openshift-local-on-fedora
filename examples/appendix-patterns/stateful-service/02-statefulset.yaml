@@ -1,0 +1,69 @@
+# Three independent, non-replicating postgres:17-alpine instances standing in
+# for a per-zone shipment archive, just something stateful to practice the
+# StatefulSet pattern against. Each Pod gets its own PersistentVolumeClaim via
+# volumeClaimTemplates, bound before that Pod starts and never shared. Runs
+# under the nonroot-v2 SCC (UID 70, fsGroup 70 for volume writes).
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: shipment-archive
+  namespace: patterns
+  labels:
+    app.kubernetes.io/name: shipment-archive
+spec:
+  serviceName: shipment-archive
+  replicas: 3
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: shipment-archive
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: shipment-archive
+    spec:
+      serviceAccountName: shipment-archive-infra
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 70
+        fsGroup: 70
+      containers:
+        - name: postgres
+          image: docker.io/library/postgres:17-alpine
+          ports:
+            - name: postgres
+              containerPort: 5432
+          env:
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef: { name: shipment-archive-app, key: username }
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef: { name: shipment-archive-app, key: password }
+            - name: POSTGRES_DB
+              valueFrom:
+                secretKeyRef: { name: shipment-archive-app, key: dbname }
+            - name: PGDATA
+              value: /var/lib/postgresql/data/pgdata
+          readinessProbe:
+            exec:
+              command: ["pg_isready", "-U", "archive_app"]
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          volumeMounts:
+            - name: archive-data
+              mountPath: /var/lib/postgresql/data
+          resources:
+            requests: { cpu: 100m, memory: 128Mi }
+            limits: { memory: 256Mi }
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities: { drop: ["ALL"] }
+            seccompProfile: { type: RuntimeDefault }
+  volumeClaimTemplates:
+    - metadata:
+        name: archive-data
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 128Mi

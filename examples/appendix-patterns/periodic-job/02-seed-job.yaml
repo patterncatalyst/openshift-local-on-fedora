@@ -1,0 +1,45 @@
+# A single-completion Job that seeds the demo shipment_events table. `seed` is
+# idempotent (a no-op once the table has rows), so re-running after a Pod
+# failure never duplicates data. restricted-v2 clean.
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: shipping-report-seed
+  namespace: patterns
+spec:
+  completions: 1
+  backoffLimit: 3
+  ttlSecondsAfterFinished: 300
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: shipping-report-seed
+    spec:
+      restartPolicy: OnFailure
+      securityContext:
+        runAsNonRoot: true
+      containers:
+        - name: shipping-report
+          image: image-registry.openshift-image-registry.svc:5000/patterns/shipping-report:v1
+          imagePullPolicy: IfNotPresent
+          args: ["seed"]
+          env:
+            - name: PG_HOST
+              value: patterns-postgres.patterns.svc.cluster.local
+            - name: PG_USER
+              valueFrom:
+                secretKeyRef: { name: patterns-postgres-app, key: username }
+            - name: PG_PASSWORD
+              valueFrom:
+                secretKeyRef: { name: patterns-postgres-app, key: password }
+            - name: PG_DATABASE
+              valueFrom:
+                secretKeyRef: { name: patterns-postgres-app, key: dbname }
+          resources:
+            requests: { cpu: 50m, memory: 96Mi }
+            limits: { memory: 192Mi }
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsNonRoot: true
+            capabilities: { drop: ["ALL"] }
+            seccompProfile: { type: RuntimeDefault }

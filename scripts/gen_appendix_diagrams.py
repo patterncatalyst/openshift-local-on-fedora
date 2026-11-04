@@ -324,6 +324,263 @@ def ambassador():
     )
 
 
+def self_awareness():
+    g.emit(
+        "appendix-17-self-awareness", 900, 320,
+        bands=[{"x": 20, "y": 52, "w": 860, "h": 236,
+                "label": "the Pod describes itself to its container",
+                "fill": "#fafafa"}],
+        nodes=[
+            {"x": 50, "y": 108, "w": 180, "h": 110, "style": "box",
+             "lines": ["Pod object", "metadata / spec", "status / resources"]},
+            {"x": 380, "y": 82, "w": 230, "h": 56, "style": "ink",
+             "lines": ["env vars (fieldRef /", "resourceFieldRef), once at start"]},
+            {"x": 380, "y": 190, "w": 230, "h": 66, "style": "ink",
+             "lines": ["/etc/podinfo volume", "labels/annotations/cpu",
+                       "updates in place"]},
+            {"x": 690, "y": 118, "w": 170, "h": 90, "style": "accent",
+             "lines": ["container", "shipping-service"]},
+        ],
+        edges=[
+            {"x1": 230, "y1": 130, "x2": 380, "y2": 110, "label": "once at start"},
+            {"x1": 230, "y1": 190, "x2": 380, "y2": 220,
+             "label": "kept current", "amber": True},
+            {"x1": 610, "y1": 110, "x2": 690, "y2": 150},
+            {"x1": 610, "y1": 223, "x2": 690, "y2": 175},
+        ],
+        notes=[{"x": 450, "y": 36,
+                "text": "Self Awareness: the Downward API, as env vars and an updating volume",
+                "anchor": "middle", "bold": True}],
+    )
+
+
+def service_discovery():
+    g.emit(
+        "appendix-16-service-discovery", 920, 320,
+        bands=[{"x": 20, "y": 50, "w": 880, "h": 240,
+                "label": "reach a name, never a Pod IP", "fill": "#fafafa"}],
+        nodes=[
+            {"x": 40, "y": 76, "w": 190, "h": 44, "style": "box",
+             "lines": ["ClusterIP (CoreDNS)"]},
+            {"x": 40, "y": 146, "w": 190, "h": 44, "style": "box",
+             "lines": ["Route (edge TLS)"]},
+            {"x": 40, "y": 216, "w": 190, "h": 56, "style": "ghost",
+             "lines": ["NodePort / LoadBalancer", "(LB <pending> on CRC)"]},
+            {"x": 370, "y": 140, "w": 190, "h": 80, "style": "accent",
+             "lines": ["shipping-service Pods", "EndpointSlice: 2 ready"]},
+            {"x": 690, "y": 108, "w": 190, "h": 44, "style": "box",
+             "lines": ["Ingress"]},
+            {"x": 690, "y": 184, "w": 190, "h": 44, "style": "ghost",
+             "lines": ["auto-created Route"]},
+        ],
+        edges=[
+            {"x1": 230, "y1": 98, "x2": 370, "y2": 160, "label": "internal"},
+            {"x1": 230, "y1": 168, "x2": 370, "y2": 180, "label": "external host"},
+            {"x1": 230, "y1": 244, "x2": 370, "y2": 200, "dashed": True},
+            {"x1": 690, "y1": 130, "x2": 690, "y2": 184,
+             "label": "becomes", "amber": True},
+            {"x1": 690, "y1": 206, "x2": 560, "y2": 190},
+        ],
+        notes=[{"x": 460, "y": 34,
+                "text": "Service Discovery: ClusterIP + CoreDNS inside, Route outside, Ingress becomes a Route",
+                "anchor": "middle", "bold": True}],
+    )
+
+
+def stateful_service():
+    g.emit(
+        "appendix-15-stateful-service", 900, 340,
+        bands=[{"x": 20, "y": 48, "w": 860, "h": 272,
+                "label": "StatefulSet shipment-archive (nonroot-v2)",
+                "fill": "#fafafa"}],
+        nodes=[
+            {"x": 40, "y": 120, "w": 170, "h": 90, "style": "accent",
+             "lines": ["headless Service", "clusterIP: None", "per-Pod DNS"]},
+            {"x": 310, "y": 80, "w": 200, "h": 40, "style": "box",
+             "lines": ["shipment-archive-0"]},
+            {"x": 310, "y": 142, "w": 200, "h": 40, "style": "box",
+             "lines": ["shipment-archive-1"]},
+            {"x": 310, "y": 204, "w": 200, "h": 40, "style": "box",
+             "lines": ["shipment-archive-2"]},
+            {"x": 610, "y": 80, "w": 240, "h": 40, "style": "ink",
+             "lines": ["archive-data-...-0 (PVC)"]},
+            {"x": 610, "y": 142, "w": 240, "h": 40, "style": "ink",
+             "lines": ["archive-data-...-1 (PVC)"]},
+            {"x": 610, "y": 204, "w": 240, "h": 40, "style": "ink",
+             "lines": ["archive-data-...-2 (PVC)"]},
+        ],
+        edges=[
+            {"x1": 210, "y1": 150, "x2": 310, "y2": 100},
+            {"x1": 210, "y1": 162, "x2": 310, "y2": 162, "label": "DNS per ordinal"},
+            {"x1": 210, "y1": 174, "x2": 310, "y2": 224},
+            {"x1": 510, "y1": 100, "x2": 610, "y2": 100, "label": "sticky"},
+            {"x1": 510, "y1": 162, "x2": 610, "y2": 162},
+            {"x1": 510, "y1": 224, "x2": 610, "y2": 224},
+        ],
+        notes=[{"x": 450, "y": 32,
+                "text": "Stateful Service: ordinal identity + its own PVC, reattached on restart",
+                "anchor": "middle", "bold": True}],
+    )
+
+
+def stateless_service():
+    g.emit(
+        "appendix-14-stateless-service", 900, 320,
+        bands=[{"x": 20, "y": 56, "w": 860, "h": 210,
+                "label": "payment-service (stateless, replicas: 3)",
+                "fill": "#fafafa"}],
+        nodes=[
+            {"x": 50, "y": 112, "w": 160, "h": 80, "style": "accent",
+             "lines": ["Service", "any Pod,", "any request"]},
+            {"x": 340, "y": 80, "w": 190, "h": 40, "style": "box",
+             "lines": ["Pod kd5jb"]},
+            {"x": 340, "y": 128, "w": 190, "h": 40, "style": "box",
+             "lines": ["Pod l5bgn"]},
+            {"x": 340, "y": 176, "w": 190, "h": 44, "style": "ghost",
+             "lines": ["Pod cb77p -> gggn2"]},
+            {"x": 650, "y": 112, "w": 190, "h": 80, "style": "ink",
+             "lines": ["Postgres", "(all shared state)"]},
+        ],
+        edges=[
+            {"x1": 210, "y1": 140, "x2": 340, "y2": 100},
+            {"x1": 210, "y1": 150, "x2": 340, "y2": 148, "label": "load-balance"},
+            {"x1": 210, "y1": 160, "x2": 340, "y2": 196},
+            {"x1": 530, "y1": 148, "x2": 650, "y2": 150, "label": "state external"},
+        ],
+        notes=[
+            {"x": 450, "y": 40,
+             "text": "Stateless Service: interchangeable Pods, state lives in Postgres",
+             "anchor": "middle", "bold": True},
+            {"x": 435, "y": 234, "text": "deleted -> replaced with a new identity, no coordination",
+             "anchor": "middle", "size": 10, "color": "#888"},
+        ],
+    )
+
+
+def singleton_service():
+    g.emit(
+        "appendix-13-singleton-service", 900, 320,
+        bands=[{"x": 20, "y": 56, "w": 860, "h": 210,
+                "label": "replicas: 1 (singleton)", "fill": "#fafafa"}],
+        nodes=[
+            {"x": 50, "y": 92, "w": 180, "h": 56, "style": "box",
+             "lines": ["Eviction API", "drain / autoscaler"]},
+            {"x": 330, "y": 86, "w": 190, "h": 66, "style": "ink",
+             "lines": ["PodDisruptionBudget", "minAvailable 1 / ALLOWED 0"]},
+            {"x": 640, "y": 100, "w": 200, "h": 72, "style": "accent",
+             "lines": ["shipping-service", "the only Pod"]},
+            {"x": 50, "y": 206, "w": 180, "h": 50, "style": "ghost",
+             "lines": ["oc delete pod"]},
+        ],
+        edges=[
+            {"x1": 230, "y1": 120, "x2": 330, "y2": 119, "label": "evict"},
+            {"x1": 520, "y1": 119, "x2": 640, "y2": 130,
+             "label": "429 refused", "amber": True},
+            {"x1": 230, "y1": 228, "x2": 640, "y2": 165,
+             "label": "bypasses PDB (succeeds)", "dashed": True},
+        ],
+        notes=[{"x": 450, "y": 40,
+                "text": "Singleton Service: the PDB stops evictions, not a direct delete",
+                "anchor": "middle", "bold": True}],
+    )
+
+
+def daemon_service():
+    g.emit(
+        "appendix-12-daemon-service", 900, 300,
+        bands=[{"x": 20, "y": 56, "w": 860, "h": 190,
+                "label": "node: crc (one per node; here, one node)",
+                "fill": "#fafafa"}],
+        nodes=[
+            {"x": 50, "y": 112, "w": 180, "h": 80, "style": "accent",
+             "lines": ["DaemonSet", "1 Pod per node", "(no replicas)"]},
+            {"x": 360, "y": 108, "w": 190, "h": 88, "style": "box",
+             "lines": ["node-collector Pod", "UID 0, spc_t",
+                       "privileged SCC"]},
+            {"x": 660, "y": 112, "w": 200, "h": 80, "style": "ink",
+             "lines": ["node /var/log/pods", "root:root, var_log_t"]},
+        ],
+        edges=[
+            {"x1": 230, "y1": 152, "x2": 360, "y2": 152, "label": "places 1/node"},
+            {"x1": 550, "y1": 152, "x2": 660, "y2": 152,
+             "label": "hostPath read", "amber": True},
+        ],
+        notes=[
+            {"x": 450, "y": 40,
+             "text": "Daemon Service: one per node, gated by SCC and SELinux",
+             "anchor": "middle", "bold": True},
+            {"x": 450, "y": 232,
+             "text": "restricted-v2 forbids hostPath; privileged SCC + spc_t permits the read",
+             "anchor": "middle", "size": 10, "color": "#888"},
+        ],
+    )
+
+
+def periodic_job():
+    g.emit(
+        "appendix-11-periodic-job", 880, 320,
+        bands=[{"x": 20, "y": 48, "w": 840, "h": 252,
+                "label": "CronJob: one Job per tick (fires once per cluster)",
+                "fill": "#fafafa"}],
+        nodes=[
+            {"x": 50, "y": 120, "w": 180, "h": 80, "style": "accent",
+             "lines": ["CronJob", "*/5 * * * *", "Forbid"]},
+            {"x": 350, "y": 82, "w": 170, "h": 44, "style": "box",
+             "lines": ["Job (tick 0)"]},
+            {"x": 350, "y": 138, "w": 170, "h": 44, "style": "box",
+             "lines": ["Job (tick 1)"]},
+            {"x": 350, "y": 194, "w": 170, "h": 44, "style": "box",
+             "lines": ["Job (tick 2)"]},
+            {"x": 650, "y": 120, "w": 190, "h": 80, "style": "ink",
+             "lines": ["report-*.csv (PVC)", "history: last 3 kept"]},
+        ],
+        edges=[
+            {"x1": 230, "y1": 150, "x2": 350, "y2": 104},
+            {"x1": 230, "y1": 160, "x2": 350, "y2": 160, "label": "creates on tick"},
+            {"x1": 230, "y1": 170, "x2": 350, "y2": 216},
+            {"x1": 520, "y1": 104, "x2": 650, "y2": 150},
+            {"x1": 520, "y1": 160, "x2": 650, "y2": 160},
+            {"x1": 520, "y1": 216, "x2": 650, "y2": 170},
+        ],
+        notes=[{"x": 440, "y": 32,
+                "text": "Periodic Job: Batch Job with a scheduler in front",
+                "anchor": "middle", "bold": True}],
+    )
+
+
+def batch_job():
+    g.emit(
+        "appendix-10-batch-job", 900, 340,
+        bands=[{"x": 20, "y": 48, "w": 860, "h": 272,
+                "label": "Indexed Job: completions=3, parallelism=3",
+                "fill": "#fafafa"}],
+        nodes=[
+            {"x": 50, "y": 128, "w": 180, "h": 72, "style": "box",
+             "lines": ["shipment_events", "300 rows"]},
+            {"x": 360, "y": 86, "w": 180, "h": 46, "style": "accent",
+             "lines": ["Pod index 0  (id%3==0)"]},
+            {"x": 360, "y": 142, "w": 180, "h": 46, "style": "accent",
+             "lines": ["Pod index 1  (id%3==1)"]},
+            {"x": 360, "y": 198, "w": 180, "h": 46, "style": "accent",
+             "lines": ["Pod index 2  (id%3==2)"]},
+            {"x": 670, "y": 128, "w": 190, "h": 72, "style": "ink",
+             "lines": ["report-0/1/2.csv", "100 rows each (PVC)"]},
+        ],
+        edges=[
+            {"x1": 230, "y1": 150, "x2": 360, "y2": 109},
+            {"x1": 230, "y1": 164, "x2": 360, "y2": 165,
+             "label": "JOB_COMPLETION_INDEX"},
+            {"x1": 230, "y1": 178, "x2": 360, "y2": 221},
+            {"x1": 540, "y1": 109, "x2": 670, "y2": 150},
+            {"x1": 540, "y1": 165, "x2": 670, "y2": 164, "label": "disjoint"},
+            {"x1": 540, "y1": 221, "x2": 670, "y2": 178},
+        ],
+        notes=[{"x": 450, "y": 32,
+                "text": "Batch Job: the index partitions the data, no coordination service",
+                "anchor": "middle", "bold": True}],
+    )
+
+
 def main():
     predictable_demands()
     declarative_deployment()
@@ -334,6 +591,14 @@ def main():
     sidecar()
     adapter()
     ambassador()
+    batch_job()
+    periodic_job()
+    daemon_service()
+    singleton_service()
+    stateless_service()
+    stateful_service()
+    service_discovery()
+    self_awareness()
 
 
 if __name__ == "__main__":

@@ -1,0 +1,15 @@
+# Shared output volume for every Job in this example. No storageClassName, so
+# it uses CRC's default crc-csi-hostpath-provisioner (WaitForFirstConsumer):
+# the claim binds when the first Job Pod mounts it. ReadWriteOnce is fine here
+# because every Pod that mounts it lands on CRC's single node.
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: shipping-reports-data
+  namespace: patterns
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 50Mi

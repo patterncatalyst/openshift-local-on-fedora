@@ -1,0 +1,17 @@
+# Route: the OpenShift-native way to expose a Service to the host, with a stable
+# hostname under apps-crc.testing and TLS terminated at the edge. This is what
+# replaces LoadBalancer/Ingress for external access on OpenShift.
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: shipping-route
+  namespace: patterns
+spec:
+  to:
+    kind: Service
+    name: shipping-service
+  port:
+    targetPort: 8080
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect
