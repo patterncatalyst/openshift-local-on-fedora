@@ -64,8 +64,8 @@ Keeping to `kubectl` for the portable parts is a deliberate choice, not a stylis
 one. Nearly everything you deploy in this guide is standard Kubernetes, and writing it
 as `kubectl` keeps that portable knowledge visible: the same manifests and commands run
 on any conformant cluster. The `oc`-only verbs are exactly the places where OpenShift
-does something plain Kubernetes does not, so a command that has to be `oc` is itself a
-signal that you have crossed into OpenShift-specific territory.
+does something plain Kubernetes doesn't, so a command that has to be `oc` is itself a
+signal that you've crossed into OpenShift-specific territory.
 
 ## Projects are namespaces
 
@@ -81,7 +81,7 @@ oc new-project demo
 ```
 
 `oc project` both switches your current namespace and, with no argument, reports
-which one you are in:
+which one you're in:
 
 ```bash
 oc project demo           # switch to demo
@@ -107,9 +107,9 @@ users create their own projects without cluster-admin, within templates and quot
 administrator sets. Creating one through `oc new-project` also attaches the default
 role bindings, a `limits` range, and, where configured, a resource quota, so a new
 project arrives governed rather than wide open. On a single-user CRC cluster you feel
-little of this, because you are always the admin, but it is the reason the project
+little of this, because you're always the admin, but it's the reason the project
 abstraction exists and the reason `oc new-project` does more than `kubectl create
-namespace`. When you later see a Pod land with a UID it did not ask for, that is the
+namespace`. When you later see a Pod land with a UID it didn't ask for, that's the
 project's wrapper at work, applying the defaults OpenShift attached.
 
 On a real cluster an administrator controls two levers that shape every new project. The
@@ -118,12 +118,12 @@ all, and a *project template* decides what a new project arrives with: its quota
 limit range, and its default network policy. CRC ships the stock defaults, so you inherit
 a sensible starting project without configuring anything, but knowing the levers exist
 explains why two OpenShift clusters can hand you very different projects from the same
-`oc new-project` command. The behavior you see here is the permissive, single-user end of
+`oc new-project` command. The behavior you see here's the permissive, single-user end of
 that range.
 
 ### Namespaces to leave alone
 
-A fresh cluster already has dozens of namespaces, and most are not yours. Anything
+A fresh cluster already has dozens of namespaces, and most aren't yours. Anything
 prefixed `openshift-` or `kube-` belongs to the platform: the control plane, the
 operators, the registry, the router, and monitoring all live there. Treat them as
 read-only. You can look (`oc get pods -n openshift-ingress` is a fine way to learn how
@@ -150,11 +150,11 @@ chapters, where seeing a permission denied is the point.
 
 ### Where the kubeconfig lives
 
-Both contexts live in your kubeconfig, by default `~/.kube/config`. It is a single
+Both contexts live in your kubeconfig, by default `~/.kube/config`. It's a single
 file holding clusters, users, and the contexts that pair them, and the "current
 context" is the one every `oc` and `kubectl` command uses unless you say otherwise. Two
 habits save confusion later. First, `oc config current-context` tells you, at any
-moment, which cluster and user you are about to act as, worth a glance before any
+moment, which cluster and user you're about to act as, worth a glance before any
 destructive command. Second, if you work with more than one cluster, the `KUBECONFIG`
 environment variable can point at a specific file, which keeps CRC's contexts from
 mixing with another cluster's. On this single cluster you can ignore all of that and
@@ -185,7 +185,7 @@ be allowed" from a guess into a command.
 
 ## Security context constraints, briefly
 
-One OpenShift-specific piece of access control shapes how every Pod here runs, so it is
+One OpenShift-specific piece of access control shapes how every Pod here runs, so it's
 worth meeting before the deploying chapter: the *security context constraint* (SCC). An
 SCC is an admission-time policy that decides which UID, group, capabilities, and volume
 types a Pod may use. The default, `restricted-v2`, is strict: it refuses a container
@@ -199,7 +199,7 @@ oc describe scc restricted-v2          # what the default allows and forbids
 
 This is why an image that runs fine on a permissive local cluster can behave
 differently here, and why the next chapter uses an image built to run as an arbitrary
-non-root user. You do not change the SCC to make an image work; you use an image that
+non-root user. You don't change the SCC to make an image work; you use an image that
 respects the constraint. `oc adm policy add-scc-to-user` can grant a more permissive SCC
 when a workload requires one, but reaching for it should be the exception, with a
 stated reason.
@@ -240,11 +240,11 @@ Deployment created, without copying generated Pod names by hand.
 ## Which tool to reach for
 
 In practice the choice is simple. Use `kubectl` (or `oc` by the same name) for anything
-that is plain Kubernetes: Deployments, Services, ConfigMaps, Secrets, scaling, logs,
+that's plain Kubernetes: Deployments, Services, ConfigMaps, Secrets, scaling, logs,
 applying YAML. Reach for an `oc`-only verb when the task is OpenShift-specific: creating
 a Route, building from source, inspecting or granting an SCC, managing projects and their
 access, or any `oc adm` cluster operation. The callouts in this guide mark those
-crossings, so you are never guessing which world you are in. If you want a single tool,
+crossings, so you're never guessing which world you're in. If you want a single tool,
 make it `oc`: it does everything `kubectl` does and the OpenShift extras besides, which
 is why the bundled client the earlier chapter set up is `oc`. The guide writes the
 portable half as `kubectl` only to keep the transferable knowledge visible, not because
@@ -252,17 +252,17 @@ you need two binaries installed.
 
 ## Logging in without handling secrets
 
-`oc login` exists, and on a shared cluster it is how you authenticate: `oc login -u
-<user>` prompts for a password, or `oc login --token=<token>` uses a bearer token from
-the web console's "Copy login command" page. This guide does not need either, because
-`crc start` already wrote the `crc-admin` context, so you are logged in the moment you
+`oc login` exists, and on a shared cluster it's how you authenticate:
+`oc login -u <user>` prompts for a password, or `oc login --token=<token>` uses a
+bearer token from the web console's "Copy login command" page. This guide doesn't need either, because
+`crc start` already wrote the `crc-admin` context, so you're logged in the moment you
 switch to it.
 
 When you do handle a token, keep it private the same way you keep the kubeadmin
-password private. `oc whoami -t` prints the current token; do not paste its output into
+password private. `oc whoami -t` prints the current token; don't paste its output into
 a script, a commit, or a chat, exactly as with the pull secret and the console
 password. The context-based login this guide uses avoids tokens entirely, which is the
-cleanest way to stay out of that trap. A token is a live credential for as long as it is
+cleanest way to stay out of that trap. A token is a live credential for as long as it's
 valid, so treating it casually is the same risk as pasting a password, and the habit of
 never printing one carries over directly to any real cluster you later work on.
 
@@ -298,7 +298,7 @@ oc new-app --help         # build-and-deploy from source or an image
 oc adm top nodes          # node CPU/memory, like kubectl top with admin framing
 oc rsh deploy/web         # open a shell in a running Pod of a Deployment
 oc debug deploy/web       # a throwaway debug Pod from a workload's spec
-oc port-forward svc/web 8080:8080   # forward a Service port to your host
+oc port-forward svc/web 8080:8080   # reach one port for debugging (not how apps are exposed; that's a Route)
 ```
 
 `oc rsh` and `oc debug` are the two to remember. `oc rsh` drops you into a shell inside
@@ -315,14 +315,14 @@ oc logs deploy/web                     # logs from the Deployment's Pods
 oc get events --sort-by=.lastTimestamp # recent cluster events, newest last
 ```
 
-When a workload will not start, the pairing of `oc get events` and `oc logs` usually
+When a workload won't start, the pairing of `oc get events` and `oc logs` usually
 tells you why before you reach for anything heavier: events show scheduling,
 image-pull, and admission problems, while logs show what the container itself said.
-Reading those two first turns most "it is not working" moments into a specific cause.
+Reading those two first turns most "it's not working" moments into a specific cause.
 
 > **🤖 Explore with your agent**
 >
-> "List every API resource that exists on this cluster but is not part of upstream
+> "List every API resource that exists on this cluster but isn't part of upstream
 > Kubernetes, and group them by their API group, so I can see what OpenShift adds."
 
 ## Build, run, observe
