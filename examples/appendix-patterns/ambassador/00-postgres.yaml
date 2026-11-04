@@ -1,0 +1,125 @@
+# A minimal, disposable Postgres for the appendix examples, the OpenShift way.
+# This is not the capstone's managed cluster: no operator, no persistent
+# storage, no replication. It exists only so shipping-service has something to
+# report "ready" against. Losing its data on a restart is fine here.
+#
+# The OpenShift difference from the minikube sibling: the postgres image owns
+# its data directory as UID 70, which the default restricted-v2 SCC forbids
+# (it assigns an arbitrary UID instead). So this Postgres runs under a
+# dedicated ServiceAccount bound to the nonroot-v2 SCC, which permits the
+# pinned UID. That is the scoped-exception habit from the deploying chapter:
+# grant the narrow SCC to one infra workload rather than loosening the default.
+# NOTE: these credentials (datamesh_app / changeme / datamesh) match
+# shipping-service's built-in config.py defaults exactly. That is what lets the
+# ambassador example run the app with ZERO Postgres environment variables: the
+# app falls back to 127.0.0.1:5432 + datamesh_app/changeme/datamesh, the
+# ambassador listens on that localhost address, and this Postgres answers with
+# those same credentials.
+apiVersion: v1
+kind: Secret
+metadata:
+  name: patterns-postgres-app
+  namespace: patterns
+type: Opaque
+stringData:
+  username: datamesh_app
+  password: changeme
+  dbname: datamesh
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: patterns-infra
+  namespace: patterns
+---
+# Grant nonroot-v2 to the infra ServiceAccount. The binding points at the
+# cluster-generated role system:openshift:scc:nonroot-v2, whose single `use`
+# permission on that SCC is what admission checks.
+# CLI equivalent: oc adm policy add-scc-to-user nonroot-v2 -z patterns-infra
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: patterns-infra-nonroot-v2
+  namespace: patterns
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: system:openshift:scc:nonroot-v2
+subjects:
+  - kind: ServiceAccount
+    name: patterns-infra
+    namespace: patterns
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: patterns-postgres
+  namespace: patterns
+  labels:
+    app.kubernetes.io/name: patterns-postgres
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: patterns-postgres
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: patterns-postgres
+    spec:
+      serviceAccountName: patterns-infra
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 70
+        fsGroup: 70
+      containers:
+        - name: postgres
+          image: docker.io/library/postgres:17-alpine
+          ports:
+            - name: postgres
+              containerPort: 5432
+          env:
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: patterns-postgres-app
+                  key: username
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: patterns-postgres-app
+                  key: password
+            - name: POSTGRES_DB
+              valueFrom:
+                secretKeyRef:
+                  name: patterns-postgres-app
+                  key: dbname
+          readinessProbe:
+            exec:
+              command: ["pg_isready", "-U", "datamesh_app"]
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              memory: 256Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+            seccompProfile:
+              type: RuntimeDefault
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: patterns-postgres
+  namespace: patterns
+spec:
+  selector:
+    app.kubernetes.io/name: patterns-postgres
+  ports:
+    - port: 5432
+      targetPort: 5432

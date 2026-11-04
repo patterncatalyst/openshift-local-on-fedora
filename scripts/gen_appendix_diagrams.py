@@ -290,6 +290,40 @@ def adapter():
     )
 
 
+def ambassador():
+    g.emit(
+        "appendix-09-ambassador", 920, 320,
+        bands=[{"x": 20, "y": 66, "w": 600, "h": 190,
+                "label": "one Pod (shared localhost)", "fill": "#fafafa"}],
+        nodes=[
+            {"x": 60, "y": 120, "w": 200, "h": 86, "style": "box",
+             "lines": ["shipping-service", "dials 127.0.0.1:5432", "(no env vars)"]},
+            {"x": 370, "y": 116, "w": 210, "h": 94, "style": "accent",
+             "lines": ["postgres-ambassador", "listens 127.0.0.1:5432",
+                       "TCP relay"]},
+            {"x": 710, "y": 110, "w": 180, "h": 60, "style": "box",
+             "lines": ["patterns-postgres", "(UPSTREAM_HOST)"]},
+            {"x": 710, "y": 196, "w": 180, "h": 56, "style": "ghost",
+             "lines": ["another backend", "(repoint here)"]},
+        ],
+        edges=[
+            {"x1": 260, "y1": 160, "x2": 370, "y2": 160,
+             "label": "127.0.0.1:5432"},
+            {"x1": 580, "y1": 150, "x2": 710, "y2": 142,
+             "label": "UPSTREAM_HOST", "amber": True},
+            {"x1": 580, "y1": 180, "x2": 710, "y2": 220,
+             "label": "or repoint", "dashed": True},
+        ],
+        notes=[
+            {"x": 460, "y": 44,
+             "text": "Ambassador: the app's target never changes",
+             "anchor": "middle", "bold": True},
+            {"x": 800, "y": 100, "text": "external", "anchor": "middle",
+             "size": 10, "color": "#888"},
+        ],
+    )
+
+
 def main():
     predictable_demands()
     declarative_deployment()
@@ -299,6 +333,7 @@ def main():
     init_container()
     sidecar()
     adapter()
+    ambassador()
 
 
 if __name__ == "__main__":
