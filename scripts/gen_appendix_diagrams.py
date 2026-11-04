@@ -354,6 +354,38 @@ def configuration_template():
     )
 
 
+def immutable_configuration():
+    g.emit(
+        "appendix-21-immutable-configuration", 900, 300,
+        bands=[{"x": 20, "y": 50, "w": 860, "h": 214,
+                "label": "a config change is a new resource + a rollout",
+                "fill": "#fafafa"}],
+        nodes=[
+            {"x": 40, "y": 76, "w": 190, "h": 46, "style": "ink",
+             "lines": ["gateway-config-v1 (immutable)"]},
+            {"x": 40, "y": 152, "w": 190, "h": 46, "style": "ink",
+             "lines": ["gateway-config-v2 (immutable)"]},
+            {"x": 360, "y": 100, "w": 180, "h": 80, "style": "accent",
+             "lines": ["Deployment", "configMapRef", "v1 -> v2"]},
+            {"x": 640, "y": 108, "w": 200, "h": 64, "style": "box",
+             "lines": ["rolling update", "revision 2"]},
+        ],
+        edges=[
+            {"x1": 230, "y1": 99, "x2": 360, "y2": 128, "label": "was", "dashed": True},
+            {"x1": 230, "y1": 175, "x2": 360, "y2": 152, "label": "now", "amber": True},
+            {"x1": 540, "y1": 140, "x2": 640, "y2": 140, "label": "oc rollout"},
+        ],
+        notes=[
+            {"x": 450, "y": 34,
+             "text": "Immutable Configuration: v1 can't be patched; create v2 and roll",
+             "anchor": "middle", "bold": True},
+            {"x": 135, "y": 224,
+             "text": "in-place patch of v1 -> rejected", "anchor": "middle",
+             "size": 10, "color": "#b8650a"},
+        ],
+    )
+
+
 def configuration_resource():
     g.emit(
         "appendix-19-configuration-resource", 880, 300,
@@ -693,6 +725,7 @@ def main():
     env_var_configuration()
     configuration_resource()
     configuration_template()
+    immutable_configuration()
 
 
 if __name__ == "__main__":

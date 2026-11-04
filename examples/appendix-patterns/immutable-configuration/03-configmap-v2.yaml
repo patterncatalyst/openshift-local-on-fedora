@@ -1,0 +1,12 @@
+# The new version. Creating this changes nothing by itself; it's inert until a
+# Deployment references it. Rolling the change forward is a Pod template update.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: gateway-config-v2
+  namespace: patterns
+immutable: true
+data:
+  service_name: graphql-gateway
+  order_rest_url: "http://order-service-v2"
+  inventory_grpc_addr: "inventory-service:50051"

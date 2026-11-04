@@ -1,0 +1,13 @@
+# An immutable ConfigMap: the API server refuses any write to data/binaryData
+# once immutable: true is set. A config change can no longer be an invisible
+# in-place patch; it must be a new, differently named ConfigMap.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: gateway-config-v1
+  namespace: patterns
+immutable: true
+data:
+  service_name: graphql-gateway
+  order_rest_url: "http://order-service"
+  inventory_grpc_addr: "inventory-service:50051"
