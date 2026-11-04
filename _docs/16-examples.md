@@ -33,6 +33,9 @@ copy to maintain, rather than the same operator-install logic pasted into severa
 | 7 Helm | `openshift/helm/demo` | A restricted-v2 chart with Postgres and Routes |
 | 8 Service Mesh | `openshift/platform/install-mesh.sh` | Sail/Service Mesh 3 + Kiali, mTLS, a canary |
 | 9 Operators | `openshift/lib.sh` + `openshift/infra` | The pinned-CSV `install_operator` pattern |
+| 10 Persistent storage | inline PVC manifests | A claim that binds on first use, data that outlives the Pod |
+| 11 Autoscaling | `openshift/platform/install-keda.sh` + inline `ScaledObject` | HPA on CPU and a KEDA ScaledObject |
+| 12 Editor and shell | `oc` verbs, no manifest | `oc rsh`, `oc debug`, `oc cp`, `oc port-forward` |
 
 ## What each example demonstrates
 
@@ -53,9 +56,15 @@ guide covers:
   plane install, a namespace is enrolled so its Pods gain a sidecar, and STRICT mTLS is enforced.
 - **Operators** shows the install pattern itself: a pinned CSV, a single approved InstallPlan,
   and the CRDs the operator owns, which is the mechanism every platform piece is built on.
+- **Persistent storage** shows a PersistentVolumeClaim binding on first use under CRC's hostpath
+  provisioner, and a file that survives the Pod that wrote it, with `fsGroup` for non-root writes.
+- **Autoscaling** shows the HPA holding a CPU target and a KEDA `ScaledObject` taking over, the
+  path from CPU-based scaling to scaling on any trigger, including to zero.
+- **Editor and shell** shows the inside-the-cluster tools: a shell in a running Pod, a debug Pod
+  for one that will not start, and copying files or forwarding a port.
 
-Taken together they move from a single Pod to a full operator-managed platform, each step adding
-one OpenShift-specific capability on top of the last.
+Taken together they move from a single Pod to a full operator-managed, stateful, self-scaling
+platform, each step adding one OpenShift-specific capability on top of the last.
 
 ## Running an example
 
@@ -191,12 +200,12 @@ an operator-managed platform, with a runnable example behind every chapter. What
 point is the core: install and start OpenShift Local, deploy under its security model, expose a
 service over TLS, package with Helm, and add platform capabilities through operators.
 
-Later parts build on that core in the same example-first, verified-live way. Persistent storage
-gives workloads durable volumes that survive a restart. Autoscaling with the Custom Metrics
-Autoscaler scales on real signals rather than a fixed replica count. A data-mesh final project
-assembles the pieces into a multi-service system running end to end on OpenShift. And a Kubernetes
-design-patterns appendix works the full catalog of patterns entirely on OpenShift, with
-`restricted-v2` variants of every manifest, reframed from the generic Kubernetes certifications to
-OpenShift's own. Each of those will arrive as the earlier chapters did: drafted, then run against a
-real cluster, then corrected to match what the cluster did, so the commands you read stay the
-commands that work.
+The core now runs from installing OpenShift Local through deploying under its security model,
+exposing a service over TLS, packaging with Helm, adding platform capabilities through Operators,
+giving workloads persistent storage, scaling them on load, and working inside the cluster. What
+remains are the larger builds that assemble these pieces. A data-mesh final project puts a
+multi-service system end to end on OpenShift, and a Kubernetes design-patterns appendix works the
+full catalog of patterns entirely on OpenShift, with `restricted-v2` variants of every manifest,
+reframed from the generic Kubernetes certifications to OpenShift's own. Each will arrive as these
+chapters did: drafted, then run against a real cluster, then corrected to match what the cluster
+did, so the commands you read stay the commands that work.
