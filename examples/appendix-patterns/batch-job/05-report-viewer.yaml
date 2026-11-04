@@ -1,0 +1,34 @@
+# A disposable viewer Pod mounting the same shipping-reports-data PVC the Jobs
+# write to. A Job's Pod reaches Succeeded the instant its container exits, and
+# OpenShift won't let you exec into a container that isn't running, so reading
+# a finished Job's output needs a separate Pod on the same volume.
+apiVersion: v1
+kind: Pod
+metadata:
+  name: shipping-report-viewer
+  namespace: patterns
+  labels:
+    app.kubernetes.io/name: shipping-report-viewer
+spec:
+  restartPolicy: Never
+  securityContext:
+    runAsNonRoot: true
+  containers:
+    - name: viewer
+      image: registry.access.redhat.com/ubi10/ubi-minimal:latest
+      command: ["sleep", "3600"]
+      volumeMounts:
+        - name: reports
+          mountPath: /var/lib/shipping-reports
+      resources:
+        requests: { cpu: 10m, memory: 32Mi }
+        limits: { memory: 64Mi }
+      securityContext:
+        allowPrivilegeEscalation: false
+        runAsNonRoot: true
+        capabilities: { drop: ["ALL"] }
+        seccompProfile: { type: RuntimeDefault }
+  volumes:
+    - name: reports
+      persistentVolumeClaim:
+        claimName: shipping-reports-data

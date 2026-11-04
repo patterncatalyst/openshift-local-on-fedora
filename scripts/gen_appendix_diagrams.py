@@ -324,6 +324,39 @@ def ambassador():
     )
 
 
+def batch_job():
+    g.emit(
+        "appendix-10-batch-job", 900, 340,
+        bands=[{"x": 20, "y": 48, "w": 860, "h": 272,
+                "label": "Indexed Job: completions=3, parallelism=3",
+                "fill": "#fafafa"}],
+        nodes=[
+            {"x": 50, "y": 128, "w": 180, "h": 72, "style": "box",
+             "lines": ["shipment_events", "300 rows"]},
+            {"x": 360, "y": 86, "w": 180, "h": 46, "style": "accent",
+             "lines": ["Pod index 0  (id%3==0)"]},
+            {"x": 360, "y": 142, "w": 180, "h": 46, "style": "accent",
+             "lines": ["Pod index 1  (id%3==1)"]},
+            {"x": 360, "y": 198, "w": 180, "h": 46, "style": "accent",
+             "lines": ["Pod index 2  (id%3==2)"]},
+            {"x": 670, "y": 128, "w": 190, "h": 72, "style": "ink",
+             "lines": ["report-0/1/2.csv", "100 rows each (PVC)"]},
+        ],
+        edges=[
+            {"x1": 230, "y1": 150, "x2": 360, "y2": 109},
+            {"x1": 230, "y1": 164, "x2": 360, "y2": 165,
+             "label": "JOB_COMPLETION_INDEX"},
+            {"x1": 230, "y1": 178, "x2": 360, "y2": 221},
+            {"x1": 540, "y1": 109, "x2": 670, "y2": 150},
+            {"x1": 540, "y1": 165, "x2": 670, "y2": 164, "label": "disjoint"},
+            {"x1": 540, "y1": 221, "x2": 670, "y2": 178},
+        ],
+        notes=[{"x": 450, "y": 32,
+                "text": "Batch Job: the index partitions the data, no coordination service",
+                "anchor": "middle", "bold": True}],
+    )
+
+
 def main():
     predictable_demands()
     declarative_deployment()
@@ -334,6 +367,7 @@ def main():
     sidecar()
     adapter()
     ambassador()
+    batch_job()
 
 
 if __name__ == "__main__":
