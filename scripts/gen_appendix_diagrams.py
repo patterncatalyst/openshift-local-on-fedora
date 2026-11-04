@@ -200,12 +200,42 @@ def automated_placement():
     )
 
 
+def init_container():
+    g.emit(
+        "appendix-06-init-container", 880, 340,
+        bands=[{"x": 20, "y": 48, "w": 840, "h": 272,
+                "label": "Pod startup: init runs to completion first",
+                "fill": "#fafafa"}],
+        nodes=[
+            {"x": 70, "y": 100, "w": 200, "h": 80, "style": "box",
+             "lines": ["init: migrate", "alembic upgrade head"]},
+            {"x": 440, "y": 92, "w": 220, "h": 80, "style": "accent",
+             "lines": ["main: notification-service", "uvicorn (serving)"]},
+            {"x": 440, "y": 214, "w": 220, "h": 64, "style": "ghost",
+             "lines": ["main never created", "PodInitializing"]},
+            {"x": 70, "y": 230, "w": 200, "h": 56, "style": "box",
+             "lines": ["Postgres"]},
+        ],
+        edges=[
+            {"x1": 270, "y1": 135, "x2": 440, "y2": 132, "label": "exit 0 -> start"},
+            {"x1": 250, "y1": 180, "x2": 440, "y2": 240,
+             "label": "exit != 0", "amber": True},
+            {"x1": 170, "y1": 230, "x2": 170, "y2": 180,
+             "label": "connects", "dashed": True},
+        ],
+        notes=[{"x": 440, "y": 32,
+                "text": "Init Container: the migration gates the app",
+                "anchor": "middle", "bold": True}],
+    )
+
+
 def main():
     predictable_demands()
     declarative_deployment()
     health_probe()
     managed_lifecycle()
     automated_placement()
+    init_container()
 
 
 if __name__ == "__main__":
