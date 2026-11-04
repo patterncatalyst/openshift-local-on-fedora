@@ -4,6 +4,18 @@ order: 12
 description: "Work inside the cluster: a shell in a running Pod with oc rsh, a throwaway debug Pod with oc debug, file copies, port-forwards, and the web terminal."
 ---
 
+## Learning objectives
+
+By the end of this chapter you can:
+
+- Open a shell in a running container with `oc rsh`
+- Debug a failing image with a throwaway `oc debug` Pod
+- Copy files into and out of a Pod
+- Forward a Pod port to your host
+- Use the browser-based web terminal where it helps
+
+## Why this matters
+
 Most of this guide drives the cluster from outside, with `oc` and `kubectl` against the
 API. Sometimes you need to be inside it: a shell in a running container to see what it
 sees, a throwaway Pod to debug an image that will not start, a file copied in or out, a
@@ -261,6 +273,11 @@ out, and reaching the Service through a forward confirm the inside-the-cluster t
 working. The `403` from the forward is the empty `httpd` docroot answering, the same proof of
 reachability the deploying chapter met: the status code shows the request arrived, not that
 anything is wrong.
+
+## For deeper coverage
+
+- [**Kubernetes for Developers**](https://www.manning.com/books/kubernetes-for-developers) (William Denniss, Manning) covers the inside-the-cluster debugging workflow this chapter collects.
+- Official docs: the [OpenShift Container Platform documentation](https://docs.openshift.com/) for `oc rsh`, `oc debug`, and the web terminal, and the [Kubernetes documentation](https://kubernetes.io/docs/tasks/debug/) for `kubectl exec` and port-forwarding.
 
 ## Where this fits
 

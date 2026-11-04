@@ -4,6 +4,17 @@ order: 7
 description: "Deploy with the Helm CLI, write charts that satisfy restricted-v2, and use OpenShift's native Helm integration and the Helm-based operator pattern."
 ---
 
+## Learning objectives
+
+By the end of this chapter you can:
+
+- Template and install a chart with the Helm CLI
+- Write charts whose Pods satisfy the `restricted-v2` standard
+- Use OpenShift's native Helm integration in the console and the API
+- Recognize when to wrap a chart as a Helm-based Operator
+
+## Why this matters
+
 Helm is the package manager for Kubernetes, and it works on OpenShift the same way
 it works anywhere: a chart templates a set of objects, and `helm install` renders
 and applies them. OpenShift adds two things on top: a built-in Helm integration in
@@ -290,6 +301,12 @@ A release that deploys, Pods with no hard-coded UID, and a clean uninstall confi
 the chart is OpenShift-ready. The `--set postgres.enabled=false,kafka.enabled=false` turns off
 the optional dependencies so the check exercises the core services alone; drop those flags to
 bring the full stack up once you have confirmed the basics.
+
+## For deeper coverage
+
+- [**Learning Helm**](https://www.oreilly.com/library/view/-/9781492083641/) (Matt Butcher, Matt Farina, Josh Dolitsky, O'Reilly) is the thorough treatment of chart authoring and the Helm lifecycle.
+- [**Managing Kubernetes Resources Using Helm**](https://www.packtpub.com/en-us/product/managing-kubernetes-resources-using-helm-9781803242897) (Andrew Block, Austin Dewey, Packt) covers templating, dependencies, and chart design in depth.
+- Official docs: the [Helm documentation](https://helm.sh/docs/) for the CLI and chart reference, and the [OpenShift Container Platform documentation](https://docs.openshift.com/) for its native Helm integration.
 
 ## Where this fits
 

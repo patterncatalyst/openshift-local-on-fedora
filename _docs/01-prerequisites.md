@@ -4,6 +4,17 @@ order: 1
 description: "Prepare the Fedora host, create a free Red Hat Developer account, download OpenShift Local and the pull secret, and plan the cluster size."
 ---
 
+## Learning objectives
+
+By the end of this chapter you can:
+
+- Confirm your Fedora host has the CPU, memory, disk, and virtualization support CRC needs
+- Create a free Red Hat Developer account and download the pull secret
+- Download the OpenShift Local release and place the `crc` binary
+- Choose the core or platform cluster size that fits your host
+
+## Why this matters
+
 OpenShift Local (the command is `crc`, short for CodeReady Containers) runs a
 single-node OpenShift 4 cluster inside a local virtual machine. Before you start
 the cluster, you need three things: a host that can run the VM, a
@@ -262,6 +273,11 @@ You now have a host that can run the VM, an account, the `crc` download, and the
 pull secret, and you have chosen a cluster size. Next, you install the `crc`
 binary and wire up the `oc` and `kubectl` clients, then run `crc setup` and
 `crc start` to bring the cluster up for the first time.
+
+## For deeper coverage
+
+- [**Kubernetes: Up and Running**](https://www.oreilly.com/library/view/-/9781098110192/) (Burns, Beda, Hightower, Evenson, O'Reilly) grounds you in the cluster objects CRC will run, useful to read alongside the first chapters.
+- Official docs: the [Red Hat OpenShift Local documentation](https://developers.redhat.com/products/openshift-local/overview) for the authoritative install, sizing, and pull-secret steps, and the [OpenShift Container Platform documentation](https://docs.openshift.com/) for the platform CRC brings up locally.
 
 ## Checklist
 

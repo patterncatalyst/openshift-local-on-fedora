@@ -4,6 +4,17 @@ order: 4
 description: "The two CLIs side by side: what they share, where oc does more, and how projects relate to namespaces."
 ---
 
+## Learning objectives
+
+By the end of this chapter you can:
+
+- Explain where `oc` and `kubectl` overlap and where `oc` does more
+- Relate an OpenShift Project to a Kubernetes Namespace plus RBAC and quota
+- Create and switch Projects with `oc`, and see them as namespaces with `kubectl`
+- Choose the portable `kubectl` workflow and add `oc` shortcuts where they help
+
+## Why this matters
+
 OpenShift gives you two command-line tools: `kubectl`, the standard Kubernetes
 CLI, and `oc`, the OpenShift CLI. They overlap almost completely. This chapter
 sets out exactly how they relate, so the chapters that follow can lead with the
@@ -330,6 +341,11 @@ oc delete project cli-tour              # clean up
 
 Creating a project with `oc` and seeing it as a namespace with `kubectl` is the
 whole relationship in one exchange: same object, two names, two tools.
+
+## For deeper coverage
+
+- [**Kubernetes for Developers**](https://www.manning.com/books/kubernetes-for-developers) (William Denniss, Manning) works the day-to-day CLI workflow this chapter leans on.
+- Official docs: the [OpenShift Container Platform documentation](https://docs.openshift.com/) for the `oc` CLI and Projects, and the [Kubernetes documentation](https://kubernetes.io/docs/reference/kubectl/) for `kubectl` and namespaces.
 
 ## Where this fits
 

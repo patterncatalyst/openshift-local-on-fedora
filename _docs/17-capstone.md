@@ -4,6 +4,18 @@ order: 17
 description: "The final project that converges the guide: a seven-service data mesh deployed to OpenShift Local, where restricted-v2, Routes, the integrated registry, Helm, the mesh, storage, and autoscaling all meet in one system."
 ---
 
+## Learning objectives
+
+By the end of this chapter you can:
+
+- Describe how a seven-service data mesh maps onto one CRC cluster across two tiers
+- Trace each earlier chapter's concept (restricted-v2, Routes, Helm, Operators, storage, mesh, autoscaling) into its place in a single running system
+- Build the service images with podman and push them to the integrated registry, then deploy the live core with one `helm install`
+- Explain why the app services run under `restricted-v2` while Postgres and Kafka need a scoped `nonroot-v2` grant
+- Exercise the mesh end to end through the GraphQL gateway's edge-TLS Route and read its composed response
+
+## Why this matters
+
 This is where the guide converges. The earlier chapters introduced the pieces one at a
 time: deploying under `restricted-v2`, exposing a Service with an edge-TLS Route,
 packaging with Helm, installing Operators, adding the service mesh, giving workloads
@@ -198,7 +210,29 @@ services lands on OpenShift.
 Once the core is up, the system is observable through the same tools the guide built. The
 gateway's Route is the front door: a request to `graphql-gateway-datamesh.apps-crc.testing`
 over HTTPS reaches the composed API, with TLS terminated at the router exactly as the Routes
-chapter showed. Inside the cluster, `oc get pods -n datamesh` shows the seven services plus
+chapter showed. A single GraphQL query exercises more than the gateway. Asking for an order
+and its stock makes the gateway call the order service over REST and the inventory service
+over gRPC, then fold both into one response:
+
+```bash
+curl -sk https://graphql-gateway-datamesh.apps-crc.testing/graphql \
+  -H 'Content-Type: application/json' \
+  -d '{"query":"{ order(id:\"<id>\"){ itemSku quantity status stock { sku quantityOnHand available } } }"}'
+```
+
+```json
+{ "data": { "order": {
+  "itemSku": "WIDGET-001", "quantity": 3, "status": "placed",
+  "stock": { "sku": "WIDGET-001", "quantityOnHand": 50, "available": true } } } }
+```
+
+The `stock` object came back over gRPC while the rest of the order came back over REST, and
+the client saw neither boundary. Placing an order shows the same gRPC edge enforcing a rule:
+a `POST` for an in-stock item is admitted, and one for an out-of-stock item is rejected with
+a `409` carrying the on-hand count the inventory service reported. The protocol choices from
+the architecture are now behavior you can watch, not claims in a manifest.
+
+Inside the cluster, `oc get pods -n datamesh` shows the seven services plus
 Postgres, Kafka, and Apicurio, and `oc get pvc -n datamesh` shows the claims keeping the
 stateful pieces' data. With the platform tier on, Kiali draws the mesh graph, the services
 as nodes and their calls as edges, with the mTLS lock on each secured connection, so the
@@ -220,6 +254,13 @@ an edge-TLS Route, keep their data on PersistentVolumeClaims, and, with the plat
 run in a mutually authenticated mesh that scales on load and reports its telemetry. Every
 one of those behaviors is a chapter you have already worked. The final project is where they
 stop being exercises and become a system.
+
+## For deeper coverage
+
+- [**Data Mesh**](https://www.oreilly.com/library/view/data-mesh/9781492092384/) (Zhamak Dehghani, O'Reilly) is the source for the architecture this project models: data as a product, domain ownership, and the organizational reasons a mesh looks the way it does.
+- [**Kubernetes Patterns**](https://www.oreilly.com/library/view/-/9781098131678/) (Ibryam and Huß, O'Reilly) names the structural patterns the deployment relies on, from health probes and predictable demands to the stateful-service and configuration patterns the chart puts to work.
+- [**Building Event-Driven Microservices**](https://www.oreilly.com/library/view/building-event-driven-microservices/9798341622180/) (Adam Bellemare, O'Reilly) covers the asynchronous Kafka edges in depth: how services publish and react to domain events without a direct call.
+- Official docs: the [OpenShift Container Platform documentation](https://docs.openshift.com/) for Security Context Constraints, Routes, and the integrated image registry; the [Kubernetes documentation](https://kubernetes.io/docs/) for the underlying Deployment, StatefulSet, and Service objects.
 
 ## Where this fits
 

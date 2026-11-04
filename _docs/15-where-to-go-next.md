@@ -4,6 +4,17 @@ order: 15
 description: "Paths onward from a local OpenShift: certifications, moving to a remote cluster, deeper platform topics, and the sibling guides."
 ---
 
+## Learning objectives
+
+By the end of this chapter you can:
+
+- Map OpenShift's certification path (DO180, DO280, EX280) to the chapters you worked
+- Plan the move from a local CRC workflow to a remote cluster
+- Identify deeper platform topics worth pursuing next
+- Find the sibling guides that go further
+
+## Why this matters
+
 You can install, run, and work a real OpenShift cluster on your own machine: deploy under
 its security model, expose services with Routes, package with Helm, install Operators, add
 a service mesh, give workloads storage, and scale them on load. This chapter points at where
@@ -173,6 +184,12 @@ which is the single habit that prevents the most common install failure. And kee
 `oc`, if you installed one, in step with the cluster, or lean on the bundled client that is
 version-matched by construction. None of this is much work spread out, and all of it is painful
 if left until a cluster is several releases behind.
+
+## For deeper coverage
+
+- [**Certified Kubernetes Application Developer (CKAD) Study Guide**](https://www.oreilly.com/library/view/-/9781098152857/) (Benjamin Muschko, O'Reilly) is strong hands-on preparation whose skills carry into the OpenShift exams.
+- [**Kubernetes Patterns**](https://www.oreilly.com/library/view/-/9781098131678/) (Ibryam and Huß, O'Reilly) is the catalog the next part of this guide works through on OpenShift.
+- Official docs: [Red Hat Training and Certification](https://www.redhat.com/en/services/training-and-certification) for the DO180, DO280, and EX280 paths, and the [OpenShift Container Platform documentation](https://docs.openshift.com/) for the platform topics beyond this guide.
 
 ## Where this fits
 

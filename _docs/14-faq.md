@@ -4,6 +4,17 @@ order: 14
 description: "Common questions and fixes for OpenShift Local: slow starts, resource pressure, networking, the oc client, security defaults, and credentials."
 ---
 
+## Learning objectives
+
+By the end of this chapter you can:
+
+- Diagnose a slow or failing `crc start`
+- Resolve resource-pressure symptoms on the host
+- Fix common networking and `oc` client problems
+- Find CRC credentials and resize the cluster safely
+
+## Why this matters
+
 This chapter is a reference for the questions that come up most when running OpenShift
 Local, grouped by what you are trying to do. Each answer is short and points back to the
 chapter that covers it in full. Read it start to finish once, then return to it when
@@ -212,6 +223,10 @@ Removing the `crc` binary and the `~/.crc` directory afterward leaves the machin
 **Can I change the cluster size while it is running?** No. Sizing takes effect only while CRC is
 stopped: `crc stop`, then `crc config set cpus`/`memory`/`disk-size`, then `crc start`. A change
 made while the cluster runs is stored but does not apply until the next stop and start.
+
+## For deeper coverage
+
+- Official docs: the [Red Hat OpenShift Local documentation](https://developers.redhat.com/products/openshift-local/overview) is the authoritative troubleshooting reference for start-up, networking, and resource issues, and the [OpenShift Container Platform documentation](https://docs.openshift.com/) covers the cluster behavior behind these answers.
 
 ## Where this fits
 
