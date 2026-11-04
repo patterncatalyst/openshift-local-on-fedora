@@ -811,6 +811,42 @@ def elastic_scale():
     )
 
 
+def image_builder():
+    g.emit(
+        "appendix-24-image-builder", 940, 360,
+        bands=[{"x": 20, "y": 46, "w": 900, "h": 292,
+                "label": "one registry, two addresses", "fill": "#fafafa"}],
+        nodes=[
+            {"x": 50, "y": 96, "w": 160, "h": 46, "style": "box",
+             "lines": ["local directory"]},
+            {"x": 50, "y": 162, "w": 160, "h": 46, "style": "box",
+             "lines": ["git commit"]},
+            {"x": 300, "y": 104, "w": 190, "h": 74, "style": "accent",
+             "lines": ["Build: Buildah in a Pod", "no Docker daemon"]},
+            {"x": 600, "y": 100, "w": 220, "h": 72, "style": "ink",
+             "lines": ["integrated registry", "...svc:5000 (in-cluster)"]},
+            {"x": 600, "y": 244, "w": 220, "h": 50, "style": "box",
+             "lines": ["Deployment / Pod"]},
+            {"x": 50, "y": 256, "w": 160, "h": 46, "style": "ghost",
+             "lines": ["host podman"]},
+        ],
+        edges=[
+            {"x1": 210, "y1": 118, "x2": 300, "y2": 130, "label": "--from-dir"},
+            {"x1": 210, "y1": 184, "x2": 300, "y2": 156, "label": "git"},
+            {"x1": 490, "y1": 140, "x2": 600, "y2": 136, "label": "push", "amber": True},
+            {"x1": 710, "y1": 172, "x2": 710, "y2": 244, "label": "pull", "amber": True},
+            {"x1": 210, "y1": 272, "x2": 600, "y2": 160, "label": "external Route", "dashed": True},
+        ],
+        notes=[
+            {"x": 470, "y": 32,
+             "text": "Image Builder: in-cluster builds push, and Pods pull, by the in-cluster address",
+             "anchor": "middle", "bold": True},
+            {"x": 130, "y": 318, "text": "outside the cluster", "anchor": "middle",
+             "size": 10, "color": "#64748b"},
+        ],
+    )
+
+
 def main():
     predictable_demands()
     declarative_deployment()
@@ -836,6 +872,7 @@ def main():
     controller()
     operator()
     elastic_scale()
+    image_builder()
 
 
 if __name__ == "__main__":

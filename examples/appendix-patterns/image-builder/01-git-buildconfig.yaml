@@ -1,0 +1,38 @@
+# A git-source, Docker-strategy BuildConfig: OpenShift clones the public repo
+# at main, builds examples/appendix-patterns/batch-job/Containerfile inside the
+# cluster with Buildah (no Docker daemon, no privileged container), and pushes
+# the result to the shipping-report-git imagestream.
+#
+# Written declaratively because `oc new-build --strategy=docker` refuses to
+# create a config when it can't find a file literally named "Dockerfile"; this
+# project uses "Containerfile", so dockerfilePath is set here from the start.
+#
+# Trigger it:  oc start-build shipping-report-git -n patterns -F
+# The finished image is labelled with the exact commit it was built from
+# (io.openshift.build.commit.id), the traceability a host-side podman build lacks.
+apiVersion: image.openshift.io/v1
+kind: ImageStream
+metadata:
+  name: shipping-report-git
+  namespace: patterns
+---
+apiVersion: build.openshift.io/v1
+kind: BuildConfig
+metadata:
+  name: shipping-report-git
+  namespace: patterns
+spec:
+  source:
+    type: Git
+    git:
+      uri: https://github.com/patterncatalyst/openshift-local-on-fedora
+      ref: main
+    contextDir: examples/appendix-patterns/batch-job
+  strategy:
+    type: Docker
+    dockerStrategy:
+      dockerfilePath: Containerfile
+  output:
+    to:
+      kind: ImageStreamTag
+      name: shipping-report-git:latest
