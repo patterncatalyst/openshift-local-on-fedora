@@ -1,0 +1,76 @@
+# inventory-service hardened to the restricted-v2 shape, but with the OpenShift
+# difference from the minikube sibling stated in the manifest: NO runAsUser is
+# set. The restricted-v2 SCC injects an arbitrary UID from the namespace's
+# assigned range on admission (and records which SCC admitted the Pod in the
+# openshift.io/scc annotation). Pinning a UID the way a plain Kubernetes
+# securityContext would is unnecessary here and often rejected if it falls
+# outside the range. Everything else is the same hardening: no privilege
+# escalation, every capability dropped, a RuntimeDefault seccomp filter, and a
+# read-only root filesystem with /tmp carved out as the one writable path.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: inventory-service
+  namespace: patterns
+  labels:
+    app.kubernetes.io/name: inventory-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: inventory-service
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: inventory-service
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: inventory-service
+          image: image-registry.openshift-image-registry.svc:5000/patterns/inventory-service:v1
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: grpc
+              containerPort: 50051
+            - name: http
+              containerPort: 8080
+          env:
+            - name: SERVICE_SCHEMA
+              value: inventory
+            - name: PG_HOST
+              value: patterns-postgres.patterns.svc.cluster.local
+            - name: PG_USER
+              valueFrom:
+                secretKeyRef: { name: patterns-postgres-app, key: username }
+            - name: PG_PASSWORD
+              valueFrom:
+                secretKeyRef: { name: patterns-postgres-app, key: password }
+            - name: PG_DATABASE
+              valueFrom:
+                secretKeyRef: { name: patterns-postgres-app, key: dbname }
+          resources:
+            requests: { cpu: 100m, memory: 192Mi }
+            limits: { memory: 512Mi }
+          startupProbe:
+            httpGet: { path: /health, port: http }
+            failureThreshold: 30
+            periodSeconds: 2
+          readinessProbe:
+            httpGet: { path: /healthz, port: http }
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsNonRoot: true
+            readOnlyRootFilesystem: true
+            capabilities: { drop: ["ALL"] }
+            seccompProfile: { type: RuntimeDefault }
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+      volumes:
+        - name: tmp
+          emptyDir: {}

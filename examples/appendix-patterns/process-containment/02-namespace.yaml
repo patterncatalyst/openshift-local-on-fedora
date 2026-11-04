@@ -1,0 +1,13 @@
+# A disposable namespace for the admission demo, separate from patterns so the
+# standard it enforces never touches other chapters' examples. OpenShift labels
+# new namespaces for Pod Security Admission automatically (synced from the SCCs
+# available in the namespace); these explicit labels make the baseline floor
+# visible rather than implicit.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: patterns-pss-demo
+  labels:
+    pod-security.kubernetes.io/enforce: baseline
+    pod-security.kubernetes.io/audit: restricted
+    pod-security.kubernetes.io/warn: restricted

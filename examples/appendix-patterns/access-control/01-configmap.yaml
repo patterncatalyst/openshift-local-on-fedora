@@ -1,0 +1,9 @@
+# payment-service's own ConfigMap, the one object its Role names for get.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: payment-config
+  namespace: patterns
+data:
+  gateway_timeout_ms: "3000"
+  capture_mode: deferred

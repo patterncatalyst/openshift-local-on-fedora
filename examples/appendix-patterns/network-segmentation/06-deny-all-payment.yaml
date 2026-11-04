@@ -1,0 +1,14 @@
+# Default-deny ingress for payment-service's Pods. No allow rule follows: this
+# one policy is the whole story for payment-service, fully isolated until a real
+# caller exists and earns an explicit rule.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: deny-all-payment
+  namespace: patterns
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: payment-service
+  policyTypes:
+    - Ingress

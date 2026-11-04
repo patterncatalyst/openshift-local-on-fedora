@@ -1,0 +1,23 @@
+# A Pod built to the restricted-v2 shape (no runAsUser; the SCC injects one).
+# Admitted cleanly by both the SCC layer and the namespace's Pod Security
+# Standard.
+apiVersion: v1
+kind: Pod
+metadata:
+  name: compliant-demo
+  namespace: patterns-pss-demo
+  labels:
+    app.kubernetes.io/name: compliant-demo
+spec:
+  securityContext:
+    runAsNonRoot: true
+    seccompProfile: { type: RuntimeDefault }
+  containers:
+    - name: demo
+      image: registry.access.redhat.com/ubi9/ubi-minimal:latest
+      command: ["sleep", "3600"]
+      resources:
+        requests: { cpu: 50m, memory: 32Mi }
+      securityContext:
+        allowPrivilegeEscalation: false
+        capabilities: { drop: ["ALL"] }

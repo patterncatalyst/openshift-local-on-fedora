@@ -1,0 +1,25 @@
+# An unrelated workload in patterns, carrying a label that matches neither
+# inventory-service's nor graphql-gateway's allow rules. Used for every negative
+# check: it should be denied against both protected services once their
+# default-deny policies exist, and stay denied even after
+# allow-gateway-to-inventory, since its label was never named. restricted-v2 clean.
+apiVersion: v1
+kind: Pod
+metadata:
+  name: netseg-test-client
+  namespace: patterns
+  labels:
+    app.kubernetes.io/name: netseg-test-client
+spec:
+  securityContext:
+    runAsNonRoot: true
+    seccompProfile: { type: RuntimeDefault }
+  containers:
+    - name: curl
+      image: registry.access.redhat.com/ubi9/ubi-minimal:latest
+      command: ["sleep", "infinity"]
+      resources:
+        requests: { cpu: 50m, memory: 32Mi }
+      securityContext:
+        allowPrivilegeEscalation: false
+        capabilities: { drop: ["ALL"] }

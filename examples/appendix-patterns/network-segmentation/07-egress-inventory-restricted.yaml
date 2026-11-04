@@ -1,0 +1,37 @@
+# Egress default-deny for inventory-service, with two destinations allowed: DNS
+# and its own Postgres. The OpenShift difference from the minikube sibling is
+# the DNS target: OpenShift runs CoreDNS as the openshift-dns DaemonSet
+# listening on port 5353 (not kube-dns on 53), so the rule selects the
+# openshift-dns namespace and its Pods on 5353. Once policyTypes includes
+# Egress, every other outbound path (including the public internet) is denied.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: inventory-egress-restricted
+  namespace: patterns
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: inventory-service
+  policyTypes:
+    - Egress
+  egress:
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: openshift-dns
+          podSelector:
+            matchLabels:
+              dns.operator.openshift.io/daemonset-dns: default
+      ports:
+        - protocol: UDP
+          port: 5353
+        - protocol: TCP
+          port: 5353
+    - to:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: patterns-postgres
+      ports:
+        - protocol: TCP
+          port: 5432

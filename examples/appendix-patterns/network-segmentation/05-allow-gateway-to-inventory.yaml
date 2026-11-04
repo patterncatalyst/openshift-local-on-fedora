@@ -1,0 +1,23 @@
+# One explicit exception to deny-all-inventory: graphql-gateway's Pods may reach
+# inventory-service on the gRPC port 50051, the one call the gateway's resolver
+# actually makes. Two policies selecting the same Pods combine additively:
+# deny-by-default plus this single allow.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-gateway-to-inventory
+  namespace: patterns
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: inventory-service
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: graphql-gateway
+      ports:
+        - protocol: TCP
+          port: 50051
