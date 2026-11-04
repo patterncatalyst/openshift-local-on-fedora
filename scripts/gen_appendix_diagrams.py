@@ -324,6 +324,39 @@ def ambassador():
     )
 
 
+def env_var_configuration():
+    g.emit(
+        "appendix-18-env-var-configuration", 880, 300,
+        bands=[{"x": 20, "y": 48, "w": 840, "h": 216,
+                "label": "notification-service env (resolved once at start)",
+                "fill": "#fafafa"}],
+        nodes=[
+            {"x": 50, "y": 78, "w": 190, "h": 46, "style": "box",
+             "lines": ["literal: SERVICE_SCHEMA"]},
+            {"x": 50, "y": 148, "w": 190, "h": 46, "style": "box",
+             "lines": ["ConfigMap: KAFKA_*"]},
+            {"x": 50, "y": 218, "w": 190, "h": 40, "style": "ink",
+             "lines": ["Secret: PG_USER/PASSWORD"]},
+            {"x": 470, "y": 110, "w": 220, "h": 120, "style": "accent",
+             "lines": ["container env", "all plain strings,",
+                       "indistinguishable"]},
+        ],
+        edges=[
+            {"x1": 240, "y1": 101, "x2": 470, "y2": 140},
+            {"x1": 240, "y1": 171, "x2": 470, "y2": 170, "label": "valueFrom"},
+            {"x1": 240, "y1": 238, "x2": 470, "y2": 200},
+        ],
+        notes=[
+            {"x": 440, "y": 32,
+             "text": "Env Var Configuration: three sources, one env block",
+             "anchor": "middle", "bold": True},
+            {"x": 580, "y": 250,
+             "text": "edit a source after start -> no effect until restart",
+             "anchor": "middle", "size": 10, "color": "#888"},
+        ],
+    )
+
+
 def self_awareness():
     g.emit(
         "appendix-17-self-awareness", 900, 320,
@@ -599,6 +632,7 @@ def main():
     stateful_service()
     service_discovery()
     self_awareness()
+    env_var_configuration()
 
 
 if __name__ == "__main__":
