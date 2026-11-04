@@ -34,7 +34,10 @@ chapters, live-verified on CRC.
       READMEs de-numbered + de-footered + em-dashes recast; LICENSE-docs preamble
       em-dashes recast (CC legal text left verbatim)
 - [x] Live verification on CRC; evidence banked here (§1-10 all verified)
-- [ ] Diagrams for new/changed chapters
+- [x] Diagrams for new/changed chapters: 6 paired SVG + .excalidraw figures
+      (crc-architecture §1, oc-and-kubectl §4, deploy-scc §5, route-edge-tls §6,
+      service-mesh §8, operator-olm §9), embedded with captions + alt text,
+      gallery rebuilt, spec in `scripts/gen_diagrams.py` (engine vendored)
 - [ ] Open the r01 PR
 
 ## Evidence — live CRC run (CRC 2.64.0, OpenShift 4.22.14, k8s v1.35.6)

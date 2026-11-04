@@ -11,6 +11,11 @@ free Red Hat Developer account, and two downloads: the `crc` release and a *pull
 secret*. This chapter gets all of that in place. It installs nothing from the
 cluster yet; that begins in the next chapter.
 
+{% include excalidraw.html
+   file="crc-architecture"
+   alt="On a Fedora host, the crc daemon and KVM with libvirt and qemu run a single virtual machine of Red Hat Enterprise Linux CoreOS. Inside the VM are the control plane, the worker, the internal registry, the router, and OLM with OperatorHub. The cluster's names resolve to 127.0.0.1 through user-mode networking."
+   caption="Figure 1.1: OpenShift Local runs a full single-node OpenShift cluster inside one local VM, reached from the host over user-mode networking." %}
+
 ## What a single-node OpenShift gives you
 
 It helps to know what you are about to run, because it explains why the sizing is

@@ -12,6 +12,11 @@ mutual TLS, and shifts a slice of traffic to a second version with a canary. It 
 the first thing in this guide delivered as an Operator, which sets up the Operators
 chapter next.
 
+{% include excalidraw.html
+   file="service-mesh"
+   alt="In the mesh-demo namespace, labelled istio.io/rev=default, two Pods each run an app plus an Envoy sidecar and talk to each other over STRICT mutual TLS. The istiod control plane sends configuration and certificates to the proxies, and Kiali is the mesh console."
+   caption="Figure 8.1: The istiod control plane configures the Envoy sidecars; the sidecars carry the traffic and enforce STRICT mutual TLS between Pods." %}
+
 ## What the mesh gives you
 
 A service mesh puts a sidecar proxy next to each Pod and routes all service-to-

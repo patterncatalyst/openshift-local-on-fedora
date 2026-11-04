@@ -9,6 +9,11 @@ CLI, and `oc`, the OpenShift CLI. They overlap almost completely. This chapter
 sets out exactly how they relate, so the chapters that follow can lead with the
 portable `kubectl` workflow and point out the OpenShift shortcuts as it goes.
 
+{% include excalidraw.html
+   file="oc-and-kubectl"
+   alt="The oc client contains all of kubectl's verbs for Pods, Deployments, Services, logs, and apply, plus OpenShift-only verbs such as new-app, expose, project, adm, and status. Those OpenShift verbs manage a Project, which is a Namespace plus RBAC and quota."
+   caption="Figure 4.1: oc is a superset of kubectl, adding the OpenShift-only verbs; a Project is a Namespace with OpenShift's RBAC and quota on top." %}
+
 ## oc is a superset of kubectl
 
 `oc` is built from the same code as `kubectl` and adds OpenShift-specific verbs on

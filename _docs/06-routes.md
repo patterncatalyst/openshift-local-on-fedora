@@ -10,6 +10,11 @@ an Ingress. OpenShift has a built-in router and a first-class object for this: t
 and, with one setting, terminates TLS at the edge. This chapter exposes the web
 app you deployed earlier with a Route and verifies it over HTTPS the correct way.
 
+{% include excalidraw.html
+   file="route-edge-tls"
+   alt="A browser on the host connects over HTTPS to the OpenShift router, which terminates TLS at the edge and forwards plain HTTP to the httpd Pod on port 8080. A note says to trust the cluster ingress CA with curl --cacert rather than --insecure."
+   caption="Figure 6.1: With edge termination the router handles TLS and forwards plain HTTP to the Pod; verify over HTTPS by trusting the cluster's ingress CA." %}
+
 ## Why Routes instead of NodePorts
 
 A NodePort opens a numbered port on the node and you reach the Service at

@@ -10,6 +10,11 @@ Pods), shows the `oc` one-liner that does the same thing, and introduces the one
 rule that trips people up when they come to OpenShift from plain Kubernetes: Pods
 run under a restricted security context by default.
 
+{% include excalidraw.html
+   file="deploy-scc"
+   alt="A Deployment named web creates a ReplicaSet, which keeps two Pods running, each an httpd container. The restricted-v2 security context constraint injects a non-root runAsUser, UID 1000650000, into the Pods."
+   caption="Figure 5.1: A Deployment manages its Pods through a ReplicaSet, and the restricted-v2 SCC assigns each Pod a non-root UID from the project's range." %}
+
 ## A workload that fits OpenShift's defaults
 
 OpenShift assigns each Pod a high, random user ID from a per-namespace range and

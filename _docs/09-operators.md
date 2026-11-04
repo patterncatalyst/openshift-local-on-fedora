@@ -13,6 +13,11 @@ and the operators this guide builds on. The payoff of understanding it is practi
 can read the objects OLM creates, an install that hangs or an upgrade that surprises you becomes
 a specific thing to look at rather than a black box to restart and hope.
 
+{% include excalidraw.html
+   file="operator-olm"
+   alt="A pinned Subscription leads to an InstallPlan that OLM creates, which you approve, which installs a CSV that reaches Succeeded. The CSV provides the installed operator: its controller and the CRDs it owns, such as kafkas.kafka.strimzi.io. The content comes from the redhat-operators catalog."
+   caption="Figure 9.1: A pinned Subscription produces one InstallPlan you approve, which installs the CSV; a Succeeded CSV and its CRDs confirm the operator." %}
+
 ## OperatorHub and OLM
 
 Four objects do the work:
