@@ -1,0 +1,37 @@
+# A KEDA ScaledObject (Custom Metrics Autoscaler) scaling graphql-gateway from
+# zero on a schedule. The Custom Metrics Autoscaler is Red Hat's supported
+# build of KEDA; it ships the core ScaledObject CRD but not the separate HTTP
+# add-on, so this chapter demonstrates scale-to-zero with the cron trigger,
+# which needs no external system to measure.
+#
+# minReplicaCount: 0 is the capability a plain HorizontalPodAutoscaler can't
+# express: outside the trigger's active window KEDA deletes its generated HPA
+# and holds the Deployment at zero; inside the window it scales to
+# desiredReplicas. The CPU-based HPA on shipping-service can never do this,
+# because a CPU percentage can't be computed from a Pod that isn't running.
+#
+# NOTE: a workload may have either a standalone HPA or a ScaledObject, never
+# both on the same target. KEDA creates and owns its own HPA (keda-hpa-*); a
+# second hand-written HPA on graphql-gateway would be rejected.
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: graphql-gateway
+  namespace: patterns
+spec:
+  scaleTargetRef:
+    name: graphql-gateway
+  minReplicaCount: 0
+  maxReplicaCount: 3
+  pollingInterval: 15     # how often KEDA re-evaluates the trigger
+  cooldownPeriod: 30      # idle seconds before scaling back to zero
+  triggers:
+    - type: cron
+      metadata:
+        timezone: UTC
+        # Active (nearly) all day: applying this scales graphql-gateway up from
+        # zero to desiredReplicas. Narrow this window (see README) to a span
+        # that excludes "now" and KEDA scales it back to zero.
+        start: "0 0 * * *"
+        end: "59 23 * * *"
+        desiredReplicas: "2"

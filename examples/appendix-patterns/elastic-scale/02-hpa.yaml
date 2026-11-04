@@ -1,0 +1,24 @@
+# HorizontalPodAutoscaler: reads CPU utilization from the OpenShift metrics
+# API (metrics.k8s.io, served out of the box, no addon) and scales
+# shipping-service's replica count between 1 and 5 to hold average CPU at 50%
+# of its 100m request. minReplicas is 1, never 0: a CPU percentage can't be
+# computed from a Pod that isn't running, so an HPA has no way to justify zero.
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: shipping-service
+  namespace: patterns
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: shipping-service
+  minReplicas: 1
+  maxReplicas: 5
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 50

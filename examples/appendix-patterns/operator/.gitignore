@@ -1,0 +1,4 @@
+# The manager binary is compiled on the host during the image build; never
+# commit it. See README.md for the build-and-push steps.
+/manager
+/bin/

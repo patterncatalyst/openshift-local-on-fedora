@@ -704,6 +704,149 @@ def batch_job():
     )
 
 
+def controller():
+    g.emit(
+        "appendix-22-controller", 920, 340,
+        bands=[{"x": 20, "y": 46, "w": 880, "h": 272,
+                "label": "observe, diff, act: the same loop twice",
+                "fill": "#fafafa"}],
+        nodes=[
+            {"x": 60, "y": 96, "w": 190, "h": 50, "style": "box",
+             "lines": ["ReplicaSet", "watched kind"]},
+            {"x": 360, "y": 92, "w": 190, "h": 58, "style": "accent",
+             "lines": ["ReplicaSet controller", "(built-in)"]},
+            {"x": 660, "y": 96, "w": 190, "h": 50, "style": "ink",
+             "lines": ["Pods x2", "owned"]},
+            {"x": 60, "y": 216, "w": 190, "h": 50, "style": "box",
+             "lines": ["ShippingPolicy", "watched kind"]},
+            {"x": 360, "y": 212, "w": 190, "h": 58, "style": "accent",
+             "lines": ["ShippingPolicyReconciler", "(custom)"]},
+            {"x": 660, "y": 212, "w": 190, "h": 50, "style": "ink",
+             "lines": ["Deployment + ConfigMap", "owned"]},
+        ],
+        edges=[
+            {"x1": 250, "y1": 121, "x2": 360, "y2": 121, "label": "watch", "dashed": True},
+            {"x1": 550, "y1": 121, "x2": 660, "y2": 121, "label": "create / delete", "amber": True},
+            {"x1": 250, "y1": 241, "x2": 360, "y2": 241, "label": "watch", "dashed": True},
+            {"x1": 550, "y1": 241, "x2": 660, "y2": 241, "label": "CreateOrUpdate", "amber": True},
+        ],
+        notes=[
+            {"x": 460, "y": 32,
+             "text": "Controller: the loop never changes shape, only the watched kind does",
+             "anchor": "middle", "bold": True},
+            {"x": 755, "y": 290,
+             "text": "owner references drive garbage collection", "anchor": "middle",
+             "size": 10, "color": "#64748b"},
+        ],
+    )
+
+
+def operator():
+    g.emit(
+        "appendix-25-operator", 900, 330,
+        bands=[{"x": 20, "y": 46, "w": 860, "h": 258,
+                "label": "a CRD plus a controller is an Operator", "fill": "#fafafa"}],
+        nodes=[
+            {"x": 50, "y": 108, "w": 200, "h": 90, "style": "accent",
+             "lines": ["ShippingPolicy (CRD)", "spec: carrier, replicas",
+                       "status: Ready, observed"]},
+            {"x": 350, "y": 122, "w": 170, "h": 60, "style": "box",
+             "lines": ["Reconcile loop"]},
+            {"x": 640, "y": 84, "w": 200, "h": 48, "style": "ink",
+             "lines": ["Deployment"]},
+            {"x": 640, "y": 176, "w": 200, "h": 48, "style": "ink",
+             "lines": ["ConfigMap"]},
+        ],
+        edges=[
+            {"x1": 250, "y1": 152, "x2": 350, "y2": 152, "label": "watch (For)"},
+            {"x1": 520, "y1": 140, "x2": 640, "y2": 108, "label": "CreateOrUpdate", "amber": True},
+            {"x1": 520, "y1": 164, "x2": 640, "y2": 200, "label": "CreateOrUpdate", "amber": True},
+            {"x1": 640, "y1": 120, "x2": 250, "y2": 140, "label": "status.replicas", "dashed": True},
+        ],
+        notes=[
+            {"x": 450, "y": 32,
+             "text": "Operator: the CRD gives the domain concept a typed place in the API",
+             "anchor": "middle", "bold": True},
+            {"x": 740, "y": 266,
+             "text": "owner refs cascade a delete to both children", "anchor": "middle",
+             "size": 10, "color": "#64748b"},
+        ],
+    )
+
+
+def elastic_scale():
+    g.emit(
+        "appendix-23-elastic-scale", 920, 340,
+        bands=[{"x": 20, "y": 46, "w": 880, "h": 272,
+                "label": "inside the Pod vs outside the Pod", "fill": "#fafafa"}],
+        nodes=[
+            {"x": 60, "y": 92, "w": 190, "h": 54, "style": "ink",
+             "lines": ["shipping-service Pods"]},
+            {"x": 360, "y": 90, "w": 180, "h": 58, "style": "accent",
+             "lines": ["HPA + VPA"]},
+            {"x": 660, "y": 92, "w": 190, "h": 54, "style": "box",
+             "lines": ["replicas 1..5", "(+ recommend)"]},
+            {"x": 60, "y": 214, "w": 190, "h": 54, "style": "box",
+             "lines": ["cron schedule", "(no Pod needed)"]},
+            {"x": 360, "y": 212, "w": 180, "h": 58, "style": "accent",
+             "lines": ["KEDA ScaledObject"]},
+            {"x": 660, "y": 214, "w": 190, "h": 54, "style": "ink",
+             "lines": ["graphql-gateway 0..3"]},
+        ],
+        edges=[
+            {"x1": 250, "y1": 119, "x2": 360, "y2": 119, "label": "read cpu / mem", "dashed": True},
+            {"x1": 540, "y1": 119, "x2": 660, "y2": 119, "label": "scale", "amber": True},
+            {"x1": 250, "y1": 241, "x2": 360, "y2": 241, "label": "read", "dashed": True},
+            {"x1": 540, "y1": 241, "x2": 660, "y2": 241, "label": "scale to zero", "amber": True},
+        ],
+        notes=[
+            {"x": 460, "y": 32,
+             "text": "Elastic Scale: resource metrics floor at 1 replica; an external signal reaches 0",
+             "anchor": "middle", "bold": True},
+            {"x": 755, "y": 162, "text": "floor = 1", "anchor": "middle",
+             "size": 10, "color": "#64748b"},
+            {"x": 755, "y": 284, "text": "floor = 0", "anchor": "middle",
+             "size": 10, "color": "#b8650a"},
+        ],
+    )
+
+
+def image_builder():
+    g.emit(
+        "appendix-24-image-builder", 940, 360,
+        bands=[{"x": 20, "y": 46, "w": 900, "h": 292,
+                "label": "one registry, two addresses", "fill": "#fafafa"}],
+        nodes=[
+            {"x": 50, "y": 96, "w": 160, "h": 46, "style": "box",
+             "lines": ["local directory"]},
+            {"x": 50, "y": 162, "w": 160, "h": 46, "style": "box",
+             "lines": ["git commit"]},
+            {"x": 300, "y": 104, "w": 190, "h": 74, "style": "accent",
+             "lines": ["Build: Buildah in a Pod", "no Docker daemon"]},
+            {"x": 600, "y": 100, "w": 220, "h": 72, "style": "ink",
+             "lines": ["integrated registry", "...svc:5000 (in-cluster)"]},
+            {"x": 600, "y": 244, "w": 220, "h": 50, "style": "box",
+             "lines": ["Deployment / Pod"]},
+            {"x": 50, "y": 256, "w": 160, "h": 46, "style": "ghost",
+             "lines": ["host podman"]},
+        ],
+        edges=[
+            {"x1": 210, "y1": 118, "x2": 300, "y2": 130, "label": "--from-dir"},
+            {"x1": 210, "y1": 184, "x2": 300, "y2": 156, "label": "git"},
+            {"x1": 490, "y1": 140, "x2": 600, "y2": 136, "label": "push", "amber": True},
+            {"x1": 710, "y1": 172, "x2": 710, "y2": 244, "label": "pull", "amber": True},
+            {"x1": 210, "y1": 272, "x2": 600, "y2": 160, "label": "external Route", "dashed": True},
+        ],
+        notes=[
+            {"x": 470, "y": 32,
+             "text": "Image Builder: in-cluster builds push, and Pods pull, by the in-cluster address",
+             "anchor": "middle", "bold": True},
+            {"x": 130, "y": 318, "text": "outside the cluster", "anchor": "middle",
+             "size": 10, "color": "#64748b"},
+        ],
+    )
+
+
 def main():
     predictable_demands()
     declarative_deployment()
@@ -726,6 +869,10 @@ def main():
     configuration_resource()
     configuration_template()
     immutable_configuration()
+    controller()
+    operator()
+    elastic_scale()
+    image_builder()
 
 
 if __name__ == "__main__":

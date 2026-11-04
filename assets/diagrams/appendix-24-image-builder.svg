@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 940 360" font-family="'Red Hat Text', system-ui, sans-serif" role="img">
+<defs><marker id="a" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#555"/></marker><marker id="am" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#b8650a"/></marker></defs>
+<rect x="20" y="46" width="900" height="292" rx="12" fill="#fafafa" stroke="#ddd"/>
+<text x="32" y="66" font-size="12" font-weight="700" fill="#888">one registry, two addresses</text>
+<rect x="50" y="96" width="160" height="46" rx="9" fill="#ffffff" stroke="#111111" stroke-width="2"/>
+<text x="130.0" y="124.5" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">local directory</text>
+<rect x="50" y="162" width="160" height="46" rx="9" fill="#ffffff" stroke="#111111" stroke-width="2"/>
+<text x="130.0" y="190.5" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">git commit</text>
+<rect x="300" y="104" width="190" height="74" rx="9" fill="#fff8ef" stroke="#e8870c" stroke-width="2"/>
+<text x="395.0" y="139.0" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">Build: Buildah in a Pod</text>
+<text x="395.0" y="156.0" font-size="11.5" fill="#555555" text-anchor="middle">no Docker daemon</text>
+<rect x="600" y="100" width="220" height="72" rx="9" fill="#f1f5f9" stroke="#64748b" stroke-width="2"/>
+<text x="710.0" y="134.0" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">integrated registry</text>
+<text x="710.0" y="151.0" font-size="11.5" fill="#555555" text-anchor="middle">...svc:5000 (in-cluster)</text>
+<rect x="600" y="244" width="220" height="50" rx="9" fill="#ffffff" stroke="#111111" stroke-width="2"/>
+<text x="710.0" y="274.5" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">Deployment / Pod</text>
+<rect x="50" y="256" width="160" height="46" rx="9" fill="#ffffff" stroke="#999999" stroke-width="1.5" stroke-dasharray="6 4"/>
+<text x="130.0" y="284.5" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">host podman</text>
+<path d="M210,118 L300,130" fill="none" stroke="#555" stroke-width="2" marker-end="url(#a)"/>
+<text x="261.0" y="118.0" font-size="11" fill="#ffffff" stroke="#ffffff" stroke-width="3" paint-order="stroke" text-anchor="middle">--from-dir</text>
+<text x="261.0" y="118.0" font-size="11" fill="#555" text-anchor="middle">--from-dir</text>
+<path d="M210,184 L300,156" fill="none" stroke="#555" stroke-width="2" marker-end="url(#a)"/>
+<text x="261.0" y="164.0" font-size="11" fill="#ffffff" stroke="#ffffff" stroke-width="3" paint-order="stroke" text-anchor="middle">git</text>
+<text x="261.0" y="164.0" font-size="11" fill="#555" text-anchor="middle">git</text>
+<path d="M490,140 L600,136" fill="none" stroke="#b8650a" stroke-width="2" marker-end="url(#am)"/>
+<text x="551.0" y="132.0" font-size="11" fill="#ffffff" stroke="#ffffff" stroke-width="3" paint-order="stroke" text-anchor="middle">push</text>
+<text x="551.0" y="132.0" font-size="11" fill="#b8650a" text-anchor="middle">push</text>
+<path d="M710,172 L710,244" fill="none" stroke="#b8650a" stroke-width="2" marker-end="url(#am)"/>
+<text x="716.0" y="202.0" font-size="11" fill="#ffffff" stroke="#ffffff" stroke-width="3" paint-order="stroke" text-anchor="middle">pull</text>
+<text x="716.0" y="202.0" font-size="11" fill="#b8650a" text-anchor="middle">pull</text>
+<path d="M210,272 L600,160" fill="none" stroke="#555" stroke-width="2" stroke-dasharray="5 4" marker-end="url(#a)"/>
+<text x="411.0" y="210.0" font-size="11" fill="#ffffff" stroke="#ffffff" stroke-width="3" paint-order="stroke" text-anchor="middle">external Route</text>
+<text x="411.0" y="210.0" font-size="11" fill="#555" text-anchor="middle">external Route</text>
+<text x="470" y="32" font-size="11" fill="#888" text-anchor="middle" font-weight="700">Image Builder: in-cluster builds push, and Pods pull, by the in-cluster address</text>
+<text x="130" y="318" font-size="10" fill="#64748b" text-anchor="middle">outside the cluster</text>
+</svg>
