@@ -280,6 +280,6 @@ before deleting, so the cluster returns to empty.
 
 ## Where this fits
 
-You can install any operator safely with a pinned version. The next chapter indexes the
-runnable examples and their verification status, closing the first part of the
-guide.
+You can install any operator safely with a pinned version. The next chapter turns to
+state: persistent storage, so a workload's data survives a Pod restart, with
+OpenShift's dynamic provisioning on CRC.

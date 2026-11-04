@@ -6,7 +6,49 @@ layout: plan
 Internal planning notes (not published; the `plans` collection is
 `output: false`).
 
-## Phase 1 — CRC core (current)
+## Phase 2 — remaining core chapters (r02)
+
+Storage, autoscaling, editor/shell, alternatives, FAQ, where-to-next; examples
+moved to §16. Hands-on chapters live-verified on CRC.
+
+- [x] Ch 10 Persistent storage (verified live: PVC Pending->Bound on first mount,
+      data survives Pod delete; hostpath SC WaitForFirstConsumer/Retain)
+- [x] Ch 11 Autoscaling (verified live: CMA operator + KedaController installed,
+      HPA on CPU, ScaledObject makes its own keda-hpa-web; HPA-or-ScaledObject
+      conflict found and fixed in the chapter)
+- [x] Ch 12 Editor and shell (verified live: oc exec/rsh/cp/debug/port-forward)
+- [x] Ch 13 Alternatives (prose)
+- [x] Ch 14 FAQ (prose)
+- [x] Ch 15 Where to go next (prose)
+- [x] Ch 16 Examples (renumbered from §10; index extended for the new chapters)
+- [x] All content chapters at the 2k prose floor, 0 ban-tier
+- [x] Diagrams: persistent-storage §10, autoscaling §11, editor-shell §12
+      (paired SVG + .excalidraw, gallery rebuilt to 9 figures)
+- [ ] Open the r02 PR
+
+### Evidence — Phase 2 live CRC run (same cluster as r01)
+
+Verified on the running CRC (OpenShift 4.22.14) with the bundled `oc`. The r01
+operators were still installed and do not interfere with these chapters.
+
+- Ch10: PVC `data` reported `Pending` immediately after create (WaitForFirstConsumer)
+  and `Bound` once the writer Pod was scheduled; a file written to the volume
+  survived `oc delete pod` and reappeared in the replacement Pod.
+- Ch11: `custom-metrics-autoscaler.v2.19.0-4` (current catalog pin, no bump) installed;
+  `KedaController` brought up keda-operator, keda-metrics-apiserver, keda-admission.
+  `oc autoscale` created HPA `web`; a `ScaledObject` on the same workload was REJECTED
+  while that HPA existed ("already managed by the hpa 'web'"); applied alone it created
+  `keda-hpa-web` owned by the ScaledObject. Chapter fixes: real scaffold file paths
+  (`subscriptions/custom-metrics-autoscaler.yaml`, `keda/kedacontroller.yaml`); the
+  HPA-or-ScaledObject (not both) rule; `keda-hpa-web` naming; a CPU request on the
+  Deployment so the HPA has a baseline.
+- Ch12: `oc exec`, `oc rsh` (arbitrary UID 1000780000), `oc debug` (ran a command),
+  `oc port-forward` (HTTP 403 through the tunnel, reachable) all worked. Fix: UBI
+  `/etc/os-release` is a symlink `oc cp` skips, so Build/run/observe now writes a
+  regular file and copies it by Pod name, and `rsh` uses `sh` not `curl`.
+- Test projects deleted. CMA operator + KedaController left installed.
+
+## Phase 1 — CRC core (r01, shipped as r01.0)
 
 Scaffold + the genuinely-new CRC content and a first slice of mirrored core
 chapters, live-verified on CRC.
