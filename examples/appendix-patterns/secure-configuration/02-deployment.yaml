@@ -1,0 +1,74 @@
+# inventory-service consuming inventory-db-credentials two ways at once: the
+# password as an env var (convenient, but visible in the process environment and
+# inherited by children), and the whole Secret as a 0400-mode mounted file
+# (nothing reads it unless something opens the path). For a credential the file
+# path removes an exposure surface the env var can't. restricted-v2 clean.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: inventory-service
+  namespace: patterns
+  labels:
+    app.kubernetes.io/name: inventory-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: inventory-service
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: inventory-service
+    spec:
+      securityContext:
+        runAsNonRoot: true
+      containers:
+        - name: inventory-service
+          image: image-registry.openshift-image-registry.svc:5000/patterns/inventory-service:v1
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: grpc
+              containerPort: 50051
+            - name: http
+              containerPort: 8080
+          env:
+            - name: SERVICE_SCHEMA
+              value: inventory
+            - name: PG_HOST
+              value: patterns-postgres.patterns.svc.cluster.local
+            - name: PG_USER
+              valueFrom:
+                secretKeyRef: { name: inventory-db-credentials, key: username }
+            # The credential as an env var: convenient, broadly exposed.
+            - name: PG_PASSWORD
+              valueFrom:
+                secretKeyRef: { name: inventory-db-credentials, key: password }
+            - name: PG_DATABASE
+              valueFrom:
+                secretKeyRef: { name: inventory-db-credentials, key: dbname }
+          volumeMounts:
+            # The same Secret as a file tree, read-only, mode 0400.
+            - name: db-credentials
+              mountPath: /etc/inventory/credentials
+              readOnly: true
+          resources:
+            requests: { cpu: 100m, memory: 192Mi }
+            limits: { memory: 512Mi }
+          startupProbe:
+            httpGet: { path: /health, port: http }
+            failureThreshold: 30
+            periodSeconds: 2
+          readinessProbe:
+            httpGet: { path: /healthz, port: http }
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsNonRoot: true
+            capabilities: { drop: ["ALL"] }
+            seccompProfile: { type: RuntimeDefault }
+      volumes:
+        - name: db-credentials
+          secret:
+            secretName: inventory-db-credentials
+            defaultMode: 0400

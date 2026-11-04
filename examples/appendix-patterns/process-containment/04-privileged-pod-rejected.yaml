@@ -1,0 +1,16 @@
+# A privileged Pod, rejected at admission. On OpenShift two layers would each
+# refuse it: the default ServiceAccount has no SCC that permits
+# privileged: true, and the namespace's baseline Pod Security Standard forbids
+# it too. The Pod object is never created.
+apiVersion: v1
+kind: Pod
+metadata:
+  name: privileged-demo
+  namespace: patterns-pss-demo
+spec:
+  containers:
+    - name: demo
+      image: registry.access.redhat.com/ubi9/ubi-minimal:latest
+      command: ["sleep", "3600"]
+      securityContext:
+        privileged: true

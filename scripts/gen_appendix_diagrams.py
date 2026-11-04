@@ -847,6 +847,111 @@ def image_builder():
     )
 
 
+def access_control():
+    g.emit(
+        "appendix-26-access-control", 900, 300,
+        bands=[{"x": 20, "y": 48, "w": 860, "h": 216,
+                "label": "identity, then exactly the grant it needs", "fill": "#fafafa"}],
+        nodes=[
+            {"x": 50, "y": 108, "w": 180, "h": 56, "style": "accent",
+             "lines": ["payment-service SA"]},
+            {"x": 330, "y": 110, "w": 150, "h": 52, "style": "box",
+             "lines": ["RoleBinding"]},
+            {"x": 580, "y": 78, "w": 250, "h": 56, "style": "ink",
+             "lines": ["Role: get payment-config,", "patterns-postgres-app"]},
+            {"x": 580, "y": 168, "w": 250, "h": 46, "style": "ghost",
+             "lines": ["other-team-secret (unnamed)"]},
+        ],
+        edges=[
+            {"x1": 230, "y1": 136, "x2": 330, "y2": 136, "label": "subject"},
+            {"x1": 480, "y1": 128, "x2": 580, "y2": 110, "label": "roleRef"},
+            {"x1": 580, "y1": 150, "x2": 480, "y2": 150, "label": "never named", "dashed": True},
+        ],
+        notes=[
+            {"x": 450, "y": 34,
+             "text": "Access Control: a Role names two resources by get; nothing else matches",
+             "anchor": "middle", "bold": True},
+            {"x": 705, "y": 236, "text": "no rule matches -> denied", "anchor": "middle",
+             "size": 10, "color": "#64748b"},
+        ],
+    )
+
+
+def network_segmentation():
+    g.emit(
+        "appendix-27-network-segmentation", 900, 320,
+        bands=[{"x": 20, "y": 48, "w": 860, "h": 236,
+                "label": "deny by default, one allow for the real caller", "fill": "#fafafa"}],
+        nodes=[
+            {"x": 60, "y": 100, "w": 170, "h": 52, "style": "box",
+             "lines": ["graphql-gateway"]},
+            {"x": 380, "y": 96, "w": 190, "h": 60, "style": "accent",
+             "lines": ["inventory-service", "deny-all ingress"]},
+            {"x": 680, "y": 100, "w": 170, "h": 52, "style": "ink",
+             "lines": ["payment-service", "fully isolated"]},
+            {"x": 60, "y": 210, "w": 170, "h": 52, "style": "ghost",
+             "lines": ["test-client"]},
+        ],
+        edges=[
+            {"x1": 230, "y1": 126, "x2": 380, "y2": 126, "label": "allow :50051", "amber": True},
+            {"x1": 230, "y1": 228, "x2": 380, "y2": 150, "label": "denied", "dashed": True},
+            {"x1": 230, "y1": 232, "x2": 680, "y2": 140, "label": "denied", "dashed": True},
+        ],
+        notes=[{"x": 450, "y": 34,
+                "text": "Network Segmentation: only a gateway-labeled source reaches inventory on gRPC",
+                "anchor": "middle", "bold": True}],
+    )
+
+
+def process_containment():
+    g.emit(
+        "appendix-28-process-containment", 900, 320,
+        bands=[{"x": 20, "y": 48, "w": 860, "h": 236,
+                "label": "two admission layers; the SCC injects the UID", "fill": "#fafafa"}],
+        nodes=[
+            {"x": 50, "y": 104, "w": 200, "h": 70, "style": "box",
+             "lines": ["Pod securityContext", "non-root, drop ALL,", "read-only root"]},
+            {"x": 350, "y": 110, "w": 180, "h": 60, "style": "accent",
+             "lines": ["restricted-v2 SCC", "injects UID"]},
+            {"x": 640, "y": 104, "w": 210, "h": 60, "style": "ink",
+             "lines": ["admitted: uid 1000650000,", "CapEff 0, ro root fs"]},
+            {"x": 350, "y": 214, "w": 180, "h": 50, "style": "ghost",
+             "lines": ["privileged Pod -> rejected"]},
+        ],
+        edges=[
+            {"x1": 250, "y1": 139, "x2": 350, "y2": 139, "label": "request"},
+            {"x1": 530, "y1": 139, "x2": 640, "y2": 134, "label": "admit", "amber": True},
+            {"x1": 440, "y1": 214, "x2": 440, "y2": 170, "label": "baseline PSA", "dashed": True},
+        ],
+        notes=[{"x": 450, "y": 34,
+                "text": "Process Containment: restricted-v2 admits the hardened Pod, baseline PSA rejects privileged",
+                "anchor": "middle", "bold": True}],
+    )
+
+
+def secure_configuration():
+    g.emit(
+        "appendix-29-secure-configuration", 900, 300,
+        bands=[{"x": 20, "y": 48, "w": 860, "h": 216,
+                "label": "one Secret, two paths; base64 is not encryption", "fill": "#fafafa"}],
+        nodes=[
+            {"x": 50, "y": 104, "w": 220, "h": 70, "style": "accent",
+             "lines": ["Secret (Opaque)", "base64, not encrypted", "in etcd"]},
+            {"x": 560, "y": 74, "w": 280, "h": 48, "style": "box",
+             "lines": ["env var PG_PASSWORD (broad)"]},
+            {"x": 560, "y": 160, "w": 280, "h": 56, "style": "ink",
+             "lines": ["file 0440 (owner root,", "group = injected fsGroup)"]},
+        ],
+        edges=[
+            {"x1": 270, "y1": 128, "x2": 560, "y2": 98, "label": "secretKeyRef"},
+            {"x1": 270, "y1": 150, "x2": 560, "y2": 186, "label": "volume mount", "amber": True},
+        ],
+        notes=[{"x": 450, "y": 34,
+                "text": "Secure Configuration: a mounted file narrows exposure the env var can't",
+                "anchor": "middle", "bold": True}],
+    )
+
+
 def main():
     predictable_demands()
     declarative_deployment()
@@ -873,6 +978,10 @@ def main():
     operator()
     elastic_scale()
     image_builder()
+    access_control()
+    network_segmentation()
+    process_containment()
+    secure_configuration()
 
 
 if __name__ == "__main__":

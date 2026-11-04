@@ -1,0 +1,15 @@
+# Default-deny ingress for inventory-service's Pods only. An empty ingress list
+# with policyTypes: [Ingress] denies every inbound connection to the selected
+# Pods. Scoped by podSelector so Postgres, payment-service, and everything else
+# in patterns are untouched.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: deny-all-inventory
+  namespace: patterns
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: inventory-service
+  policyTypes:
+    - Ingress
