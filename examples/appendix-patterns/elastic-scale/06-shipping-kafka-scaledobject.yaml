@@ -1,0 +1,33 @@
+# REFERENCE ONLY, not applied in this chapter's run. The other canonical KEDA
+# trigger measures a queue's backlog rather than a schedule: Kafka consumer
+# lag. The §17 data mesh runs this shape in production against
+# notification-service, a real Kafka consumer. This appendix's shipping-service
+# is a REST-only skeleton with nothing consuming a topic, and the pristine
+# patterns cluster runs no Kafka broker, so applying this would leave the
+# trigger unable to resolve its bootstrapServers.
+#
+# It's here to read alongside 05-gateway-scaledobject.yaml: lagThreshold "5"
+# means one replica per five messages of unprocessed backlog, computed by KEDA
+# polling Kafka's committed-offset-versus-log-end-offset gap for this consumer
+# group, entirely independent of whether a consumer is running to report it.
+# That independence from a running Pod is what lets minReplicaCount be 0, the
+# same property the cron trigger has and a CPU-based HPA structurally lacks.
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: notification-service
+  namespace: patterns
+spec:
+  scaleTargetRef:
+    name: notification-service
+  pollingInterval: 5
+  cooldownPeriod: 30
+  minReplicaCount: 0
+  maxReplicaCount: 3
+  triggers:
+    - type: kafka
+      metadata:
+        bootstrapServers: capstone-kafka-kafka-bootstrap.capstone.svc.cluster.local:9092
+        consumerGroup: notification-service
+        topic: order-placed
+        lagThreshold: "5"

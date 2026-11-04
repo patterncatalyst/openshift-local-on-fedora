@@ -774,6 +774,43 @@ def operator():
     )
 
 
+def elastic_scale():
+    g.emit(
+        "appendix-23-elastic-scale", 920, 340,
+        bands=[{"x": 20, "y": 46, "w": 880, "h": 272,
+                "label": "inside the Pod vs outside the Pod", "fill": "#fafafa"}],
+        nodes=[
+            {"x": 60, "y": 92, "w": 190, "h": 54, "style": "ink",
+             "lines": ["shipping-service Pods"]},
+            {"x": 360, "y": 90, "w": 180, "h": 58, "style": "accent",
+             "lines": ["HPA + VPA"]},
+            {"x": 660, "y": 92, "w": 190, "h": 54, "style": "box",
+             "lines": ["replicas 1..5", "(+ recommend)"]},
+            {"x": 60, "y": 214, "w": 190, "h": 54, "style": "box",
+             "lines": ["cron schedule", "(no Pod needed)"]},
+            {"x": 360, "y": 212, "w": 180, "h": 58, "style": "accent",
+             "lines": ["KEDA ScaledObject"]},
+            {"x": 660, "y": 214, "w": 190, "h": 54, "style": "ink",
+             "lines": ["graphql-gateway 0..3"]},
+        ],
+        edges=[
+            {"x1": 250, "y1": 119, "x2": 360, "y2": 119, "label": "read cpu / mem", "dashed": True},
+            {"x1": 540, "y1": 119, "x2": 660, "y2": 119, "label": "scale", "amber": True},
+            {"x1": 250, "y1": 241, "x2": 360, "y2": 241, "label": "read", "dashed": True},
+            {"x1": 540, "y1": 241, "x2": 660, "y2": 241, "label": "scale to zero", "amber": True},
+        ],
+        notes=[
+            {"x": 460, "y": 32,
+             "text": "Elastic Scale: resource metrics floor at 1 replica; an external signal reaches 0",
+             "anchor": "middle", "bold": True},
+            {"x": 755, "y": 162, "text": "floor = 1", "anchor": "middle",
+             "size": 10, "color": "#64748b"},
+            {"x": 755, "y": 284, "text": "floor = 0", "anchor": "middle",
+             "size": 10, "color": "#b8650a"},
+        ],
+    )
+
+
 def main():
     predictable_demands()
     declarative_deployment()
@@ -798,6 +835,7 @@ def main():
     immutable_configuration()
     controller()
     operator()
+    elastic_scale()
 
 
 if __name__ == "__main__":
