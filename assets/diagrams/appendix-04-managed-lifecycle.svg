@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 340" font-family="'Red Hat Text', system-ui, sans-serif" role="img">
+<defs><marker id="a" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#555"/></marker><marker id="am" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#b8650a"/></marker></defs>
+<rect x="20" y="50" width="880" height="200" rx="12" fill="#fafafa" stroke="#ddd"/>
+<text x="32" y="70" font-size="12" font-weight="700" fill="#888">termination sequence (grace period 30s)</text>
+<rect x="40" y="110" width="130" height="80" rx="9" fill="#ffffff" stroke="#111111" stroke-width="2"/>
+<text x="105.0" y="140.5" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">delete</text>
+<text x="105.0" y="157.5" font-size="11.5" fill="#555555" text-anchor="middle">remove from</text>
+<text x="105.0" y="172.5" font-size="11.5" fill="#555555" text-anchor="middle">endpoints</text>
+<rect x="205" y="104" width="150" height="92" rx="9" fill="#fff8ef" stroke="#e8870c" stroke-width="2"/>
+<text x="280.0" y="140.5" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">preStop</text>
+<text x="280.0" y="157.5" font-size="11.5" fill="#555555" text-anchor="middle">sleep 10</text>
+<text x="280.0" y="172.5" font-size="11.5" fill="#555555" text-anchor="middle">still serving</text>
+<rect x="390" y="110" width="150" height="80" rx="9" fill="#ffffff" stroke="#111111" stroke-width="2"/>
+<text x="465.0" y="140.5" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">SIGTERM</text>
+<text x="465.0" y="157.5" font-size="11.5" fill="#555555" text-anchor="middle">to PID 1</text>
+<text x="465.0" y="172.5" font-size="11.5" fill="#555555" text-anchor="middle">(uvicorn)</text>
+<rect x="575" y="110" width="160" height="80" rx="9" fill="#ffffff" stroke="#111111" stroke-width="2"/>
+<text x="655.0" y="148.0" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">graceful shutdown</text>
+<text x="655.0" y="165.0" font-size="11.5" fill="#555555" text-anchor="middle">dispose pool</text>
+<rect x="770" y="116" width="110" height="68" rx="9" fill="#f1f5f9" stroke="#64748b" stroke-width="2"/>
+<text x="825.0" y="148.0" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">exit</text>
+<text x="825.0" y="165.0" font-size="11.5" fill="#555555" text-anchor="middle">~10s total</text>
+<path d="M170,150 L205,150" fill="none" stroke="#555" stroke-width="2" marker-end="url(#a)"/>
+<path d="M355,150 L390,150" fill="none" stroke="#555" stroke-width="2" marker-end="url(#a)"/>
+<text x="378.5" y="144.0" font-size="11" fill="#ffffff" stroke="#ffffff" stroke-width="3" paint-order="stroke" text-anchor="middle">after hook</text>
+<text x="378.5" y="144.0" font-size="11" fill="#555" text-anchor="middle">after hook</text>
+<path d="M540,150 L575,150" fill="none" stroke="#555" stroke-width="2" marker-end="url(#a)"/>
+<path d="M735,150 L770,150" fill="none" stroke="#555" stroke-width="2" marker-end="url(#a)"/>
+<text x="460" y="34" font-size="11" fill="#888" text-anchor="middle" font-weight="700">Managed Lifecycle: the termination sequence</text>
+<text x="460" y="228" font-size="10" fill="#b8650a" text-anchor="middle">SIGKILL instead if the grace period expires first</text>
+</svg>

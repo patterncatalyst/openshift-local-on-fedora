@@ -134,10 +134,46 @@ def health_probe():
     )
 
 
+def managed_lifecycle():
+    g.emit(
+        "appendix-04-managed-lifecycle", 920, 340,
+        bands=[{"x": 20, "y": 50, "w": 880, "h": 200,
+                "label": "termination sequence (grace period 30s)",
+                "fill": "#fafafa"}],
+        nodes=[
+            {"x": 40, "y": 110, "w": 130, "h": 80, "style": "box",
+             "lines": ["delete", "remove from", "endpoints"]},
+            {"x": 205, "y": 104, "w": 150, "h": 92, "style": "accent",
+             "lines": ["preStop", "sleep 10", "still serving"]},
+            {"x": 390, "y": 110, "w": 150, "h": 80, "style": "box",
+             "lines": ["SIGTERM", "to PID 1", "(uvicorn)"]},
+            {"x": 575, "y": 110, "w": 160, "h": 80, "style": "box",
+             "lines": ["graceful shutdown", "dispose pool"]},
+            {"x": 770, "y": 116, "w": 110, "h": 68, "style": "ink",
+             "lines": ["exit", "~10s total"]},
+        ],
+        edges=[
+            {"x1": 170, "y1": 150, "x2": 205, "y2": 150},
+            {"x1": 355, "y1": 150, "x2": 390, "y2": 150, "label": "after hook"},
+            {"x1": 540, "y1": 150, "x2": 575, "y2": 150},
+            {"x1": 735, "y1": 150, "x2": 770, "y2": 150},
+        ],
+        notes=[
+            {"x": 460, "y": 34,
+             "text": "Managed Lifecycle: the termination sequence",
+             "anchor": "middle", "bold": True},
+            {"x": 460, "y": 228,
+             "text": "SIGKILL instead if the grace period expires first",
+             "anchor": "middle", "size": 10, "color": "#b8650a"},
+        ],
+    )
+
+
 def main():
     predictable_demands()
     declarative_deployment()
     health_probe()
+    managed_lifecycle()
 
 
 if __name__ == "__main__":

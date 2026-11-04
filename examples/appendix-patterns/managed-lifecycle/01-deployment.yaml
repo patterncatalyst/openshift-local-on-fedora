@@ -1,0 +1,100 @@
+# shipping-service with postStart/preStop hooks and a terminationGracePeriod-
+# Seconds sized to cover them, under restricted-v2. shipping-service is used
+# here (rather than notification-service) because its lifespan shutdown is a
+# clean DB-pool dispose with no external dependency, so the graceful-shutdown
+# sequence completes well inside the grace period. That is the whole point of
+# the Managed Lifecycle pattern: the container is handed a chance to stop
+# cleanly, and it takes it.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: shipping-service
+  namespace: patterns
+  labels:
+    app.kubernetes.io/name: shipping-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: shipping-service
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: shipping-service
+    spec:
+      securityContext:
+        runAsNonRoot: true
+      # Long enough for the preStop sleep (10s) plus the app's own shutdown
+      # (near-instant: dispose the SQLAlchemy engine's connection pool).
+      terminationGracePeriodSeconds: 30
+      containers:
+        - name: shipping-service
+          image: image-registry.openshift-image-registry.svc:5000/patterns/shipping-service:v1
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 8080
+          env:
+            - name: SERVICE_SCHEMA
+              value: shipping
+            - name: PG_HOST
+              value: patterns-postgres.patterns.svc.cluster.local
+            - name: PG_PORT
+              value: "5432"
+            - name: PG_USER
+              valueFrom:
+                secretKeyRef: { name: patterns-postgres-app, key: username }
+            - name: PG_PASSWORD
+              valueFrom:
+                secretKeyRef: { name: patterns-postgres-app, key: password }
+            - name: PG_DATABASE
+              valueFrom:
+                secretKeyRef: { name: patterns-postgres-app, key: dbname }
+          lifecycle:
+            # Warm-up marker written before the container is considered started;
+            # the kubelet holds probes until this exits.
+            postStart:
+              exec:
+                command: ["sh", "-c", "date > /tmp/managed-lifecycle-ready"]
+            # Endpoint-removal propagation delay: gives the Service and the
+            # router time to stop sending new requests before SIGTERM arrives.
+            preStop:
+              exec:
+                command: ["sh", "-c", "sleep 10"]
+          resources:
+            requests:
+              cpu: 100m
+              memory: 192Mi
+            limits:
+              memory: 512Mi
+          startupProbe:
+            httpGet: { path: /health, port: http }
+            failureThreshold: 30
+            periodSeconds: 2
+          livenessProbe:
+            httpGet: { path: /health, port: http }
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          readinessProbe:
+            httpGet: { path: /healthz, port: http }
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsNonRoot: true
+            capabilities:
+              drop: ["ALL"]
+            seccompProfile:
+              type: RuntimeDefault
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: shipping-service
+  namespace: patterns
+spec:
+  selector:
+    app.kubernetes.io/name: shipping-service
+  ports:
+    - port: 80
+      targetPort: 8080
