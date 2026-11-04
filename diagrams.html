@@ -1,28 +1,44 @@
 ---
 layout: default
 title: Diagrams
-description: "Every figure in the OpenShift Local (CRC) on Fedora guide, in one gallery."
+description: "Every figure from the book on one page, with its editable Excalidraw source."
 permalink: /diagrams/
 ---
 
+<style>
+  .diagram-gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(28rem, 1fr));
+    gap: 2rem;
+    margin-top: 2rem;
+  }
+  .diagram-gallery .excalidraw-embed { margin: 0; }
+  @media (max-width: 40rem) {
+    .diagram-gallery { grid-template-columns: 1fr; }
+  }
+</style>
+
 <section class="section">
-  <div class="container container-prose">
+  <div class="container">
     <span class="hero__eyebrow">Diagrams</span>
-    <h1>Every figure, in one place.</h1>
+    <h1>Every figure, on one page.</h1>
     <p class="hero__lead">
-      Each figure ships as a rendered SVG plus an editable Excalidraw source.
-      The gallery grows as the hands-on chapters land.
+      The 6 diagrams from OpenShift Local (CRC) on Fedora, in reading order. Each one renders
+      inline here and ships a paired <code>.excalidraw</code> source you can
+      open on excalidraw.com and edit.
     </p>
   </div>
 </section>
 
 <section class="section">
   <div class="container">
-    <div class="cards">
-      {%- comment -%}
-        Figures are added here as chapters land, grouped by chapter. Each entry
-        embeds the SVG from assets/diagrams/ via the excalidraw include.
-      {%- endcomment -%}
+    <div class="diagram-gallery">
+      {%- include excalidraw.html file="crc-architecture" alt="On a Fedora host, the crc daemon and KVM with libvirt and qemu run a single virtual machine of Red Hat Enterprise Linux CoreOS. Inside the VM are the control plane, the worker, the internal registry, the router, and OLM with OperatorHub. The cluster's names resolve to 127.0.0.1 through user-mode networking." caption="Figure 1.1: OpenShift Local runs a full single-node OpenShift cluster inside one local VM, reached from the host over user-mode networking." -%}
+      {%- include excalidraw.html file="oc-and-kubectl" alt="The oc client contains all of kubectl's verbs for Pods, Deployments, Services, logs, and apply, plus OpenShift-only verbs such as new-app, expose, project, adm, and status. Those OpenShift verbs manage a Project, which is a Namespace plus RBAC and quota." caption="Figure 4.1: oc is a superset of kubectl, adding the OpenShift-only verbs; a Project is a Namespace with OpenShift's RBAC and quota on top." -%}
+      {%- include excalidraw.html file="deploy-scc" alt="A Deployment named web creates a ReplicaSet, which keeps two Pods running, each an httpd container. The restricted-v2 security context constraint injects a non-root runAsUser, UID 1000650000, into the Pods." caption="Figure 5.1: A Deployment manages its Pods through a ReplicaSet, and the restricted-v2 SCC assigns each Pod a non-root UID from the project's range." -%}
+      {%- include excalidraw.html file="route-edge-tls" alt="A browser on the host connects over HTTPS to the OpenShift router, which terminates TLS at the edge and forwards plain HTTP to the httpd Pod on port 8080. A note says to trust the cluster ingress CA with curl --cacert rather than --insecure." caption="Figure 6.1: With edge termination the router handles TLS and forwards plain HTTP to the Pod; verify over HTTPS by trusting the cluster's ingress CA." -%}
+      {%- include excalidraw.html file="service-mesh" alt="In the mesh-demo namespace, labelled istio.io/rev=default, two Pods each run an app plus an Envoy sidecar and talk to each other over STRICT mutual TLS. The istiod control plane sends configuration and certificates to the proxies, and Kiali is the mesh console." caption="Figure 8.1: The istiod control plane configures the Envoy sidecars; the sidecars carry the traffic and enforce STRICT mutual TLS between Pods." -%}
+      {%- include excalidraw.html file="operator-olm" alt="A pinned Subscription leads to an InstallPlan that OLM creates, which you approve, which installs a CSV that reaches Succeeded. The CSV provides the installed operator: its controller and the CRDs it owns, such as kafkas.kafka.strimzi.io. The content comes from the redhat-operators catalog." caption="Figure 9.1: A pinned Subscription produces one InstallPlan you approve, which installs the CSV; a Succeeded CSV and its CRDs confirm the operator." -%}
     </div>
   </div>
 </section>

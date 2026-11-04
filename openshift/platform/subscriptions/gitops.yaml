@@ -1,0 +1,35 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: openshift-gitops-operator
+  labels:
+    app.kubernetes.io/part-of: demo
+---
+apiVersion: operators.coreos.com/v1
+kind: OperatorGroup
+metadata:
+  name: openshift-gitops-operator
+  namespace: openshift-gitops-operator
+spec:
+  upgradeStrategy: Default
+---
+# OpenShift GitOps (Argo CD). teardown.sh sets DISABLE_DEFAULT_ARGOCD_INSTANCE=true here before removing it.
+# Pinned: installPlanApproval Manual + startingCSV, and install_operator
+# (lib.sh) approves only the InstallPlan naming this CSV. Before each use,
+# re-check the newest CSV in the channel (references/versions.md):
+#   oc get packagemanifest openshift-gitops-operator -n openshift-marketplace \
+#     -o jsonpath='{range .status.channels[*]}{.name}{"  "}{.currentCSV}{"\n"}{end}'
+apiVersion: operators.coreos.com/v1alpha1
+kind: Subscription
+metadata:
+  name: openshift-gitops-operator
+  namespace: openshift-gitops-operator
+  labels:
+    app.kubernetes.io/part-of: demo
+spec:
+  name: openshift-gitops-operator
+  source: redhat-operators
+  sourceNamespace: openshift-marketplace
+  channel: gitops-1.22
+  startingCSV: openshift-gitops-operator.v1.22.1
+  installPlanApproval: Manual
