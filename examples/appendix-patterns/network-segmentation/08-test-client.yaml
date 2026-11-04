@@ -16,7 +16,7 @@ spec:
     seccompProfile: { type: RuntimeDefault }
   containers:
     - name: curl
-      image: registry.access.redhat.com/ubi9/ubi-minimal:latest
+      image: registry.access.redhat.com/ubi9/ubi-minimal:9.6
       command: ["sleep", "infinity"]
       resources:
         requests: { cpu: 50m, memory: 32Mi }

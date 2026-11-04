@@ -33,9 +33,9 @@ oc exec -n patterns netseg-test-client -- sh -c 'curl -s -o /dev/null -m 4 http:
 
 oc apply -f 05-allow-gateway-to-inventory.yaml
 # a probe Pod labeled as the gateway reaches inventory:50051; the test client does not
-oc run netseg-probe-gateway --image=registry.access.redhat.com/ubi9/ubi-minimal:latest \
+oc run netseg-probe-gateway --image=registry.access.redhat.com/ubi9/ubi-minimal:9.6 \
   --labels=app.kubernetes.io/name=graphql-gateway -n patterns --restart=Never \
-  --overrides='{"spec":{"securityContext":{"runAsNonRoot":true,"seccompProfile":{"type":"RuntimeDefault"}},"containers":[{"name":"p","image":"registry.access.redhat.com/ubi9/ubi-minimal:latest","command":["sleep","infinity"],"securityContext":{"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]}}}]}}'
+  --overrides='{"spec":{"securityContext":{"runAsNonRoot":true,"seccompProfile":{"type":"RuntimeDefault"}},"containers":[{"name":"p","image":"registry.access.redhat.com/ubi9/ubi-minimal:9.6","command":["sleep","infinity"],"securityContext":{"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]}}}]}}'
 oc wait --for=condition=Ready pod/netseg-probe-gateway -n patterns --timeout=60s
 oc exec -n patterns netseg-probe-gateway -- sh -c 'curl -s -o /dev/null -m 4 inventory-service:50051; echo exit=$?'   # connected (not 28)
 oc exec -n patterns netseg-test-client  -- sh -c 'curl -s -o /dev/null -m 4 inventory-service:50051; echo exit=$?'   # exit=28

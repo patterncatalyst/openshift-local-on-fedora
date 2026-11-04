@@ -205,7 +205,7 @@ g.emit("editor-shell", 900, 340,
          "anchor":"middle", "bold":True},
     ])
 
-# 10. Capstone: the seven-service data mesh on one CRC cluster
+# 10. Final project: the seven-service data mesh on one CRC cluster
 g.emit("capstone-datamesh", 960, 470,
     bands=[
         {"x":280, "y":150, "w":350, "h":110, "label":"six data-product services (restricted-v2)", "fill":"#fafafa"},

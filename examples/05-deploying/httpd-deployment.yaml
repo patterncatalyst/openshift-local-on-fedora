@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: httpd
-          image: registry.access.redhat.com/ubi9/httpd-24:latest
+          image: registry.access.redhat.com/ubi9/httpd-24:9.6
           ports:
             - containerPort: 8080
 ---

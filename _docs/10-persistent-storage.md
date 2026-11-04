@@ -41,7 +41,7 @@ Three Kubernetes objects work together, and the names are easy to confuse:
 
 The split matters because it keeps workloads portable. A Pod asks for "10 GiB that I
 can read and write" through a PVC, and the cluster satisfies it however it can: a
-hostpath directory on CRC, a block volume on a cloud. The manifest does not change
+hostpath directory on CRC, a block volume on a cloud. The manifest doesn't change
 between them, which is the portability this guide favors throughout.
 
 ## The default StorageClass on CRC
@@ -56,7 +56,7 @@ oc get storageclass
 
 Two of its settings shape how storage behaves here, and both are worth understanding
 before you create a claim. The volume binding mode is `WaitForFirstConsumer`, which
-means a PVC is not provisioned the moment you create it; the cluster waits until a Pod
+means a PVC isn't provisioned the moment you create it; the cluster waits until a Pod
 that uses the claim is scheduled, then provisions the volume on that Pod's node. On a
 single-node cluster the node is never in doubt, but the effect is visible: a fresh PVC
 sits in `Pending` until a Pod mounts it, which is expected rather than a fault. The
@@ -67,13 +67,13 @@ the cost of leaving volumes to clean up by hand.
 The provisioner is a hostpath provisioner: a PV is a directory on the CRC node's disk.
 That has one consequence to keep in mind. The data lives inside the CRC VM, so it
 survives Pod restarts, deployments, and `crc stop`, but a `crc delete` discards the VM
-and everything on it. For local development that is the right trade, as long as you do
-not treat the cluster as a place to keep anything you cannot recreate.
+and everything on it. For local development that's the right trade, as long as you do
+not treat the cluster as a place to keep anything you can't recreate.
 
 ### How dynamic provisioning happens
 
 Dynamic provisioning is why you never create a PV by hand here. The StorageClass names a
-provisioner, a controller that watches for claims it is responsible for. When a PVC that
+provisioner, a controller that watches for claims it's responsible for. When a PVC that
 uses the class needs a volume, the provisioner creates the backing storage and a matching
 PV, then binds the two. On a cloud that step calls an API to carve out a block device; on
 CRC it creates a directory on the node. Either way the workload sees the same result: a
@@ -157,9 +157,9 @@ The claim moves from `Pending` to `Bound` only after the writer Pod is scheduled
 is the binding mode in action, not a delay to worry about.
 
 `ReadWriteOnce` is the access mode the hostpath provisioner supports: the volume mounts
-read-write on a single node. That fits CRC, where there is one node. The other modes
+read-write on a single node. That fits CRC, where there's one node. The other modes
 (`ReadWriteMany` for many nodes writing at once) need a provisioner that supports them,
-which a real cluster with shared storage provides and a single-node hostpath does not.
+which a real cluster with shared storage provides and a single-node hostpath doesn't.
 
 ### Choosing an access mode
 
@@ -169,7 +169,7 @@ suits a database or any single writer, and is what CRC offers. `ReadOnlyMany` (R
 mounts read-only on many nodes, for sharing static content that no Pod writes.
 `ReadWriteMany` (RWX) mounts read-write on many nodes at once, which a shared filesystem
 provides and which workloads reach for when several replicas must write the same volume.
-On CRC, with one node and a hostpath provisioner, RWO is the realistic choice, and it is
+On CRC, with one node and a hostpath provisioner, RWO is the realistic choice, and it's
 also the mode most stateful workloads want: a database that let two replicas write the
 same files would corrupt itself, so RWO is a feature, not a limitation. When you port a
 manifest to a cluster with shared storage, the access mode is one of the few fields worth
@@ -193,8 +193,8 @@ oc exec deploy/writer -- cat /data/note.txt   # still "survives a restart"
 ```
 
 The replacement Pod is a different Pod with a fresh container filesystem, yet
-`/data/note.txt` is still there, because `/data` is the PVC, not the container. That is
-the whole idea: the Pod is disposable, the claim is not. The same holds across a
+`/data/note.txt` is still there, because `/data` is the PVC, not the container. That's
+the whole idea: the Pod is disposable, the claim isn't. The same holds across a
 `rollout restart` or a new image: as long as the Deployment keeps mounting the same claim,
 the data carries forward, which is what lets you update a stateful workload without losing
 what it stored.
@@ -218,7 +218,7 @@ The rule is the same as it was for the deploying and Helm chapters: rely on grou
 ownership rather than a fixed user, and the volume is writable regardless of which UID
 the project hands out. When a stateful image fails on OpenShift with a permission error
 writing to its data directory, the `fsGroup` is almost always the missing piece: the image
-expected to own its files as a fixed user, and the arbitrary UID cannot write until the
+expected to own its files as a fixed user, and the arbitrary UID can't write until the
 mount is made group-writable. Setting `fsGroup` to the group the image writes as resolves
 it without granting the image any extra privilege.
 
@@ -256,17 +256,17 @@ as first class.
 
 > **⌨️ The `oc` way**
 >
-> There is no OpenShift-only verb for storage; PVCs are standard Kubernetes. What `oc`
+> There's no OpenShift-only verb for storage; PVCs are standard Kubernetes. What `oc`
 > adds is the console view: under Storage you see every PersistentVolumeClaim, its bound
 > volume, its capacity, and which Pods mount it, which is the fastest way to spot a claim
 > stuck `Pending` for want of a consumer.
 
 ## Cleaning up and the Retain policy
 
-Because the StorageClass uses the `Retain` reclaim policy, deleting the project does not
+Because the StorageClass uses the `Retain` reclaim policy, deleting the project doesn't
 erase the volume's data. The PVC goes with the namespace, but the PV it was bound to is
 kept, now `Released` rather than deleted. On CRC the storage is small and local, so this
-rarely matters, but it is worth knowing when you expect a deleted claim to free space:
+rarely matters, but it's worth knowing when you expect a deleted claim to free space:
 
 ```bash
 oc delete project storage-demo
@@ -282,10 +282,10 @@ volumes.
 
 A PVC stuck in `Pending` is the most common storage snag, and on CRC it usually has one
 of two causes. The ordinary one is the binding mode: a claim with no consumer waits by
-design, so a `Pending` claim that has no Pod yet is not broken, it is waiting for one.
+design, so a `Pending` claim that has no Pod yet isn't broken, it's waiting for one.
 Create or schedule a Pod that mounts it and it binds. The real failure is a provisioner
-that cannot satisfy the claim, for example a request larger than the node's free disk, or
-an access mode the hostpath provisioner does not support. The reason is in the claim's
+that can't satisfy the claim, for example a request larger than the node's free disk, or
+an access mode the hostpath provisioner doesn't support. The reason is in the claim's
 events:
 
 ```bash
@@ -296,14 +296,14 @@ Reading those events first saves guessing. A claim that asks for `ReadWriteMany`
 CRC's hostpath, for instance, stays `Pending` because the provisioner offers only
 `ReadWriteOnce`, and the event names that mismatch directly.
 
-## Resizing is not available here
+## Resizing isn't available here
 
-The CRC StorageClass sets `allowVolumeExpansion` to false, so you cannot grow a bound
+The CRC StorageClass sets `allowVolumeExpansion` to false, so you can't grow a bound
 volume in place by editing the claim. On a cluster whose StorageClass allows expansion,
 raising a PVC's `storage` request resizes the volume online; on CRC you instead create a
 larger claim, copy the data across, and switch the workload to the new claim. For local
 development this is rarely a problem, because the volumes are small and easy to recreate,
-but it is the kind of difference from a production cluster that is better known in advance
+but it's the kind of difference from a production cluster that's better known in advance
 than discovered when a resize silently does nothing.
 
 ## Build, run, observe

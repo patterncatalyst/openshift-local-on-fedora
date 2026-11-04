@@ -29,9 +29,9 @@ cluster yet; that begins in the next chapter.
 
 ## What a single-node OpenShift gives you
 
-It helps to know what you are about to run, because it explains why the sizing is
-larger than a container runtime or a bare Kubernetes node. OpenShift Local is not a
-trimmed-down Kubernetes. It is a real OpenShift 4 release collapsed onto one machine
+It helps to know what you're about to run, because it explains why the sizing is
+larger than a container runtime or a bare Kubernetes node. OpenShift Local isn't a
+trimmed-down Kubernetes. It's a real OpenShift 4 release collapsed onto one machine
 that plays control-plane, worker, and infrastructure roles at once. That one node
 runs the API server, etcd, the scheduler, and the controller managers, and on top of
 them the pieces that make it OpenShift rather than plain Kubernetes:
@@ -49,10 +49,10 @@ them the pieces that make it OpenShift rather than plain Kubernetes:
 
 All of that runs before your first workload, which is why the memory and CPU figures
 below start where they do. The payoff is that everything you build here behaves the
-way it will on a production OpenShift cluster, because it is the same software.
+way it will on a production OpenShift cluster, because it's the same software.
 
-The single limit is that it is one node. The control plane and the worker
-are the same machine, so there is no high availability, and features that exist
+The single limit is that it's one node. The control plane and the worker
+are the same machine, so there's no high availability, and features that exist
 to spread work across nodes have nothing to spread it over: Pod anti-affinity,
 multi-zone scheduling, and a `LoadBalancer` service with an external IP pool are all
 things you can read and model here but not exercise. Everything else, the
@@ -83,7 +83,7 @@ Your host must be able to run a KVM virtual machine:
   expose *nested* virtualization.
 - `libvirt` and `NetworkManager`, which OpenShift Local drives to create the VM
   and its network. The `crc setup` step checks these and sets up what it can;
-  you do not configure libvirt by hand.
+  you don't configure libvirt by hand.
 
 Confirm virtualization is live before going further:
 
@@ -96,7 +96,7 @@ lsmod | grep kvm
 ```
 
 If the first command prints `0`, enable virtualization in your firmware setup.
-If you are on a cloud or nested VM, enable nested virtualization on the outer
+If you're on a cloud or nested VM, enable nested virtualization on the outer
 hypervisor and confirm the guest sees it:
 
 ```bash
@@ -116,15 +116,15 @@ df -h ~/.crc       # the VM image lives under your home directory
 The VM image grows as the cluster writes to it, up to the disk cap you set later, so
 give `~/.crc` real headroom rather than the bare minimum.
 
-### If virtualization is not available
+### If virtualization isn't available
 
 A `0` from the `vmx`/`svm` check almost always means virtualization is turned off in
 firmware rather than missing from the CPU. The setting hides under different names
 depending on the vendor: "Intel Virtualization Technology" or "VT-x" on Intel boards,
 "SVM Mode" or "AMD-V" on AMD. Enable it, save, and reboot, then run the check again.
-Secure Boot does not need to be disabled for KVM.
+Secure Boot doesn't need to be disabled for KVM.
 
-If the modules are present but `crc` later cannot talk to libvirt, the usual cause is
+If the modules are present but `crc` later can't talk to libvirt, the usual cause is
 group membership: `crc setup` adds your user to the `libvirt` group, but a group
 change only takes effect in a new login session, so log out and back in once after
 setup. You run `crc` as your normal user, never with `sudo`; running it as root
@@ -146,11 +146,11 @@ getent hosts console-openshift-console.apps-crc.testing   # 127.0.0.1
 
 `crc setup` is what makes those names resolve, by installing a small
 NetworkManager/dnsmasq dispatch rule on the host. Because the traffic loops back
-locally, you do not open inbound firewall ports and you do not need a tunnel to reach
+locally, you don't open inbound firewall ports and you don't need a tunnel to reach
 a Route. This also means the cluster is reachable only from this machine, which is
 exactly what you want for local development. User-mode networking works with SELinux
-left enforcing; you do not disable it. If you ever need the VM on a routable address
-instead (to reach it from another host), that is the `system` network mode, set with
+left enforcing; you don't disable it. If you ever need the VM on a routable address
+instead (to reach it from another host), that's the `system` network mode, set with
 `crc config set network-mode system` while the cluster is stopped, but the default
 suits everything in this guide.
 
@@ -180,14 +180,14 @@ gigabytes, so the initial start is slow; later starts reuse the cached bundle un
 to a newer release.
 
 Installing the binary itself comes next. For now, save the archive and the pull
-secret somewhere you will remember. Keep the pull secret as a file: you pass its
+secret somewhere you'll remember. Keep the pull secret as a file: you pass its
 path to `crc` once, and the cluster stores it. You never need to open it, print
 it, or paste its contents.
 
 > **⌨️ The `oc` way**
 >
 > The download page also carries the matching `oc` and `kubectl` clients, but you
-> do not need to fetch them separately. `crc` ships a bundled `oc`, and installing
+> don't need to fetch them separately. `crc` ships a bundled `oc`, and installing
 > CRC puts it on your `PATH` with `crc oc-env`. Install a standalone `oc` only if you
 > want it available when the cluster is stopped.
 
@@ -200,9 +200,9 @@ images and the Operator catalog content, which is why `crc start` asks for it on
 Treat it like a password:
 
 - Save it as a file (for example `~/.crc/pull-secret.json`) and leave it there.
-- Do not commit it to a repository. If your project has a `.gitignore`, add a
-  `pull-secret*.json` rule so it cannot be staged by accident.
-- Do not paste its contents into a terminal, a script, or a chat. Every command
+- Don't commit it to a repository. If your project has a `.gitignore`, add a
+  `pull-secret*.json` rule so it can't be staged by accident.
+- Don't paste its contents into a terminal, a script, or a chat. Every command
   in this guide takes the *path* to the file, never its text.
 
 If a pull secret is ever exposed, rotate it: the download page issues a fresh one,
@@ -215,7 +215,7 @@ layout before you start:
 
 - `crc.json` and the `crc config` store: your sizing and other settings.
 - `machines/crc/`: the VM disk image and libvirt definition. This is the directory
-  that grows, so it is the one to watch with `df -h ~/.crc`.
+  that grows, so it's the one to watch with `df -h ~/.crc`.
 - `bin/oc/oc`: the bundled `oc` client that matches the cluster exactly, the one
   `crc oc-env` puts on your `PATH`.
 - `cache/`: the downloaded bundle for each OpenShift version, reused across starts.
@@ -227,7 +227,7 @@ downloading again.
 
 > CRC asks once whether to send anonymous usage telemetry. You can answer at the
 > prompt, or decide ahead of time with `crc config set consent-telemetry no` (or
-> `yes`). It does not affect how the cluster runs.
+> `yes`). It doesn't affect how the cluster runs.
 
 ## Plan the cluster size
 
@@ -247,11 +247,11 @@ target is the one to plan for if your host has the headroom. On a smaller host,
 start with the core target and raise it later; the setting is a one-line change
 followed by a restart.
 
-The jump to 32 GiB is not arbitrary. The idle control plane and the built-in
+The jump to 32 GiB isn't arbitrary. The idle control plane and the built-in
 components already hold several gigabytes before you deploy anything, and each
 Operator you add (the service mesh control plane, Kiali, the autoscaler, the
 observability stack) brings its own Pods. The platform target leaves room for all of
-them plus a workload; the core target does not.
+them plus a workload; the core target doesn't.
 
 You set these right before the first start, with:
 
@@ -270,7 +270,7 @@ stop-and-resize later.
 ## Where this fits
 
 You now have a host that can run the VM, an account, the `crc` download, and the
-pull secret, and you have chosen a cluster size. Next, you install the `crc`
+pull secret, and you've chosen a cluster size. Next, you install the `crc`
 binary and wire up the `oc` and `kubectl` clients, then run `crc setup` and
 `crc start` to bring the cluster up for the first time.
 
@@ -283,7 +283,7 @@ binary and wire up the `oc` and `kubectl` clients, then run `crc setup` and
 
 - [ ] Virtualization is enabled (`grep -Ec '(vmx|svm)' /proc/cpuinfo` is non-zero).
 - [ ] The host has enough free memory and disk for the target you chose.
-- [ ] You have a free Red Hat Developer account.
+- [ ] You've a free Red Hat Developer account.
 - [ ] The `crc` archive is downloaded.
 - [ ] The pull secret is saved as a file and is git-ignored.
-- [ ] You have chosen the core or platform cluster size for your host.
+- [ ] You've chosen the core or platform cluster size for your host.

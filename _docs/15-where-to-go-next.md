@@ -32,7 +32,7 @@ OpenShift application development: deploying, Routes, builds, the things the ear
 here exercised. The **DO280** course leads to the **EX280**, the Red Hat Certified OpenShift
 Administrator exam, which covers the cluster-level work this guide reached: Operators,
 security context constraints, storage, and the platform. Everything EX280 tests, you can
-rehearse on CRC, which is why a local cluster is the cheapest practice environment there is. The
+rehearse on CRC, which is why a local cluster is the cheapest practice environment there's. The
 map from this guide to the exam is close: the deploying, Routes, and Helm chapters cover the
 application side DO180 asks about, and the Operators, storage, and security material lines up with
 the administrator topics in DO280. Working each chapter's Build, run, observe block until you can
@@ -49,12 +49,12 @@ manifest that passes on plain Kubernetes being rejected by OpenShift's SCCs. Pra
 clusters, rather than one, is what surfaces those differences before an exam does. Either way, the habit this guide built, run the
 command against a real cluster and read what it does, is the habit the hands-on exams reward.
 
-The hands-on format is the reason a local cluster matters so much for these. The exams do not
+The hands-on format is the reason a local cluster matters so much for these. The exams don't
 ask you to recall facts; they put you at a terminal with tasks to complete against a real
 cluster under time, so the skill they test is exactly the one you build by doing the work
 rather than reading about it. Practising on CRC means practising in the same shape as the exam:
 create the project, apply the manifest, fix what the cluster rejects, verify the result. Set
-yourself a task, give it a time limit, and do it without notes, and you are rehearsing both the
+yourself a task, give it a time limit, and do it without notes, and you're rehearsing both the
 material and the pace.
 
 ## Moving to a remote cluster
@@ -62,7 +62,7 @@ material and the pace.
 CRC is the local stand-in for a real cluster, and moving to one is mostly a change of
 address. You authenticate to a remote OpenShift with `oc login` against its API URL, and the
 same `oc` and `kubectl` commands, the same manifests, and the same Helm charts work there,
-because it is the same software. What changes are the things a single node cannot imitate:
+because it's the same software. What changes are the things a single node can't imitate:
 real high availability across nodes, a load balancer with external IP addresses, shared
 storage that supports `ReadWriteMany`, and the scale to run many workloads at once. Those are
 the edges this guide flagged where it reached them, so you already know where to expect a
@@ -119,18 +119,18 @@ build with in-cluster builds is deployed by a Tekton pipeline on each commit, it
 is held in Git and reconciled by Argo CD, it runs in the mesh with mutual TLS, it scales on load
 through the Custom Metrics Autoscaler, and its metrics and traces flow to the observability
 stack that also feeds Kiali's graph. Every one of those is an operator you install the same way,
-and together they are what people mean by a platform rather than a cluster. You do not need all
-of them, and on a single-node CRC you cannot run all of them at once, but each is a small,
+and together they're what people mean by a platform rather than a cluster. You don't need all
+of them, and on a single-node CRC you can't run all of them at once, but each is a small,
 familiar step from where this guide leaves you, and you can add whichever one your next project
 actually calls for.
 
 ## A plan for your next sessions on CRC
 
-Skills set when you use them on something of your own, so here is a concrete progression that
+Skills set when you use them on something of your own, so here's a concrete progression that
 reuses what this guide built, each step a short project on your running cluster:
 
 - **Deploy an app you know** under `restricted-v2`: take a container image you already use and
-  get it running here. If it needs root or a fixed UID, that is the lesson, and fixing it,
+  get it running here. If it needs root or a fixed UID, that's the lesson, and fixing it,
   usually by choosing a UBI-based image or setting an `fsGroup`, is the exercise.
 - **Put it behind an edge Route** and reach it over HTTPS with the ingress CA trusted, so the
   Routes chapter becomes muscle memory rather than a recipe.
@@ -138,10 +138,10 @@ reuses what this guide built, each step a short project on your running cluster:
   data survives, then make it a StatefulSet if it has more than one replica.
 - **Package it as a Helm chart** that passes `restricted-v2`, so you can install and uninstall
   it cleanly, which is the shape every reusable deployment takes.
-- **Install one Operator** you have a use for, pinned, from OperatorHub, and drive it with a
+- **Install one Operator** you've a use for, pinned, from OperatorHub, and drive it with a
   custom resource, which is the pattern the whole platform is built on.
 
-Each builds on the last, and by the end you have taken one real application from a bare image to
+Each builds on the last, and by the end you've taken one real application from a bare image to
 an operator-managed, stateful, TLS-exposed deployment, entirely on your own machine.
 
 ## The sibling guides
@@ -159,7 +159,7 @@ Reading across the family is the fastest way to turn "I can run OpenShift locall
 build a real system on it," because each sibling takes the same cluster and puts a different
 kind of workload on it.
 
-The data-mesh guides are the closest to a full application on OpenShift, and they are the
+The data-mesh guides are the closest to a full application on OpenShift, and they're the
 recommended next read if you want to see the operator set from this guide carrying a real,
 multi-service system: a mesh wiring the services together, Kafka from an operator, storage for
 the stateful pieces, and observability watching the whole thing. The API Patterns sites are the
@@ -173,16 +173,16 @@ first place.
 One habit carries all of this forward: keep the tools current. Upgrade `crc` when a new
 release comes out, which brings a fresh OpenShift bundle, and re-check an operator's catalog
 version before you pin it, because the catalog moves. Staying current is less work than
-catching up later, and it keeps your local cluster close to the remote ones you will deploy to.
+catching up later, and it keeps your local cluster close to the remote ones you'll deploy to.
 A local OpenShift that tracks the real releases is the most useful kind.
 
-There is a practical rhythm to it. When a new CRC release appears, install the binary over the
+There's a practical rhythm to it. When a new CRC release appears, install the binary over the
 old one and let the next start pull the fresh bundle; a major jump wants a `crc delete` first for
 a clean slate. Before you pin an operator for a new project, run the `oc get packagemanifest`
 check and take the version the channel serves today rather than one a document named months ago,
 which is the single habit that prevents the most common install failure. And keep a standalone
-`oc`, if you installed one, in step with the cluster, or lean on the bundled client that is
-version-matched by construction. None of this is much work spread out, and all of it is painful
+`oc`, if you installed one, in step with the cluster, or lean on the bundled client that's
+version-matched by construction. None of this is much work spread out, and all of it's painful
 if left until a cluster is several releases behind.
 
 ## For deeper coverage
@@ -196,6 +196,6 @@ if left until a cluster is several releases behind.
 This is the last of the core chapters. The examples index gathers the runnable code behind
 them, the final project then converges the whole guide into a data mesh running on OpenShift,
 and a later part adds the Kubernetes design patterns worked entirely on CRC, each arriving the
-same way the chapters here did: drafted, run against a real cluster, and corrected to match. You have a real OpenShift cluster on your own machine
-and the grounding to take it anywhere, whether that is a certification, a remote cluster, or a
+same way the chapters here did: drafted, run against a real cluster, and corrected to match. You've a real OpenShift cluster on your own machine
+and the grounding to take it anywhere, whether that's a certification, a remote cluster, or a
 platform built one operator at a time on the foundation this guide laid.

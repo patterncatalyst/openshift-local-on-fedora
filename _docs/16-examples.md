@@ -50,13 +50,13 @@ copy to maintain, rather than the same operator-install logic pasted into severa
 
 ## What each example demonstrates
 
-The examples are not interchangeable; each one isolates a specific thing OpenShift does
+The examples aren't interchangeable; each one isolates a specific thing OpenShift does
 differently from plain Kubernetes, so reading the list is a map of what the first part of the
 guide covers:
 
 - **Deploying** shows the security model in action: a UBI workload comes up under
   `restricted-v2` with an arbitrary, project-assigned UID, and the example reads that UID back
-  from the running Pod so you see it is real.
+  from the running Pod so you see it's real.
 - **Routes** shows edge-terminated TLS: a Service is exposed at a hostname under
   `apps-crc.testing`, and the example verifies it over HTTPS by trusting the cluster's ingress
   CA, the correct way rather than skipping verification.
@@ -72,7 +72,7 @@ guide covers:
 - **Autoscaling** shows the HPA holding a CPU target and a KEDA `ScaledObject` taking over, the
   path from CPU-based scaling to scaling on any trigger, including to zero.
 - **Editor and shell** shows the inside-the-cluster tools: a shell in a running Pod, a debug Pod
-  for one that will not start, and copying files or forwarding a port.
+  for one that won't start, and copying files or forwarding a port.
 
 Taken together they move from a single Pod to a full operator-managed, stateful, self-scaling
 platform, each step adding one OpenShift-specific capability on top of the last.
@@ -83,8 +83,8 @@ Each `examples/` directory is self-contained, so running one is the same two ste
 have a cluster up on the `crc-admin` context, then run the directory's `demo.sh`, or copy the
 commands from its `README.md` if you would rather step through them. A `demo.sh` applies the
 manifest, shows the result the chapter describes, and cleans up after itself, so it leaves the
-cluster as it found it. Reading the script before you run it is worth the minute: it is short,
-it names every object it creates, and it is the fastest way to see the chapter's commands as one
+cluster as it found it. Reading the script before you run it's worth the minute: it's short,
+it names every object it creates, and it's the fastest way to see the chapter's commands as one
 sequence rather than scattered through the prose. A `demo.sh` follows the same arc as the chapter's
 Build, run, observe block, so the script and the prose reinforce each other: the block shows the
 commands in context, and the script runs them end to end so you can confirm the result on your own
@@ -92,17 +92,17 @@ cluster rather than taking the chapter's word for it.
 
 The platform pieces run through the scaffold instead, which expects the same starting point: a
 cluster up, the `crc-admin` context current, and the bundled `oc` on your `PATH`. Every scaffold
-script begins by calling `require_crc`, which refuses to run against anything that is not
+script begins by calling `require_crc`, which refuses to run against anything that's not
 OpenShift Local, so a script can never touch the wrong cluster by accident.
 
 The platform tier is opt-in and sized for the platform target. `install-platform.sh` is the single
 entry point that brings up the optional capabilities together, and each one also has its own
 installer you can run alone when you want just the mesh, or just autoscaling, rather than the whole
 tier. Because every installer pins its operator version and approves one InstallPlan, running the
-tier twice is safe: an operator already at the pinned version is left as it is rather than
+tier twice is safe: an operator already at the pinned version is left as it's rather than
 reinstalled. The matching `teardown.sh` removes the tier in reverse, so you can stand it up to work
 through a chapter and tear it back down to a bare cluster afterward without hunting for stray
-objects. On a host that cannot spare the platform target's memory, run the individual installers
+objects. On a host that can't spare the platform target's memory, run the individual installers
 for the one capability a chapter needs instead of the full tier.
 
 ## The openshift/ scaffold
@@ -111,7 +111,7 @@ The scaffold is the shared machinery the platform chapters use. Each script owns
 be read on its own:
 
 - `lib.sh`: the helpers every other script sources, including `require_crc` (refuses any cluster
-  that is not CRC) and `install_operator` (pin the CSV, approve one InstallPlan, wait for it to
+  that's not CRC) and `install_operator` (pin the CSV, approve one InstallPlan, wait for it to
   succeed).
 - `install-infra.sh`, `infra/`: the project and AMQ Streams Kafka, the base an application needs.
 - `build-images.sh`, `deploy.sh`: in-cluster image builds and the Helm release that deploys them.
@@ -137,7 +137,7 @@ source openshift/lib.sh && require_crc
 
 ## Conventions the examples follow
 
-Every example is written to the same conventions, so once you have read one the rest are
+Every example is written to the same conventions, so once you've read one the rest are
 predictable:
 
 - **`kubectl` in the bodies, `oc` where it must be.** The portable Kubernetes workflow is written
@@ -151,7 +151,7 @@ predictable:
 - **Cleanup at the end.** Examples delete the project or release they created, so running them
   leaves no residue, which matters on a single cluster reused across chapters.
 
-These are not arbitrary house style; each one keeps the examples runnable, portable, and safe to
+These aren't arbitrary house style; each one keeps the examples runnable, portable, and safe to
 run back to back on the same cluster.
 
 ## Reproducing a verification run
@@ -168,8 +168,8 @@ carrying earlier work, because leftover namespaces, operators, or CRDs can make 
 appear to pass when it only found something already there. Recreating the cluster before such a
 run removes that ambiguity. For ordinary iteration on one project, a plain stop and start is
 faster and fine; the clean start is for when the result has to mean something on its own. This is
-the same discipline the platform scripts assume, and it is why each begins by refusing any cluster
-that is not OpenShift Local.
+the same discipline the platform scripts assume, and it's why each begins by refusing any cluster
+that's not OpenShift Local.
 
 ## Verification status
 
@@ -186,28 +186,28 @@ state is a point-in-time fact about one run on one cluster, which belongs in the
 rather than in prose a reader takes as a permanent claim. What belongs on the page is the
 technique, written so it holds regardless of when you run it.
 
-Nothing here is marked verified on the strength of looking correct; a status moves
+Nothing here's marked verified on the strength of looking correct; a status moves
 only after a passing run on a real cluster.
 
 This matters more than it might seem, because cluster commands fail in ways that reading alone
-does not catch. A manifest that looks right can be rejected by an SCC at admission, a pinned
+doesn't catch. A manifest that looks right can be rejected by an SCC at admission, a pinned
 operator version can vanish from the catalog, an image tag can move, a Route can return a status
-the prose did not expect. The only way to know a command works on this release of OpenShift Local
+the prose didn't expect. The only way to know a command works on this release of OpenShift Local
 is to run it there, which is why verification is a live step rather than a review. When a live run
 turns up a difference, the chapter is corrected to match what the cluster actually did, so the
 commands you read are the commands that ran.
 
 The evidence capture is deliberate about secrets. `capture-evidence.sh` records what a run
 produced into a dated directory, and it scrubs anything sensitive first, so the kubeadmin password,
-tokens, and the pull secret never land in a file. That is the same discipline the earlier chapters
+tokens, and the pull secret never land in a file. That's the same discipline the earlier chapters
 follow at the command line: the cluster is driven through the `crc-admin` context, and no secret is
 printed, logged, or committed. Verification and secret hygiene are the two standards every example
-here is held to.
+here's held to.
 
 ## Where this fits
 
 This closes the first part of the guide, which takes you from an empty host to a cluster running
-an operator-managed platform, with a runnable example behind every chapter. What you have at this
+an operator-managed platform, with a runnable example behind every chapter. What you've at this
 point is the core: install and start OpenShift Local, deploy under its security model, expose a
 service over TLS, package with Helm, and add platform capabilities through operators.
 
@@ -215,7 +215,7 @@ The core now runs from installing OpenShift Local through deploying under its se
 exposing a service over TLS, packaging with Helm, adding platform capabilities through Operators,
 giving workloads persistent storage, scaling them on load, and working inside the cluster. The
 final project then assembles these pieces into one system: a seven-service data mesh end to end on
-OpenShift. What remains after that is the Kubernetes design-patterns appendix, which works the
+OpenShift. What remains after that's the Kubernetes design-patterns appendix, which works the
 full catalog of patterns entirely on OpenShift, with `restricted-v2` variants of every manifest,
 reframed from the generic Kubernetes certifications to OpenShift's own. It will arrive as these
 chapters did: drafted, then run against a real cluster, then corrected to match what the cluster

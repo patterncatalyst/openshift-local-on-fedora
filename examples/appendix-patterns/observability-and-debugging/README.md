@@ -44,7 +44,7 @@ oc debug -n patterns deployment/shipping-service -- /bin/sh -c 'env | grep SERVI
 
 # ephemeral container: attaches to the RUNNING pod; needs --profile=restricted here
 kubectl debug -n patterns "$POD" --profile=restricted -c netcheck \
-  --image=registry.access.redhat.com/ubi9/ubi-minimal:latest \
+  --image=registry.access.redhat.com/ubi9/ubi-minimal:9.6 \
   -- curl -s -o /dev/null -w '%{http_code}\n' http://localhost:8080/health
 oc logs -n patterns "$POD" -c netcheck            # ephemeral localhost:8080/health -> 200
 ```

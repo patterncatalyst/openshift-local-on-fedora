@@ -20,7 +20,7 @@ OpenShift Service Mesh is Red Hat's distribution of Istio. Version 3 is driven b
 the Sail operator, which manages Istio through a small `Istio` custom resource
 instead of the older multi-CR control plane. This chapter installs the mesh and
 Kiali from OperatorHub, brings up the control plane, enrolls a namespace, turns on
-mutual TLS, and shifts a slice of traffic to a second version with a canary. It is
+mutual TLS, and shifts a slice of traffic to a second version with a canary. It's
 the first thing in this guide delivered as an Operator, which sets up the Operators
 chapter next.
 
@@ -39,8 +39,8 @@ plane is Istio, and Kiali is the console that visualizes the mesh.
 
 ### What the sidecar actually does
 
-The sidecar is an Envoy proxy, and once it is in a Pod, every connection the application
-makes or receives passes through it first. The application still thinks it is talking plain
+The sidecar is an Envoy proxy, and once it's in a Pod, every connection the application
+makes or receives passes through it first. The application still thinks it's talking plain
 HTTP to another service; the proxy is what turns that into a mutually authenticated,
 encrypted call, applies whatever routing rules are in force, and records the metrics. Because
 the proxy sits in the data path for all traffic, the mesh can add encryption, retries,
@@ -59,8 +59,8 @@ Service Mesh 3 enrolls a namespace by a *revision label*, `istio.io/rev`, rather
 revision, which is what makes a safe upgrade possible: you can run two control-plane revisions
 side by side, move namespaces to the new one a few at a time by changing their label, and roll
 back by changing it again. On this single control plane the revision is just `default`, but the
-mechanism is the reason the label replaced the annotation, and it is worth starting with the
-model that scales rather than the one that does not.
+mechanism is the reason the label replaced the annotation, and it's worth starting with the
+model that scales rather than the one that doesn't.
 
 ## Install the operators
 
@@ -124,8 +124,8 @@ The two resources split a job that older Istio did with an init container. Getti
 traffic to flow through its sidecar requires rewriting the Pod's network rules, and doing that
 per Pod needs elevated privileges that sit poorly with `restricted-v2`. `IstioCNI` moves the
 rewrite into a CNI plugin that runs once on the node, so individual Pods no longer need the
-privileged init container, which is a cleaner fit for OpenShift's security model. That is why
-the control plane here is two custom resources rather than one: `IstioCNI` owns the per-node
+privileged init container, which is a cleaner fit for OpenShift's security model. That's why
+the control plane here's two custom resources rather than one: `IstioCNI` owns the per-node
 networking, and `Istio` owns the control plane the proxies talk to.
 
 The `Istio` CR named `default` serves the revision named `default`: a Pod joins the
@@ -164,7 +164,7 @@ oc rollout restart deployment/web -n mesh-demo
 
 > **⌨️ The `oc` way**
 >
-> There is no `kubectl` shortcut here; the mesh is all custom resources. What the
+> There's no `kubectl` shortcut here; the mesh is all custom resources. What the
 > OpenShift console adds is **Kiali**, linked from the Networking menu: it draws the
 > mesh topology and shows the per-workload mTLS status. The live traffic-rate graph
 > needs a metrics source, which the observability chapter wires in by pointing Kiali
@@ -205,7 +205,7 @@ and keeps its certificates fresh. Each sidecar receives a short-lived certificat
 workload's ServiceAccount, encoded as a SPIFFE identity, and `istiod` rotates it automatically
 long before it expires. When one sidecar connects to another, the two present these
 certificates and verify each other, so both ends of every in-mesh call are authenticated, not
-just encrypted. STRICT mode says a sidecar must refuse any connection that is not mutual TLS,
+just encrypted. STRICT mode says a sidecar must refuse any connection that's not mutual TLS,
 which is why a plaintext caller from outside the mesh is rejected. PERMISSIVE, the exception for
 a Route-facing port, tells the sidecar to accept both, so the router's plaintext hop still
 works while in-mesh traffic stays encrypted. The identities come from the ServiceAccount, which
@@ -269,7 +269,7 @@ rather than in every caller's code:
 A `DestinationRule` carries the connection-level policy: connection-pool limits that cap how
 much load a caller can pile onto a service, and *outlier detection*, which ejects a Pod from
 the load-balancing pool after it returns a run of errors and brings it back once it recovers.
-That ejection is Istio's form of circuit breaking, and like everything else here it is applied
+That ejection is Istio's form of circuit breaking, and like everything else here it's applied
 by the proxies, so no application changes to add it. These are the controls that make a mesh
 worth running beyond mTLS: the failure handling that would otherwise be copied into every
 service lives in one place, described declaratively.
@@ -293,11 +293,11 @@ the hops of a request, all without instrumenting the application. Kiali is the c
 turns this into a picture, drawing the services as a graph with live traffic on the edges and
 the mTLS lock on secured connections.
 
-Kiali does not generate those metrics itself; it reads them from a Prometheus-compatible
+Kiali doesn't generate those metrics itself; it reads them from a Prometheus-compatible
 source. On this cluster the Kiali custom resource ships with its metrics source disabled,
 because OpenShift Local runs no standalone Prometheus by default. The observability chapter
 installs the Red Hat build of OpenTelemetry and points Kiali at it, and only then does the
-traffic graph fill in. Until that is wired, Kiali still shows the mesh topology and each
+traffic graph fill in. Until that's wired, Kiali still shows the mesh topology and each
 workload's mTLS status, which is enough to confirm a namespace is enrolled and secured; the
 live traffic rates are what wait on the metrics source.
 
@@ -321,15 +321,15 @@ spec:
 ```
 
 This moves access control off the network's IP addresses and onto cryptographic identity, so
-the rule holds even as Pods move and IPs change. It is the layer that turns "traffic is
-encrypted" into "only these callers are allowed," and it is worth knowing the object exists
-even where this guide does not apply one.
+the rule holds even as Pods move and IPs change. It's the layer that turns "traffic is
+encrypted" into "only these callers are allowed," and it's worth knowing the object exists
+even where this guide doesn't apply one.
 
 ## What a mesh costs
 
-The mesh is not free, and on a single-node cluster the cost is visible. Every enrolled Pod
+The mesh isn't free, and on a single-node cluster the cost is visible. Every enrolled Pod
 gains an Envoy sidecar, which adds memory and a small per-request latency, and `istiod` plus
-Kiali are more workloads competing for the one node's resources. That is part of why the
+Kiali are more workloads competing for the one node's resources. That's part of why the
 platform sizing target is larger. The payoff, encryption, traffic control, and telemetry with
 no application changes, is worth it for a system of services talking to each other, and
 overkill for a single app. Enroll the namespaces that benefit, and leave the rest out of the

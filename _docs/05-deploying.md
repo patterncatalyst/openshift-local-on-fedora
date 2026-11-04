@@ -39,8 +39,8 @@ The reason behind the arbitrary UID is worth understanding, because it explains 
 much of OpenShift's behavior differs from a permissive local cluster. Each project is
 allocated its own block of user IDs, ten thousand wide, and every Pod in the project runs
 somewhere in that block. Because two projects never share a UID range, a process in one
-project cannot masquerade as a user in another, and a container that escapes its boundary
-still holds only an unprivileged ID that owns nothing on the host. It is defense in depth
+project can't masquerade as a user in another, and a container that escapes its boundary
+still holds only an unprivileged ID that owns nothing on the host. It's defense in depth
 applied to identity: the cluster assumes a workload might misbehave and limits the blast
 radius in advance. The cost is that images have to be written to not care which UID they
 run as, which UBI images are, and which is the first thing to check when a third-party
@@ -54,7 +54,7 @@ oc new-project deploy-demo
 
 ## Deploy with kubectl
 
-Write a Deployment. This is standard Kubernetes; nothing here is OpenShift-specific:
+Write a Deployment. This is standard Kubernetes; nothing here's OpenShift-specific:
 
 ```yaml
 # httpd-deployment.yaml
@@ -105,14 +105,14 @@ kubectl get pods -l app=web -w        # Ctrl-C once both are Running
 kubectl rollout status deployment/web
 ```
 
-The container listens on 8080, not 80: an unprivileged process cannot bind a port
+The container listens on 8080, not 80: an unprivileged process can't bind a port
 below 1024, and UBI's httpd image is configured for 8080 precisely because it runs
-non-root. That is the restricted default in action.
+non-root. That's the restricted default in action.
 
 ### What a Deployment actually manages
 
-A Deployment does not run Pods directly. It creates a *ReplicaSet*, and the ReplicaSet
-keeps the requested number of Pods alive. The chain matters because it is what makes the
+A Deployment doesn't run Pods directly. It creates a *ReplicaSet*, and the ReplicaSet
+keeps the requested number of Pods alive. The chain matters because it's what makes the
 workload self-healing: the `selector` tells the ReplicaSet which Pods are its
 responsibility (here, any Pod labelled `app=web`), and the `template` is the blueprint it
 stamps out to reach the replica count. Delete a Pod and the ReplicaSet notices the count
@@ -124,7 +124,7 @@ kubectl get pods -l app=web -w        # a replacement appears almost immediately
 ```
 
 The `selector` and the template labels have to agree, which is a common first mistake: if
-the template's `app=web` did not match the selector, the ReplicaSet would create Pods it
+the template's `app=web` didn't match the selector, the ReplicaSet would create Pods it
 then refused to count, and the Deployment would churn. Keeping both on the same label is
 what ties the three objects together.
 
@@ -139,7 +139,7 @@ kubectl describe pod -l app=web       # events, the assigned node, and why if it
 kubectl get pod -l app=web -o jsonpath='{.items[0].spec.containers[0].securityContext.runAsUser}{"\n"}'
 ```
 
-`kubectl describe` is the command to reach for first when a Pod is not Running. Its Events
+`kubectl describe` is the command to reach for first when a Pod isn't Running. Its Events
 section at the bottom records the Pod's whole recent history, including scheduling
 decisions, image pulls, and any admission or probe failure, in plain language. Between
 `describe` and `logs`, almost every "why is this Pod not up" question answers itself
@@ -147,7 +147,7 @@ without guesswork.
 
 That prints a high UID like `1000650000`. It comes from the project's allocated
 range, visible as the `openshift.io/sa.scc.uid-range` annotation on the namespace
-(`1000650000/10000` here: the first UID and the size of the range). You did not
+(`1000650000/10000` here: the first UID and the size of the range). You didn't
 set it; OpenShift did, and the pod runs under the `restricted-v2` security
 context constraint that enforces it.
 
@@ -164,10 +164,10 @@ kubectl get namespace deploy-demo \
 
 ### Which SCC the Pod got, and how
 
-A Pod does not pick its own SCC. At admission time OpenShift looks at the Pod's
+A Pod doesn't pick its own SCC. At admission time OpenShift looks at the Pod's
 *ServiceAccount*, finds the SCCs that account is allowed to use, and applies the most
 restrictive one that still permits what the Pod asks for. With no ServiceAccount named,
-the Pod uses the project's `default` account, which is allowed `restricted-v2`, so that is
+the Pod uses the project's `default` account, which is allowed `restricted-v2`, so that's
 what it gets. The decision is recorded on the Pod as an annotation:
 
 ```bash
@@ -181,14 +181,14 @@ around permissions, the SCC annotation and the injected `runAsUser` together exp
 
 ### What restricted-v2 forbids
 
-`restricted-v2` is strict by design, because it is the policy every workload gets unless
+`restricted-v2` is strict by design, because it's the policy every workload gets unless
 an administrator grants more. It drops nearly all Linux capabilities, forbids privilege
 escalation, refuses the host's network, PID, and IPC namespaces, blocks host-path
 volumes, and assigns the arbitrary non-root UID you just saw rather than honoring a
-`runAsUser` the image requests. UBI images cope with this because they are built to run as
+`runAsUser` the image requests. UBI images cope with this because they're built to run as
 any UID and to keep their writable files group-owned by GID 0, the group the arbitrary UID
 still belongs to. An image that hard-codes a specific user, writes to root-owned paths, or
-needs a low port will not start cleanly here, and that is the constraint working as
+needs a low port won't start cleanly here, and that's the constraint working as
 intended rather than a fault to route around.
 
 > **⌨️ The `oc` way**
@@ -200,7 +200,7 @@ intended rather than a fault to route around.
 > oc new-app --image=registry.access.redhat.com/ubi9/httpd-24:latest --name=web
 > ```
 >
-> It is the fastest way to get something running. The guide uses explicit YAML
+> It's the fastest way to get something running. The guide uses explicit YAML
 > where seeing the object matters, and `oc new-app` where speed matters.
 
 One difference is worth knowing: `oc new-app` also creates an *ImageStream*, an OpenShift
@@ -234,7 +234,7 @@ while the Pods behind it are replaced freely.
 Inside the same namespace, the short name `web` resolves. From another namespace you use
 the fully qualified form, `web.deploy-demo.svc.cluster.local`, or its shorter
 `web.deploy-demo.svc` variant, which is how services in different projects find each other.
-This matters as soon as a system spans more than one namespace, and it is the same name a
+This matters as soon as a system spans more than one namespace, and it's the same name a
 Route will target in the next chapter. A Service is reachable only from inside the cluster,
 which is exactly why exposing one to your host needs the separate Route object rather than a
 bigger Service.
@@ -266,17 +266,17 @@ by hand.
 ## Where the image comes from
 
 The Deployment pulls from `registry.access.redhat.com`, Red Hat's public registry, which
-serves UBI images without authentication. That is why this chapter needs no image pull
+serves UBI images without authentication. That's why this chapter needs no image pull
 secret for the workload itself: the pull secret you gave `crc start` is for the cluster's
 own release and Operator content, not for public UBI images. Red Hat's other registry,
 `registry.redhat.io`, does require authentication, and an image from there needs a pull
 secret in the namespace. For everything in this guide the public registry is enough, and
-sticking to UBI images keeps you on content that is built to run under `restricted-v2`.
+sticking to UBI images keeps you on content that's built to run under `restricted-v2`.
 
 ## Give the container health checks
 
 The Deployment above omits health probes to stay minimal, but a workload you intend to
-keep running should declare them, because they are how the cluster knows the difference
+keep running should declare them, because they're how the cluster knows the difference
 between "started" and "ready to serve":
 
 ```yaml
@@ -287,7 +287,7 @@ between "started" and "ready to serve":
 ```
 
 A *readiness* probe decides whether a Pod receives Service traffic: until it passes, the
-Pod stays out of the endpoints list, so a rollout does not send requests to a Pod that is
+Pod stays out of the endpoints list, so a rollout doesn't send requests to a Pod that's
 still starting. A *liveness* probe decides whether a Pod should be restarted: if it starts
 failing, the kubelet restarts the container. Without probes the cluster treats a running
 process as healthy, which is fine for this demo and risky for anything real. Adding them is
@@ -303,11 +303,11 @@ The other addition a real workload wants is resource requests and limits:
           limits:   { memory: 256Mi }
 ```
 
-A *request* is what the scheduler reserves when it places the Pod, so it is how the cluster
+A *request* is what the scheduler reserves when it places the Pod, so it's how the cluster
 avoids overcommitting the node; a *limit* is the ceiling the Pod is held to at runtime. On a
 single-node CRC cluster, where everything competes for one node's memory, requests are what
 keep your workloads and the platform from starving each other. Leaving them off is why an
-oversubscribed cluster schedules Pods it then cannot feed, so set at least a modest request
+oversubscribed cluster schedules Pods it then can't feed, so set at least a modest request
 on anything you expect to stay up.
 
 The platform components already hold a large share of the node, so on CRC the practical
@@ -332,7 +332,7 @@ oc adm policy add-scc-to-user anyuid -z default -n deploy-demo
 The security chapters cover SCCs in depth; for now the rule is: prefer an
 image that runs as an arbitrary non-root UID, and you never have to think about
 it. Most official Red Hat images already do, so you reach for `anyuid` rarely, and when
-you do it is worth a comment saying which workload needed it and why.
+you do it's worth a comment saying which workload needed it and why.
 
 > **🤖 Explore with your agent**
 >

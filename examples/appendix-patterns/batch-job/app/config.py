@@ -1,6 +1,6 @@
 """Configuration for shipping-report, sourced from environment variables.
 
-Mirrors the capstone services' own settings shape (service_schema, pg_*)
+Mirrors the data-mesh services' own settings shape (service_schema, pg_*)
 so the pattern reads the same way across the appendix, even though this
 runner is a one-shot CLI rather than an HTTP service.
 """

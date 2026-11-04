@@ -23,7 +23,7 @@ console in a browser.
 ## One cluster at a time
 
 OpenShift Local runs one VM and expects the host to itself. If you also run
-minikube or another local cluster, stop it first so the two do not compete for
+minikube or another local cluster, stop it first so the two don't compete for
 CPU, memory, and the KVM subsystem:
 
 ```bash
@@ -31,11 +31,11 @@ minikube stop            # if you have minikube running
 crc status               # should report "Stopped" before you start
 ```
 
-Two clusters sharing one host do not fail cleanly. They fail with symptoms that look
-like bugs in whatever you are running: Pods that stay Pending for want of memory, an
+Two clusters sharing one host don't fail cleanly. They fail with symptoms that look
+like bugs in whatever you're running: Pods that stay Pending for want of memory, an
 API server that times out under CPU pressure, a disk that fills mid-build. Stopping the
 other cluster first removes a whole category of confusing failures before it starts, so
-it is worth making a habit rather than a thing you check only once something breaks.
+it's worth making a habit rather than a thing you check only once something breaks.
 
 ## Set the cluster size
 
@@ -57,9 +57,9 @@ is set with:
 crc config view | grep -E 'cpus|memory|disk-size'
 ```
 
-Err on the side of more memory than you think you need. An undersized cluster does not
+Err on the side of more memory than you think you need. An undersized cluster doesn't
 refuse to start; it starts and then struggles, with cluster operators flapping between
-healthy and degraded as they compete for memory. That is a far harder state to diagnose
+healthy and degraded as they compete for memory. That's a far harder state to diagnose
 than a clean "not enough memory" message, so if your host can spare it, the platform
 target is the safer choice even for the early chapters.
 
@@ -76,7 +76,7 @@ crc setup
 It prints each check as it runs and fixes what it can. If a check fails, it tells
 you what to do (enable virtualization, add your user to a group, free disk space)
 and you re-run it. Nothing starts yet. The bundle unpack is the slow part of this
-step, because the bundle is several gigabytes; once it is in `~/.crc`, later starts on
+step, because the bundle is several gigabytes; once it's in `~/.crc`, later starts on
 the same CRC version reuse it. You run `crc setup` again only after you upgrade CRC to a
 new release, or if a later check reports the host configuration has drifted.
 
@@ -90,13 +90,13 @@ contents:
 crc start --pull-secret-file ~/.crc/pull-secret.json
 ```
 
-The first start takes several minutes, and it is doing real work the whole time. The
+The first start takes several minutes, and it's doing real work the whole time. The
 VM boots Red Hat Enterprise Linux CoreOS, the immutable OS OpenShift nodes run. The
 kubelet starts and brings up the control plane as static Pods: etcd, the API server,
 the scheduler, and the controller managers. Once the API answers, the *cluster
 operators* take over, each reconciling one part of the platform (the ingress router,
 the image registry, the console, authentication, monitoring) until all of them report
-healthy. That settling is why `crc start` does not return the instant the API is up,
+healthy. That settling is why `crc start` doesn't return the instant the API is up,
 and why a cluster can need another minute or two after the command finishes before
 every operator is ready.
 
@@ -106,7 +106,7 @@ kubeadmin credentials.
 > **Never paste the kubeadmin password or a token.** When you need the console
 > login, run `crc console --credentials` yourself to see it. Keep it out of
 > scripts, commits, and anything you share. The command-line login below uses the
-> admin *context* that `crc start` writes, so you do not need to handle the
+> admin *context* that `crc start` writes, so you don't need to handle the
 > password at all for `oc` work.
 
 ## Log in with oc
@@ -144,9 +144,9 @@ oc get nodes
 ```
 
 Read the three condition columns together. `Available=True` means the capability is
-serving. `Progressing=True` means it is still rolling out a change, normal right after
+serving. `Progressing=True` means it's still rolling out a change, normal right after
 a start and expected to clear on its own. `Degraded=True` is the one to act on: it
-means the operator cannot reach its desired state, and on CRC the usual cause is
+means the operator can't reach its desired state, and on CRC the usual cause is
 resource pressure from an undersized VM. Wait for `Progressing` to clear across the
 board before you deploy anything, because an operator still settling can make an
 unrelated deploy look like it failed.
@@ -169,10 +169,10 @@ oc get nodes -o wide
 
 The one node carries all three roles at once. On a multi-node cluster the control-plane
 nodes usually carry a taint that keeps ordinary workloads off them, so your Pods land on
-dedicated worker nodes. CRC removes that taint, because there is nowhere else for a Pod
-to go: the same node has to run both the control plane and your application. That is why
-every Deployment you create here schedules without any tolerations, and it is the one
-place where local behavior differs from a production cluster in a way you will notice.
+dedicated worker nodes. CRC removes that taint, because there's nowhere else for a Pod
+to go: the same node has to run both the control plane and your application. That's why
+every Deployment you create here schedules without any tolerations, and it's the one
+place where local behavior differs from a production cluster in a way you'll notice.
 The Kubernetes version the node reports is the one inside this OpenShift release, which
 matters when a tool or chart pins a minimum Kubernetes version.
 
@@ -186,7 +186,7 @@ crc console
 
 That launches your browser at `https://console-openshift-console.apps-crc.testing`.
 Log in as `kubeadmin`; retrieve the password with `crc console --credentials` if
-you do not have it. The console has two perspectives, and the switcher between them is
+you don't have it. The console has two perspectives, and the switcher between them is
 worth knowing from the start. The **Administrator** perspective is where you manage the
 cluster: nodes, cluster operators, the OperatorHub catalog later chapters install from,
 and a YAML editor for any resource. The **Developer** perspective is application-centric,
@@ -196,19 +196,19 @@ have deployed without reading YAML.
 
 Two console areas come up repeatedly in later chapters. **OperatorHub**, under the
 Administrator perspective, is the catalog you install the service mesh and the other
-Operators from, and it is also where you watch an install progress and approve it. The
+Operators from, and it's also where you watch an install progress and approve it. The
 **Observe** area carries the cluster's built-in monitoring: dashboards for node and
 workload resource use, and a metrics query page. On an undersized cluster those
 dashboards are the quickest way to confirm that memory pressure, rather than a bug, is
-behind a Pod that will not schedule.
+behind a Pod that won't schedule.
 
 ## The internal image registry
 
-OpenShift ships an internal image registry, and it is already running on your cluster.
+OpenShift ships an internal image registry, and it's already running on your cluster.
 It matters here because later chapters build container images inside the cluster rather
 than on your host: a build produces an image, pushes it to the internal registry, and a
-Deployment pulls it back, all without a container engine on your machine. You do not
-configure any of this now. It is enough to know the registry is part of what came up
+Deployment pulls it back, all without a container engine on your machine. You don't
+configure any of this now. It's enough to know the registry is part of what came up
 during the start, which is one more reason the cluster asks for the memory it does. When
 a build chapter refers to pushing an image "to the cluster," this registry is where it
 lands.
@@ -217,7 +217,7 @@ lands.
 
 Most failed starts come down to one of a few causes, and each has a clear fix:
 
-- **An expired or wrong pull secret.** If the cluster cannot pull its release images,
+- **An expired or wrong pull secret.** If the cluster can't pull its release images,
   download a fresh pull secret and start again. Pass the new file with
   `--pull-secret-file`.
 - **Not enough memory or disk.** A start that boots but leaves operators `Degraded`, or
@@ -234,14 +234,14 @@ Most failed starts come down to one of a few causes, and each has a clear fix:
 - **A start that hangs waiting for the API.** If `crc start` sits for a long time on a
   message about waiting for the kube-apiserver, the control plane is coming up slowly
   under resource pressure rather than hung. Give it a few minutes; if it never
-  completes, stop the cluster, raise the memory, and start again. When it is stuck
+  completes, stop the cluster, raise the memory, and start again. When it's stuck
   rather than slow, the cause almost always traces back to the VM being too small.
 
 When a start fails, `crc start --log-level debug` prints what it was doing when it
 stopped, which almost always points at one of the causes above. If nothing in the log
 is clear, the reliable reset is `crc stop`, then `crc delete`, then `crc start`: it
 discards a half-built VM and provisions a fresh one from the cached bundle, without a
-re-download. That is slower than a plain start, but it clears a corrupted VM state that
+re-download. That's slower than a plain start, but it clears a corrupted VM state that
 no amount of restarting will fix, and it leaves you on a known-clean cluster to
 continue from.
 
@@ -261,14 +261,14 @@ A tool that refuses to trust a loopback API endpoint is the thing to reconfigure
 the cluster.
 If a Route ever fails to resolve on the host, the cause is almost always the DNS rule
 `crc setup` installs: a NetworkManager dispatcher entry that points `.apps-crc.testing`
-and `.crc.testing` at the cluster. Re-running `crc setup` restores it. You do not edit
+and `.crc.testing` at the cluster. Re-running `crc setup` restores it. You don't edit
 `/etc/hosts` for individual Routes; the wildcard rule covers every hostname the cluster
 will ever serve under `apps-crc.testing`, which is what makes a freshly created Route
 reachable the moment it exists.
 
 ## Stopping and starting again
 
-Stop the cluster when you are done for the day; do not delete it. A stop keeps the
+Stop the cluster when you're done for the day; don't delete it. A stop keeps the
 VM and its state so the next start is quick:
 
 ```bash
@@ -283,7 +283,7 @@ while day-to-day iteration on one project wants the fast `crc stop` and `crc sta
 
 ## Build, run, observe
 
-A quick end-to-end check that the cluster is live and you are the admin:
+A quick end-to-end check that the cluster is live and you're the admin:
 
 ```bash
 crc status                                   # Running, OpenShift: Running
@@ -305,6 +305,6 @@ delete a project, the cluster is ready for the chapters that follow.
 
 ## Where this fits
 
-OpenShift is running and you are logged in. The next chapter looks at `oc` and `kubectl`
+OpenShift is running and you're logged in. The next chapter looks at `oc` and `kubectl`
 side by side: what they share, where `oc` does more, and how projects relate to
 namespaces, so the deploying chapters that follow read cleanly in either CLI.
