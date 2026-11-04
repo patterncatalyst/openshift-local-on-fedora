@@ -200,12 +200,140 @@ def automated_placement():
     )
 
 
+def init_container():
+    g.emit(
+        "appendix-06-init-container", 880, 340,
+        bands=[{"x": 20, "y": 48, "w": 840, "h": 272,
+                "label": "Pod startup: init runs to completion first",
+                "fill": "#fafafa"}],
+        nodes=[
+            {"x": 70, "y": 100, "w": 200, "h": 80, "style": "box",
+             "lines": ["init: migrate", "alembic upgrade head"]},
+            {"x": 440, "y": 92, "w": 220, "h": 80, "style": "accent",
+             "lines": ["main: notification-service", "uvicorn (serving)"]},
+            {"x": 440, "y": 214, "w": 220, "h": 64, "style": "ghost",
+             "lines": ["main never created", "PodInitializing"]},
+            {"x": 70, "y": 230, "w": 200, "h": 56, "style": "box",
+             "lines": ["Postgres"]},
+        ],
+        edges=[
+            {"x1": 270, "y1": 135, "x2": 440, "y2": 132, "label": "exit 0 -> start"},
+            {"x1": 250, "y1": 180, "x2": 440, "y2": 240,
+             "label": "exit != 0", "amber": True},
+            {"x1": 170, "y1": 230, "x2": 170, "y2": 180,
+             "label": "connects", "dashed": True},
+        ],
+        notes=[{"x": 440, "y": 32,
+                "text": "Init Container: the migration gates the app",
+                "anchor": "middle", "bold": True}],
+    )
+
+
+def sidecar():
+    g.emit(
+        "appendix-07-sidecar", 900, 300,
+        bands=[{"x": 20, "y": 56, "w": 860, "h": 200,
+                "label": "one Pod, shared network namespace (localhost)",
+                "fill": "#fafafa"}],
+        nodes=[
+            {"x": 90, "y": 96, "w": 720, "h": 46, "style": "accent",
+             "lines": ["probe-tailer  —  restartPolicy: Always (native sidecar)"]},
+            {"x": 210, "y": 168, "w": 480, "h": 46, "style": "box",
+             "lines": ["shipping-service (main container)"]},
+        ],
+        edges=[
+            {"x1": 70, "y1": 236, "x2": 830, "y2": 236, "label": "time"},
+        ],
+        notes=[
+            {"x": 450, "y": 38,
+             "text": "Sidecar: the native sidecar brackets the app's lifetime",
+             "anchor": "middle", "bold": True},
+            {"x": 95, "y": 90, "text": "sidecar starts", "anchor": "start",
+             "size": 10, "color": "#b8650a"},
+            {"x": 215, "y": 162, "text": "app starts", "anchor": "start",
+             "size": 10, "color": "#888"},
+            {"x": 688, "y": 162, "text": "app stops (SIGTERM)", "anchor": "end",
+             "size": 10, "color": "#888"},
+            {"x": 808, "y": 90, "text": "sidecar stops last", "anchor": "end",
+             "size": 10, "color": "#b8650a"},
+        ],
+    )
+
+
+def adapter():
+    g.emit(
+        "appendix-08-adapter", 900, 300,
+        bands=[{"x": 20, "y": 70, "w": 600, "h": 170,
+                "label": "one Pod (shared localhost)", "fill": "#fafafa"}],
+        nodes=[
+            {"x": 60, "y": 120, "w": 190, "h": 80, "style": "box",
+             "lines": ["shipping-service", "/healthz", "JSON body"]},
+            {"x": 360, "y": 116, "w": 200, "h": 88, "style": "accent",
+             "lines": ["metrics-adapter", ":9100/metrics",
+                       "Prometheus text"]},
+            {"x": 700, "y": 128, "w": 170, "h": 64, "style": "box",
+             "lines": ["Prometheus", "scraper"]},
+        ],
+        edges=[
+            {"x1": 250, "y1": 160, "x2": 360, "y2": 160,
+             "label": "poll (localhost)"},
+            {"x1": 560, "y1": 160, "x2": 700, "y2": 160,
+             "label": "scrape /metrics", "amber": True},
+        ],
+        notes=[
+            {"x": 450, "y": 44,
+             "text": "Adapter: same fact, the scraper's format",
+             "anchor": "middle", "bold": True},
+            {"x": 760, "y": 108, "text": "external", "anchor": "middle",
+             "size": 10, "color": "#888"},
+        ],
+    )
+
+
+def ambassador():
+    g.emit(
+        "appendix-09-ambassador", 920, 320,
+        bands=[{"x": 20, "y": 66, "w": 600, "h": 190,
+                "label": "one Pod (shared localhost)", "fill": "#fafafa"}],
+        nodes=[
+            {"x": 60, "y": 120, "w": 200, "h": 86, "style": "box",
+             "lines": ["shipping-service", "dials 127.0.0.1:5432", "(no env vars)"]},
+            {"x": 370, "y": 116, "w": 210, "h": 94, "style": "accent",
+             "lines": ["postgres-ambassador", "listens 127.0.0.1:5432",
+                       "TCP relay"]},
+            {"x": 710, "y": 110, "w": 180, "h": 60, "style": "box",
+             "lines": ["patterns-postgres", "(UPSTREAM_HOST)"]},
+            {"x": 710, "y": 196, "w": 180, "h": 56, "style": "ghost",
+             "lines": ["another backend", "(repoint here)"]},
+        ],
+        edges=[
+            {"x1": 260, "y1": 160, "x2": 370, "y2": 160,
+             "label": "127.0.0.1:5432"},
+            {"x1": 580, "y1": 150, "x2": 710, "y2": 142,
+             "label": "UPSTREAM_HOST", "amber": True},
+            {"x1": 580, "y1": 180, "x2": 710, "y2": 220,
+             "label": "or repoint", "dashed": True},
+        ],
+        notes=[
+            {"x": 460, "y": 44,
+             "text": "Ambassador: the app's target never changes",
+             "anchor": "middle", "bold": True},
+            {"x": 800, "y": 100, "text": "external", "anchor": "middle",
+             "size": 10, "color": "#888"},
+        ],
+    )
+
+
 def main():
     predictable_demands()
     declarative_deployment()
     health_probe()
     managed_lifecycle()
     automated_placement()
+    init_container()
+    sidecar()
+    adapter()
+    ambassador()
 
 
 if __name__ == "__main__":

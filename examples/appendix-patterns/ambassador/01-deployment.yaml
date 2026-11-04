@@ -1,0 +1,110 @@
+# shipping-service with NO Postgres environment variables at all, plus a
+# postgres-ambassador sidecar. The app falls back to its config.py defaults
+# (127.0.0.1:5432, datamesh_app/changeme/datamesh), the ambassador listens on
+# that localhost address and relays to the real patterns-postgres Service. The
+# app never knows where its database actually lives; only the ambassador does.
+# Both containers run under restricted-v2.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: shipping-service
+  namespace: patterns
+  labels:
+    app.kubernetes.io/name: shipping-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: shipping-service
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: shipping-service
+    spec:
+      securityContext:
+        runAsNonRoot: true
+      containers:
+        - name: shipping-service
+          image: image-registry.openshift-image-registry.svc:5000/patterns/shipping-service:v1
+          imagePullPolicy: IfNotPresent
+          # Deliberately no env: the service uses its own defaults, and the
+          # ambassador decides what 127.0.0.1:5432 really reaches.
+          ports:
+            - name: http
+              containerPort: 8080
+          resources:
+            requests: { cpu: 100m, memory: 192Mi }
+            limits: { memory: 512Mi }
+          startupProbe:
+            httpGet: { path: /health, port: http }
+            failureThreshold: 30
+            periodSeconds: 2
+          livenessProbe:
+            httpGet: { path: /health, port: http }
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          readinessProbe:
+            httpGet: { path: /healthz, port: http }
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsNonRoot: true
+            capabilities: { drop: ["ALL"] }
+            seccompProfile: { type: RuntimeDefault }
+        - name: postgres-ambassador
+          image: registry.access.redhat.com/ubi10/python-314-minimal:latest
+          command: ["python3", "-c"]
+          args:
+            - |
+              import asyncio, os
+              UPSTREAM_HOST = os.environ.get("UPSTREAM_HOST", "patterns-postgres.patterns.svc.cluster.local")
+              UPSTREAM_PORT = int(os.environ.get("UPSTREAM_PORT", "5432"))
+              async def pipe(reader, writer):
+                  try:
+                      while True:
+                          data = await reader.read(4096)
+                          if not data:
+                              break
+                          writer.write(data)
+                          await writer.drain()
+                  finally:
+                      writer.close()
+              async def handle(cr, cw):
+                  try:
+                      sr, sw = await asyncio.open_connection(UPSTREAM_HOST, UPSTREAM_PORT)
+                  except OSError:
+                      cw.close()
+                      return
+                  await asyncio.gather(pipe(cr, sw), pipe(sr, cw))
+              async def main():
+                  server = await asyncio.start_server(handle, "127.0.0.1", 5432)
+                  async with server:
+                      await server.serve_forever()
+              asyncio.run(main())
+          env:
+            # Change this one value (see the README) to repoint the database
+            # without touching the shipping-service container at all.
+            - name: UPSTREAM_HOST
+              value: patterns-postgres.patterns.svc.cluster.local
+          resources:
+            requests: { cpu: 20m, memory: 32Mi }
+            limits: { memory: 64Mi }
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsNonRoot: true
+            capabilities: { drop: ["ALL"] }
+            seccompProfile: { type: RuntimeDefault }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: shipping-service
+  namespace: patterns
+spec:
+  selector:
+    app.kubernetes.io/name: shipping-service
+  ports:
+    - name: http
+      port: 80
+      targetPort: 8080
