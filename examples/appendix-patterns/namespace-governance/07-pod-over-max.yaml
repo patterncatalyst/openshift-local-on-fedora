@@ -1,0 +1,21 @@
+# A pod explicitly requesting more CPU than the LimitRange max (500m). Rejected
+# synchronously at admission, with no pod created.
+apiVersion: v1
+kind: Pod
+metadata:
+  name: over-max-check
+  namespace: patterns
+spec:
+  securityContext:
+    runAsNonRoot: true
+    seccompProfile: { type: RuntimeDefault }
+  containers:
+    - name: demo
+      image: registry.access.redhat.com/ubi9/ubi-minimal:latest
+      command: ["sleep", "3600"]
+      resources:
+        requests: { cpu: 100m }
+        limits: { cpu: 600m }
+      securityContext:
+        allowPrivilegeEscalation: false
+        capabilities: { drop: ["ALL"] }

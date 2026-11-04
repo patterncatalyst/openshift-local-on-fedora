@@ -952,6 +952,107 @@ def secure_configuration():
     )
 
 
+def observability_and_debugging():
+    g.emit(
+        "appendix-30-observability-and-debugging", 920, 340,
+        bands=[{"x": 20, "y": 46, "w": 880, "h": 278,
+                "label": "five windows into one running Pod", "fill": "#fafafa"}],
+        nodes=[
+            {"x": 60, "y": 70, "w": 210, "h": 40, "style": "box", "lines": ["oc logs (-p / -c / -f)"]},
+            {"x": 60, "y": 122, "w": 210, "h": 40, "style": "box", "lines": ["oc exec"]},
+            {"x": 60, "y": 174, "w": 210, "h": 40, "style": "box", "lines": ["oc port-forward (debug only)"]},
+            {"x": 60, "y": 226, "w": 210, "h": 40, "style": "box", "lines": ["oc describe / get events"]},
+            {"x": 60, "y": 278, "w": 210, "h": 40, "style": "box", "lines": ["oc debug / ephemeral container"]},
+            {"x": 620, "y": 150, "w": 220, "h": 80, "style": "accent",
+             "lines": ["shipping-service Pod", "+ heartbeat"]},
+        ],
+        edges=[
+            {"x1": 270, "y1": 90, "x2": 620, "y2": 165, "label": "stdout/stderr"},
+            {"x1": 270, "y1": 142, "x2": 620, "y2": 178, "label": "run in-container"},
+            {"x1": 270, "y1": 194, "x2": 620, "y2": 190, "label": "tunnel to a port"},
+            {"x1": 270, "y1": 246, "x2": 620, "y2": 205, "label": "control-plane view"},
+            {"x1": 270, "y1": 298, "x2": 620, "y2": 220, "label": "copy or attach", "amber": True},
+        ],
+        notes=[{"x": 460, "y": 32,
+                "text": "Observability: five tools, five questions, none change the Pod's image",
+                "anchor": "middle", "bold": True}],
+    )
+
+
+def packaging_helm_and_kustomize():
+    g.emit(
+        "appendix-31-packaging-helm-and-kustomize", 900, 320,
+        bands=[{"x": 20, "y": 46, "w": 860, "h": 236,
+                "label": "template vs data: two ways to parameterize", "fill": "#fafafa"}],
+        nodes=[
+            {"x": 50, "y": 94, "w": 200, "h": 56, "style": "accent",
+             "lines": ["Helm chart + values.yaml"]},
+            {"x": 360, "y": 92, "w": 210, "h": 60, "style": "ink",
+             "lines": ["release: rev 1, 2,", "rollback"]},
+            {"x": 50, "y": 206, "w": 200, "h": 56, "style": "accent",
+             "lines": ["Kustomize base + overlays"]},
+            {"x": 360, "y": 206, "w": 210, "h": 56, "style": "ink",
+             "lines": ["rendered manifests", "(no release object)"]},
+        ],
+        edges=[
+            {"x1": 250, "y1": 122, "x2": 360, "y2": 122, "label": "install / upgrade", "amber": True},
+            {"x1": 250, "y1": 234, "x2": 360, "y2": 234, "label": "oc apply -k", "amber": True},
+        ],
+        notes=[{"x": 450, "y": 32,
+                "text": "Packaging: Helm tracks a release; Kustomize patches plain YAML",
+                "anchor": "middle", "bold": True}],
+    )
+
+
+def namespace_governance():
+    g.emit(
+        "appendix-32-namespace-governance", 920, 320,
+        bands=[{"x": 20, "y": 46, "w": 880, "h": 236,
+                "label": "how much (quota, limits) and who first (priority)", "fill": "#fafafa"}],
+        nodes=[
+            {"x": 50, "y": 92, "w": 210, "h": 56, "style": "accent",
+             "lines": ["ResourceQuota", "namespace total cap"]},
+            {"x": 50, "y": 188, "w": 210, "h": 56, "style": "box",
+             "lines": ["LimitRange", "per-container default/bound"]},
+            {"x": 370, "y": 120, "w": 190, "h": 90, "style": "ink",
+             "lines": ["containers defaulted,", "totals capped,", "4th pod rejected"]},
+            {"x": 660, "y": 92, "w": 220, "h": 56, "style": "ghost",
+             "lines": ["ClusterResourceQuota", "across projects"]},
+            {"x": 660, "y": 188, "w": 220, "h": 56, "style": "box",
+             "lines": ["PriorityClass", "who wins when tight"]},
+        ],
+        edges=[
+            {"x1": 260, "y1": 120, "x2": 370, "y2": 150, "label": "counts / caps"},
+            {"x1": 260, "y1": 216, "x2": 370, "y2": 180, "label": "defaults / bounds", "amber": True},
+        ],
+        notes=[{"x": 460, "y": 32,
+                "text": "Namespace Governance: LimitRange (mutating) runs before ResourceQuota (validating)",
+                "anchor": "middle", "bold": True}],
+    )
+
+
+def do280_crosswalk():
+    g.emit(
+        "appendix-33-do280-crosswalk", 920, 300,
+        bands=[{"x": 20, "y": 46, "w": 880, "h": 236,
+                "label": "DO280/EX280 objective coverage (chapters per area)", "fill": "#fafafa"}],
+        nodes=[
+            {"x": 40, "y": 92, "w": 200, "h": 54, "style": "accent", "lines": ["Deploy & manage apps", "8"]},
+            {"x": 260, "y": 92, "w": 200, "h": 54, "style": "ink", "lines": ["Storage & config", "7"]},
+            {"x": 480, "y": 92, "w": 200, "h": 54, "style": "ink", "lines": ["Reliability", "6"]},
+            {"x": 700, "y": 92, "w": 180, "h": 54, "style": "box", "lines": ["Security", "3"]},
+            {"x": 40, "y": 184, "w": 200, "h": 54, "style": "box", "lines": ["Networking", "2"]},
+            {"x": 260, "y": 184, "w": 200, "h": 54, "style": "box", "lines": ["Operators", "2"]},
+            {"x": 480, "y": 184, "w": 200, "h": 54, "style": "box", "lines": ["Troubleshoot", "2"]},
+            {"x": 700, "y": 184, "w": 180, "h": 54, "style": "box", "lines": ["Builds", "1"]},
+        ],
+        edges=[],
+        notes=[{"x": 460, "y": 32,
+                "text": "DO280/EX280 Crosswalk: every appendix chapter mapped to an objective area",
+                "anchor": "middle", "bold": True}],
+    )
+
+
 def main():
     predictable_demands()
     declarative_deployment()
@@ -982,6 +1083,10 @@ def main():
     network_segmentation()
     process_containment()
     secure_configuration()
+    observability_and_debugging()
+    packaging_helm_and_kustomize()
+    namespace_governance()
+    do280_crosswalk()
 
 
 if __name__ == "__main__":

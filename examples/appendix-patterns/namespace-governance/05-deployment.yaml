@@ -1,0 +1,64 @@
+# shipping-service at two replicas, exactly filling the pod quota alongside the
+# disposable Postgres (3 pods total). It sets a CPU request but no CPU limit, by
+# design (the Predictable Demands reasoning); the LimitRange's default.cpu
+# supplies the limit the ResourceQuota's limits.cpu dimension requires, before
+# quota admission runs. restricted-v2 clean.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: shipping-service
+  namespace: patterns
+  labels:
+    app.kubernetes.io/name: shipping-service
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: shipping-service
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: shipping-service
+    spec:
+      priorityClassName: patterns-high-priority
+      securityContext:
+        runAsNonRoot: true
+      containers:
+        - name: shipping-service
+          image: image-registry.openshift-image-registry.svc:5000/patterns/shipping-service:v1
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 8080
+          env:
+            - name: SERVICE_SCHEMA
+              valueFrom:
+                configMapKeyRef: { name: shipping-config, key: service_schema }
+            - name: PG_HOST
+              value: patterns-postgres.patterns.svc.cluster.local
+            - name: PG_USER
+              valueFrom:
+                secretKeyRef: { name: patterns-postgres-app, key: username }
+            - name: PG_PASSWORD
+              valueFrom:
+                secretKeyRef: { name: patterns-postgres-app, key: password }
+            - name: PG_DATABASE
+              valueFrom:
+                secretKeyRef: { name: patterns-postgres-app, key: dbname }
+          resources:
+            # A CPU request, but deliberately no CPU limit: the LimitRange fills it in.
+            requests: { cpu: 100m, memory: 192Mi }
+            limits: { memory: 512Mi }
+          startupProbe:
+            httpGet: { path: /health, port: http }
+            failureThreshold: 30
+            periodSeconds: 2
+          readinessProbe:
+            httpGet: { path: /healthz, port: http }
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsNonRoot: true
+            capabilities: { drop: ["ALL"] }
+            seccompProfile: { type: RuntimeDefault }
