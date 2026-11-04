@@ -1,0 +1,7 @@
+# Keep GitHub's language card reflecting the tutorial (HTML/SCSS/Ruby/Markdown),
+# not the runnable examples or the deck builders. These dirs hold supporting code,
+# not the site's content.
+examples/**      linguist-vendored
+presentation/**  linguist-vendored
+openshift/**     linguist-vendored
+scripts/**       linguist-vendored
