@@ -237,7 +237,7 @@ def sidecar():
                 "fill": "#fafafa"}],
         nodes=[
             {"x": 90, "y": 96, "w": 720, "h": 46, "style": "accent",
-             "lines": ["probe-tailer  —  restartPolicy: Always (native sidecar)"]},
+             "lines": ["probe-tailer: restartPolicy: Always (native sidecar)"]},
             {"x": 210, "y": 168, "w": 480, "h": 46, "style": "box",
              "lines": ["shipping-service (main container)"]},
         ],

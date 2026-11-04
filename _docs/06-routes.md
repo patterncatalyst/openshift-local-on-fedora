@@ -31,9 +31,9 @@ app you deployed earlier with a Route and verifies it over HTTPS the correct way
 A NodePort opens a numbered port on the node and you reach the Service at
 `node-ip:port`. It works, but the port is arbitrary (drawn from a high range like
 30000-32767), the URL is unfriendly, and every NodePort is one more hole punched in the
-node's firewall. On OpenShift it is also the wrong grain: you would be exposing raw ports on
+node's firewall. On OpenShift it's also the wrong grain: you would be exposing raw ports on
 the cluster node rather than naming an HTTP service, with no hostname, no TLS, and no path
-routing. The Route exists precisely so you do not do that for web traffic.
+routing. The Route exists precisely so you don't do that for web traffic.
 OpenShift's router (an ingress controller that ships with the cluster) watches
 Route objects and serves each one at a real hostname. On CRC every Route lands
 under `*.apps-crc.testing`, which resolves to the cluster out of the box.
@@ -92,8 +92,8 @@ you expose a service securely:
 
 - **Edge**: the router terminates TLS and forwards plain HTTP to the Pod over the internal
   network. The Pod carries no certificate. This is the simplest option and the one this
-  chapter uses, suited to any service that does not itself need to see encrypted traffic.
-- **Passthrough**: the router does not decrypt at all; it forwards the encrypted connection
+  chapter uses, suited to any service that doesn't itself need to see encrypted traffic.
+- **Passthrough**: the router doesn't decrypt at all; it forwards the encrypted connection
   straight to the Pod, which must present its own certificate. Use this when the application
   must terminate TLS itself, for example to satisfy a compliance rule that traffic is
   encrypted all the way to the process.
@@ -111,8 +111,8 @@ edge unless a requirement forces otherwise keeps that cost off your workloads.
 ## Terminate TLS at the edge
 
 Edge termination means the router handles TLS and forwards plain HTTP to your Pod
-on the cluster network. You do not manage a certificate in the Pod; the router
-uses the cluster's ingress certificate. When a Route does not supply its own certificate,
+on the cluster network. You don't manage a certificate in the Pod; the router
+uses the cluster's ingress certificate. When a Route doesn't supply its own certificate,
 the router falls back to the cluster's default ingress certificate, which is the wildcard
 certificate for `apps-crc.testing` here, so your Route is served over TLS without you
 providing anything. You can supply a per-Route certificate for a custom hostname, but for a
@@ -156,7 +156,7 @@ open. `Redirect` is the sensible default for anything a person will open in a br
 
 ### Custom hostnames and path-based routing
 
-A Route does not have to take the generated hostname. Set `spec.host` to any name that
+A Route doesn't have to take the generated hostname. Set `spec.host` to any name that
 resolves to the cluster, and the router serves the Route there instead; on a real cluster
 this is how a service gets a friendly public name. A Route can also match on a path, so
 several Routes can share one hostname and send different prefixes to different Services:
@@ -169,7 +169,7 @@ spec:
 
 Path-based Routes are how you put several backends behind one hostname, for example an API
 under `/api` and a UI at `/`. The router matches the most specific path first, so the order
-you create them in does not matter.
+you create them in doesn't matter.
 
 ## Verify over HTTPS the correct way
 
@@ -187,7 +187,7 @@ curl --cacert /tmp/crc-ca.crt "https://$HOST" | head -c 200
 ```
 
 Use `--cacert`, never `--insecure`. Skipping verification hides exactly the kind
-of certificate problem you would want to catch, and it teaches a habit you do not
+of certificate problem you would want to catch, and it teaches a habit you don't
 want in any other environment.
 
 The certificate the router presents is signed by the cluster's own ingress CA, which no
@@ -196,7 +196,7 @@ the `--cacert` command does, is the correct way to make the handshake succeed: i
 connection is encrypted and served by this cluster, rather than silently accepting whatever
 certificate arrives. On a production cluster you would replace the ingress certificate with
 one from a public or corporate CA, and then no `--cacert` would be needed, because clients
-already trust the signer. The CRC default is self-signed only because it is a local cluster
+already trust the signer. The CRC default is self-signed only because it's a local cluster
 with no public name, so the mechanism to trust is the same one you would configure in
 production, just with a different signer.
 
@@ -213,20 +213,20 @@ you would have written by hand.
 
 > **⌨️ The `oc` way**
 >
-> There is no `kubectl` equivalent for any of this: Route is an OpenShift API type
+> There's no `kubectl` equivalent for any of this: Route is an OpenShift API type
 > and `oc expose` / `oc create route` are the way to make one. On plain Kubernetes
 > the nearest equivalent is an Ingress plus an ingress controller you install and
 > configure yourself; OpenShift ships the router and the Route type ready to use.
 
 ## Tuning and troubleshooting a Route
 
-The router reads a set of annotations on the Route for behavior that does not fit in the
+The router reads a set of annotations on the Route for behavior that doesn't fit in the
 spec. Two come up often: `haproxy.router.openshift.io/timeout` raises the proxy timeout for a
 slow backend, and `haproxy.router.openshift.io/balance` changes the load-balancing algorithm
-across the Service's Pods. You rarely need them for a simple web app, but they are the lever
+across the Service's Pods. You rarely need them for a simple web app, but they're the lever
 when a Route works and the backend is just slow.
 
-When a Route does not serve what you expect, two status codes point straight at the cause. A
+When a Route doesn't serve what you expect, two status codes point straight at the cause. A
 `503` from the router means the Route resolved but found no healthy endpoints behind its
 Service, so the problem is the workload or the Service selector, not the Route. A connection
 that never completes the TLS handshake, as opposed to returning a status code, means the
@@ -249,7 +249,7 @@ oc get route web -o jsonpath='{.status.ingress[0].conditions[0].type}={.status.i
 ```
 
 Checking `Admitted` separates a Route the router has taken up from one it has rejected, which
-is the first thing to confirm when a brand-new Route does not answer at all.
+is the first thing to confirm when a brand-new Route doesn't answer at all.
 
 ## Reaching internal Services without a Route
 
@@ -268,17 +268,17 @@ database, a cache, or a backend service that only other Pods call has no busines
 Route, because a Route is a public door. On a multi-tenant cluster you can go further and add
 a `NetworkPolicy` that restricts which Pods may even open an internal connection to a Service,
 so that "internal" means a specific set of callers rather than the whole cluster. CRC is
-single-user, so you will not need NetworkPolicies here, but the principle, expose the
+single-user, so you'll not need NetworkPolicies here, but the principle, expose the
 minimum, is the same one that keeps a real cluster's attack surface small.
 
 ### Routers on a production cluster
 
-On CRC there is one router serving `apps-crc.testing`, and that is all you deal with. A
+On CRC there's one router serving `apps-crc.testing`, and that's all you deal with. A
 production cluster can run several `IngressController` objects, each serving a different
 domain or a different slice of Routes, a pattern called router sharding, used to separate
 internal from external traffic or to spread load. The Route object you write is identical in
-every case; which router serves it is decided by labels and the controller's configuration.
-Knowing the extra layer exists means a Route that is served in one place and not another is a
+every case; which router serves it's decided by labels and the controller's configuration.
+Knowing the extra layer exists means a Route that's served in one place and not another is a
 sharding question, not a broken Route.
 
 ## Build, run, observe

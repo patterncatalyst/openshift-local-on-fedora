@@ -17,7 +17,7 @@ By the end of this chapter you can:
 
 You now have the `crc` archive and a pull secret on disk. This chapter
 installs the `crc` binary and sets up the two clients you drive the cluster with:
-`oc`, the OpenShift CLI, and `kubectl`, the Kubernetes CLI. It still does not
+`oc`, the OpenShift CLI, and `kubectl`, the Kubernetes CLI. It still doesn't
 start anything; `crc setup` and `crc start` come next.
 
 ## Install the crc binary
@@ -77,7 +77,7 @@ OpenShift version: 4.22.14
 MicroShift version: 4.22.13
 ```
 
-The OpenShift version is baked into the CRC release as a *bundle*; you do not
+The OpenShift version is baked into the CRC release as a *bundle*; you don't
 download it separately. The first `crc setup` unpacks that bundle
 into `~/.crc`.
 
@@ -86,7 +86,7 @@ a MicroShift preset instead of full OpenShift. This guide stays on the `openshif
 preset, so the MicroShift line is informational: it tells you which MicroShift build
 this release would run if you switched presets, and nothing in these chapters uses it.
 The `+...` suffix on the CRC version is the build's commit hash, handy only when you
-report an issue and need to say exactly which build you are on.
+report an issue and need to say exactly which build you're on.
 
 ### Upgrading CRC later
 
@@ -94,9 +94,9 @@ When a newer CRC comes out, install the new binary the same way, over the old on
 A new release carries a new OpenShift bundle, so the first `crc start` after an
 upgrade pulls that bundle, and a major version jump usually wants a clean slate: stop
 the cluster, run `crc delete` to discard the old VM, then `crc setup` and `crc start`
-on the new version. Your `crc config` settings survive a binary upgrade, so you do not
+on the new version. Your `crc config` settings survive a binary upgrade, so you don't
 re-enter the sizing. This matches the house habit of staying on current tool
-versions rather than pinning an old one: upgrade `crc`, do not hold it back.
+versions rather than pinning an old one: upgrade `crc`, don't hold it back.
 
 ## How CRC runs the cluster
 
@@ -115,7 +115,7 @@ ports to the loopback address, so the cluster is reachable locally and nowhere e
 Knowing these layers makes the failure modes legible. A start that fails on
 "virtualization" is a KVM or firmware problem; one that fails creating the network is
 libvirt; one where the API never answers after a clean start is usually the daemon or
-the tunnel, not the cluster. You do not manage any of these by hand. `crc` creates,
+the tunnel, not the cluster. You don't manage any of these by hand. `crc` creates,
 starts, and tears them down for you; the point is only to recognize which layer a
 message is about.
 
@@ -129,7 +129,7 @@ SCCs, `project.openshift.io` for Projects, and the Operator APIs. `oc` carries v
 for those groups that `kubectl` has no equivalent for, which is why the chapters that
 reach a Route or an Operator switch to `oc`.
 
-Every CRC release bundles a matching `oc`, so you do not fetch the client
+Every CRC release bundles a matching `oc`, so you don't fetch the client
 separately. There are two ways to reach it.
 
 ### Option A: use the bundled client (recommended)
@@ -149,7 +149,7 @@ echo 'eval "$(crc oc-env)"' >> ~/.bashrc
 ```
 
 The bundled client is always version-matched to the cluster bundle, which is why
-it is the recommended path. `crc oc-env` prepends the client's directory inside
+it's the recommended path. `crc oc-env` prepends the client's directory inside
 `~/.crc` to your `PATH`, so the bundled `oc` wins over any other `oc` already
 installed. The one caveat: it resolves the path inside `~/.crc`, so the cluster must
 have been set up at least once for it to point somewhere real.
@@ -180,7 +180,7 @@ it.
 > one. If you prefer, run every `kubectl` command in the guide as `oc` instead;
 > the output is the same.
 
-If you want both and do not want to install a second binary, a symlink makes
+If you want both and don't want to install a second binary, a symlink makes
 `kubectl` resolve to `oc`:
 
 ```bash
@@ -193,11 +193,11 @@ This is worth settling now, because it causes confusing failures later. A host c
 easily end up with several things named `oc`: the bundled client from `crc oc-env`, a
 standalone one you installed, and sometimes a wrapper a different tool dropped into
 `/usr/local/bin` that only runs `oc` inside a container. The container wrapper is the
-dangerous one here, because it cannot reach `api.crc.testing`: the name resolves to
+dangerous one here, because it can't reach `api.crc.testing`: the name resolves to
 `127.0.0.1`, which inside the wrapper's container is the container itself, not your
 host, so every call fails with a connection refused.
 
-Check which `oc` you are actually running, and make sure it is a plain binary:
+Check which `oc` you're actually running, and make sure it's a plain binary:
 
 ```bash
 command -v oc            # should resolve into ~/.crc/... after crc oc-env
@@ -234,7 +234,7 @@ Open a new shell to pick these up. `crc <Tab>` and `oc get <Tab>` will then
 complete subcommands and resource types, which saves a lot of typing against the long
 OpenShift resource names. OpenShift adds dozens of custom resource types beyond the
 core Kubernetes set, and each Operator you install adds more, so tab-completion is the
-quickest way to recall an exact name. When completion is not enough, `oc api-resources`
+quickest way to recall an exact name. When completion isn't enough, `oc api-resources`
 lists every type the cluster currently serves along with its short name and API group,
 which is the authoritative reference once the cluster is up.
 
@@ -250,7 +250,7 @@ crc config set https-proxy http://proxy.example.com:3128
 crc config set no-proxy    .crc.testing,127.0.0.1
 ```
 
-Keep `.crc.testing` and `127.0.0.1` in `no-proxy` so cluster-local traffic does not
+Keep `.crc.testing` and `127.0.0.1` in `no-proxy` so cluster-local traffic doesn't
 bounce off the proxy. On a home or lab network with direct access, skip this section.
 
 ## Verify
@@ -267,14 +267,14 @@ If `oc` or `kubectl` is missing, you either skipped Option A's `eval` line or ha
 not added `~/.local/bin` to `PATH`. Fix that now; starting the cluster assumes all
 three resolve.
 
-### If the PATH change does not take
+### If the PATH change doesn't take
 
 A `command not found` right after you edited a profile is almost always a shell
 mismatch rather than a bad install. The line you added runs only when that particular
 profile is read, and which file a shell reads depends on how it starts. Fedora's
 default shell is bash, which reads `~/.bashrc` for interactive shells; if your shell
 is zsh, the same line belongs in `~/.zshrc` instead. A fresh terminal tab reads the
-profile; a shell you already had open does not, until you `source` the file or open a
+profile; a shell you already had open doesn't, until you `source` the file or open a
 new one.
 
 Two quick checks settle it:
@@ -290,7 +290,7 @@ is right. Clearing it, or opening a new shell, makes the next `oc` resolve fresh
 
 ## Removing CRC or starting over
 
-It is worth knowing the reverse of installation before you need it, because the two
+It's worth knowing the reverse of installation before you need it, because the two
 cleanup commands do different things and the difference matters. `crc delete` throws
 away the VM and its cluster state but keeps the cached bundle and your host setup, so
 a later `crc start` re-provisions a fresh cluster quickly without a download. This is
@@ -299,7 +299,7 @@ exactly that habit: starting from a known-empty cluster rather than one carrying
 leftovers from earlier work.
 
 `crc cleanup` goes further and reverses what `crc setup` did to the host: it removes
-the libvirt network and the DNS rule. Run it only when you are uninstalling CRC for
+the libvirt network and the DNS rule. Run it only when you're uninstalling CRC for
 good. After it, removing the `~/.local/bin/crc` binary and the `~/.crc` directory
 leaves the machine as it was. For normal day-to-day use you never run `crc cleanup`;
 `crc stop` and `crc delete` are the two you actually use.
@@ -307,24 +307,24 @@ leaves the machine as it was. For normal day-to-day use you never run `crc clean
 ## What crc setup will prepare
 
 The next chapter runs `crc setup`, which is the one-time host preparation step before
-the first start. It is worth knowing in advance what it touches, so none of it is a
+the first start. It's worth knowing in advance what it touches, so none of it's a
 surprise: it validates the host (virtualization, libvirt, free resources), unpacks the
 OpenShift bundle into `~/.crc`, creates the libvirt network the VM uses, installs the
 host DNS rule that makes `api.crc.testing` and `*.apps-crc.testing` resolve, and adds
-your user to the `libvirt` group. It does not start the cluster. You run it once per
+your user to the `libvirt` group. It doesn't start the cluster. You run it once per
 machine, and again after a CRC upgrade.
 
 Each of those steps is why `crc setup` needs to run before the first start rather than
 as part of it. The host validation fails fast if virtualization is off, so you find
 out before a long bundle unpack. The network and DNS changes are host-level and
-persist across cluster restarts, so they are done once rather than on every start. And
+persist across cluster restarts, so they're done once rather than on every start. And
 the group change is the one with a delayed effect, since a new group membership only
 applies to login sessions that start after it, which is the reason the previous
 chapter suggested logging out and back in once.
 
 ## Confirm your configuration
 
-Before the next chapter, it is useful to see the settings `crc` will start with. Two
+Before the next chapter, it's useful to see the settings `crc` will start with. Two
 read-only commands show the whole picture:
 
 ```bash
@@ -332,7 +332,7 @@ crc config view      # every value you have set (cpus, memory, disk-size, proxy)
 crc status           # whether the cluster is running, and its disk usage
 ```
 
-`crc config view` lists only values you have changed from their defaults, so an empty
+`crc config view` lists only values you've changed from their defaults, so an empty
 or short list early on is expected. `crc status` reports `Stopped` until you start the
 cluster, which is the state you should be in at the end of this chapter.
 

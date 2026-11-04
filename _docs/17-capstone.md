@@ -20,8 +20,8 @@ This is where the guide converges. The earlier chapters introduced the pieces on
 time: deploying under `restricted-v2`, exposing a Service with an edge-TLS Route,
 packaging with Helm, installing Operators, adding the service mesh, giving workloads
 storage, scaling them on load. This final project puts them together into a single
-coherent system and shows when, how, and why each one fits alongside the others. It is the largest thing in
-the guide, and the one that justifies the chapters before it, because it is where their
+coherent system and shows when, how, and why each one fits alongside the others. It's the largest thing in
+the guide, and the one that justifies the chapters before it, because it's where their
 separate lessons have to work at the same time, on the same cluster, in one system.
 
 The system is a **data mesh**: a domain of services modeling order-placement-through-
@@ -48,7 +48,7 @@ code:
 Use this chapter to see how everything in this guide fits together on one CRC cluster;
 use the reference architectures when the data mesh itself is the subject and you want the
 runnable chart. Where the two drift, the reference architecture is canonical. Keeping the
-full build there rather than copying it here is a choice, not a gap: the service code and
+full build there rather than copying it here's a choice, not a gap: the service code and
 its chart have one home that stays current, and this chapter stays a stable map of how the
 guide's chapters converge, which is the part that belongs in the guide itself.
 
@@ -116,7 +116,7 @@ cleanly under `restricted-v2`. This is the registry the starting-the-cluster cha
 part of what came up; the final project is where it does real work, holding the nine images
 the mesh runs.
 
-Podman is not the only tool for this step; the rest of the Red Hat container toolchain does the
+Podman isn't the only tool for this step; the rest of the Red Hat container toolchain does the
 same job and some of it fits even better. **Buildah** builds OCI images from a Containerfile,
 and `podman build` in fact delegates to it, so `buildah bud` is a direct substitute when you
 want the builder on its own, for example in a CI job with no need for podman's run-time half.
@@ -130,7 +130,7 @@ push in a single familiar tool.
 
 **Helm, from the Helm chapter.** The chart carries one data-driven `app-deployment.yaml`
 template and describes the seven workloads as entries in `values.yaml`, each with its port,
-probe, size, and whether it gets a Route. That is the restricted-v2-clean, portable chart
+probe, size, and whether it gets a Route. That's the restricted-v2-clean, portable chart
 the Helm chapter described, scaled to a real system: one template, seven services, a single
 `helm install`.
 
@@ -156,7 +156,7 @@ autoscaling chapter's HPA-and-KEDA mechanics drive the mesh's elasticity.
 
 ## The deploy, at a glance
 
-The reference architecture's appendix has the full sequence; the shape of it is the
+The reference architecture's appendix has the full sequence; the shape of it's the
 through-line of this whole guide:
 
 ```bash
@@ -180,14 +180,14 @@ oc get route graphql-gateway -n datamesh      # the gateway's edge-TLS hostname
 
 A detail the reference appendix calls out and worth carrying here: on first start the app
 Pods can crash-loop briefly while Postgres and Kafka come up, then converge once their
-dependencies are ready. That is the expected startup pattern for a system whose services
+dependencies are ready. That's the expected startup pattern for a system whose services
 race their datastores, not a failure, and it settles on its own.
 
-The OpenShift-specific work is concentrated in three places, and they are exactly the
+The OpenShift-specific work is concentrated in three places, and they're exactly the
 differences this guide spent its chapters on. The app Deployments drop `runAsUser` so
 `restricted-v2` can assign one; Postgres and Kafka get the scoped `nonroot-v2` grant for
 their pinned UIDs; and the gateway and registry get Routes while everything else stays
-internal. Nothing else about the chart is OpenShift-particular. That is the payoff of
+internal. Nothing else about the chart is OpenShift-particular. That's the payoff of
 learning the platform chapter by chapter: porting a real multi-service system to OpenShift
 turns out to be a short, specific list of changes, not a rewrite, because the hard parts
 were each a chapter you already worked.
@@ -200,9 +200,9 @@ services that own their own data forces the whole toolkit into play: many worklo
 the security defaults, stateful infrastructure that needs the scoped SCC and persistent
 volumes, internal service-to-service traffic that the mesh secures, a public edge that a
 Route exposes, events that flow through an operator-installed Kafka, and load that
-autoscaling has to track. It is large enough that the pieces have to cooperate, which is the
-thing a sequence of isolated examples cannot show. The domain, order through shipment, is
-ordinary by design: the interest is not the business logic but how a realistic system of
+autoscaling has to track. It's large enough that the pieces have to cooperate, which is the
+thing a sequence of isolated examples can't show. The domain, order through shipment, is
+ordinary by design: the interest isn't the business logic but how a realistic system of
 services lands on OpenShift.
 
 ## Seeing it run
@@ -238,7 +238,7 @@ stateful pieces' data. With the platform tier on, Kiali draws the mesh graph, th
 as nodes and their calls as edges, with the mTLS lock on each secured connection, so the
 protocol choices become visible as traffic rather than staying abstract in the manifests.
 
-This is where the guide's debugging tools pay off at scale. When a service does not come up,
+This is where the guide's debugging tools pay off at scale. When a service doesn't come up,
 the pairing of `oc get events` and `oc logs` names the cause, and `oc rsh` into a running
 service confirms what it sees of its database and its peers. A seven-service system has more
 moving parts than any single chapter's example, and the inside-the-cluster tools are what
@@ -247,12 +247,12 @@ a whole mesh.
 
 ## What the final project proves
 
-Run end to end, the data mesh shows that the guide's pieces are not separate tricks but one
+Run end to end, the data mesh shows that the guide's pieces aren't separate tricks but one
 toolkit. A single `helm install` brings up seven services that OpenShift admits under
 `restricted-v2`, reach each other over the cluster network, expose just the gateway through
 an edge-TLS Route, keep their data on PersistentVolumeClaims, and, with the platform tier,
 run in a mutually authenticated mesh that scales on load and reports its telemetry. Every
-one of those behaviors is a chapter you have already worked. The final project is where they
+one of those behaviors is a chapter you've already worked. The final project is where they
 stop being exercises and become a system.
 
 ## For deeper coverage

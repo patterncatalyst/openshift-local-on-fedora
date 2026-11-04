@@ -20,7 +20,7 @@ watches custom resources and reconciles the real objects to match. OpenShift shi
 the Operator Lifecycle Manager (OLM) and a catalog, OperatorHub, so installing one
 is a declarative action rather than a pile of manifests. You already installed two
 Operators for the service mesh earlier; this chapter explains the machinery
-and the operators this guide builds on. The payoff of understanding it is practical: once you
+and the operators this guide builds on. The payoff of understanding it's practical: once you
 can read the objects OLM creates, an install that hangs or an upgrade that surprises you becomes
 a specific thing to look at rather than a black box to restart and hope.
 
@@ -35,7 +35,7 @@ Four objects do the work:
 
 - **PackageManifest**: a catalog entry OLM reads from OperatorHub. It lists the
   operator's channels and the current ClusterServiceVersion in each.
-- **Subscription**: your request to install an operator from a channel. It is the
+- **Subscription**: your request to install an operator from a channel. It's the
   object you create.
 - **InstallPlan**: OLM's plan to install a specific ClusterServiceVersion, created
   in response to a Subscription.
@@ -49,7 +49,7 @@ their own namespace and group.
 Behind those objects sits one more: the **CatalogSource**. A CatalogSource is a Pod,
 running in `openshift-marketplace`, that serves a catalog of operators to OLM. OpenShift
 ships several by default, and `redhat-operators` is the one the Subscriptions in this guide
-pull from. When you query a PackageManifest, you are reading what a CatalogSource advertises,
+pull from. When you query a PackageManifest, you're reading what a CatalogSource advertises,
 which is why the list of available versions reflects the catalog as it stands today rather than
 a fixed set. The catalog Pod also explains a timing quirk worth knowing: just after a cluster
 start, the marketplace reports ready a short while before it actually serves packages, so a
@@ -71,7 +71,7 @@ modes before you subscribe, visible on its PackageManifest, saves that dead end.
 
 Left to defaults, a Subscription auto-approves every InstallPlan, so an operator can
 upgrade itself the moment the catalog publishes a new version. For a tutorial you
-want the opposite: a known version that does not move under you. The house pattern
+want the opposite: a known version that doesn't move under you. The house pattern
 pins the exact CSV and approves only the matching InstallPlan:
 
 ```yaml
@@ -110,7 +110,7 @@ oc get packagemanifest amq-streams -n openshift-marketplace \
   -o jsonpath='{range .status.channels[*]}{.name} {.currentCSV}{"\n"}{end}'
 ```
 
-This is not a formality. A CSV that was current when a guide was written is often gone from the
+This isn't a formality. A CSV that was current when a guide was written is often gone from the
 catalog months later, replaced by a newer patch, and a Subscription pinned to a CSV the catalog
 no longer serves never gets an InstallPlan: it waits forever. Re-checking and pinning the CSV
 the channel serves today is what keeps an install from hanging. The pins in this repository were
@@ -122,11 +122,11 @@ A channel is a named track of releases, like `amq-streams-3.2.x` or `stable`, an
 channel the operator's CSVs form an upgrade graph: each CSV records which earlier version it
 `replaces`, and sometimes versions it may `skip`. With automatic approval, OLM walks that graph
 to the channel head the moment the catalog publishes a new CSV, so an operator can upgrade itself
-overnight. For production that can be the right choice; for a tutorial it is the opposite of what
+overnight. For production that can be the right choice; for a tutorial it's the opposite of what
 you want, because the version underneath you would change and the commands might not match. Manual
 approval plus a pinned `startingCSV` freezes the operator at a known version: OLM proposes the
 upgrade InstallPlans but leaves them unapproved, so nothing moves until you edit the pin and
-approve the next one yourself. That is the whole point of the house pattern, a version that
+approve the next one yourself. That's the whole point of the house pattern, a version that
 holds still until you choose to move it.
 
 ## The operators this guide relies on
@@ -150,9 +150,9 @@ not depend on the Red Hat packaging; the operator is the OpenShift delivery path
 
 What the Red Hat packaging adds is lifecycle and support: a tested operator on a defined
 channel, with a supported upgrade path and images that carry Red Hat's security maintenance.
-On OpenShift that is the delivery mechanism you reach for, because it integrates with OLM and the
+On OpenShift that's the delivery mechanism you reach for, because it integrates with OLM and the
 console. The point for this guide is that your workloads stay portable: an application that talks
-to Kafka does not know whether Kafka arrived via Strimzi on plain Kubernetes or AMQ Streams on
+to Kafka doesn't know whether Kafka arrived via Strimzi on plain Kubernetes or AMQ Streams on
 OpenShift, so the same code and manifests move between the two with only the install path
 changing. Choosing the Red Hat operator is an operational decision about support and lifecycle,
 not a change to what you build.
@@ -166,7 +166,7 @@ separate install scripts.
 ## Operators Red Hat adds beyond the stack
 
 Beyond the stack above, OpenShift offers operators that make a cluster easier to run
-and observe. These are not yet used elsewhere in this family of projects, so treat
+and observe. These aren't yet used elsewhere in this family of projects, so treat
 the pins as ones to establish on your own cluster; confirm each package and its
 current CSV with `oc get packagemanifest <pkg> -n openshift-marketplace` before
 installing.
@@ -176,7 +176,7 @@ installing.
 The Cluster Observability Operator (package `cluster-observability-operator`)
 deploys and manages monitoring stacks on the cluster: it reconciles a
 `MonitoringStack` custom resource into a Prometheus and Alertmanager setup you own,
-separate from the cluster's built-in platform monitoring. It is the OpenShift-native
+separate from the cluster's built-in platform monitoring. It's the OpenShift-native
 way to stand up metrics for your own workloads without hand-rolling Prometheus. It matters here
 because the service mesh chapter noted that Kiali's traffic graph needs a metrics source: a
 `MonitoringStack`, or the OpenTelemetry stack the observability chapter installs, is what fills
@@ -194,7 +194,7 @@ oc get packagemanifest cluster-observability-operator -n openshift-marketplace \
 The Node Tuning Operator ships with OpenShift and applies sysctl and kernel tuning
 to nodes through a `Tuned` custom resource; the Performance Profile it manages is how
 you pin CPUs, set huge pages, and enable low-latency features on a node. On a
-single-node CRC the tuning you can meaningfully apply is limited, but it is worth
+single-node CRC the tuning you can meaningfully apply is limited, but it's worth
 seeing what a `Tuned` resource looks like and how the operator rolls it out, because
 the mechanism is identical on a real cluster.
 
@@ -204,9 +204,9 @@ OpenShift's SDN is built in, so a networking operator adds a specific capability
 top. Two are worth knowing: the **MetalLB Operator**, which hands out
 `LoadBalancer` service IPs on bare metal, and the **Kubernetes NMState Operator**,
 which configures node network interfaces through a `NodeNetworkConfigurationPolicy`.
-On single-node CRC their practical use is narrow (there is one node and no external
+On single-node CRC their practical use is narrow (there's one node and no external
 IP pool), so this section is about recognizing what each does; which one to install
-depends on what you are modeling. The value of knowing they exist is that a networking need on a
+depends on what you're modeling. The value of knowing they exist is that a networking need on a
 real cluster, a load-balancer IP or a specific interface configuration, has a named operator
 answer rather than a hand-built one, and the resource you would create to drive it looks the same
 whether you try it here or apply it on a cluster where it has real effect.
@@ -225,7 +225,7 @@ oc get crd | grep <operator-domain>               # the CRDs the operator owns
 
 A CSV stuck short of `Succeeded` points at the install, not the workload: a missing
 OperatorGroup for a SingleNamespace operator, an unapproved InstallPlan, or a dependency the
-operator needs and cannot find. Reading the CSV's status conditions, with `oc describe csv`,
+operator needs and can't find. Reading the CSV's status conditions, with `oc describe csv`,
 names the reason. The pattern to internalize is that an operator install has two gates, the CSV
 reaching `Succeeded` and its CRDs appearing, and both should be checked rather than assuming the
 Subscription alone did the job.
@@ -234,7 +234,7 @@ An operator differs from a plain Deployment in what it then does. A Deployment r
 an operator runs a controller that watches custom resources and reconciles real objects to
 match them. Installing the operator only puts that controller in place and registers its CRDs.
 Nothing happens to your cluster until you create one of its custom resources, which is the step
-that tells the operator what to build. That is why the mesh chapter installed the operators and
+that tells the operator what to build. That's why the mesh chapter installed the operators and
 then applied an `Istio` resource: the operator was watching, and the CR was the instruction.
 
 ## Uninstalling an operator cleanly
@@ -249,11 +249,11 @@ oc delete subscription <name> -n openshift-operators
 oc delete csv <csv-name> -n openshift-operators
 ```
 
-Delete the custom resources first, so the operator tears down what it created while it is still
+Delete the custom resources first, so the operator tears down what it created while it's still
 running to do so. Then remove the Subscription and the CSV. This sequence leaves the operator's CRDs
 in place, because deleting a CRD deletes every object of that type across the
-cluster, so you remove CRDs only when you are sure nothing depends on them. A custom resource that
-will not delete is usually held by a finalizer the operator clears, which is the reason for
+cluster, so you remove CRDs only when you're sure nothing depends on them. A custom resource that
+won't delete is usually held by a finalizer the operator clears, which is the reason for
 ordering CR deletion before the operator goes away. The repository's `teardown.sh` follows exactly
 this order, reading each CSV's owned CRDs before removing anything, so the cluster returns to
 empty without orphaned objects.
