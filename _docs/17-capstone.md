@@ -4,6 +4,18 @@ order: 17
 description: "The final project that converges the guide: a seven-service data mesh deployed to OpenShift Local, where restricted-v2, Routes, the integrated registry, Helm, the mesh, storage, and autoscaling all meet in one system."
 ---
 
+## Learning objectives
+
+By the end of this chapter you can:
+
+- Describe how a seven-service data mesh maps onto one CRC cluster across two tiers
+- Trace each earlier chapter's concept (restricted-v2, Routes, Helm, Operators, storage, mesh, autoscaling) into its place in a single running system
+- Build the service images with podman and push them to the integrated registry, then deploy the live core with one `helm install`
+- Explain why the app services run under `restricted-v2` while Postgres and Kafka need a scoped `nonroot-v2` grant
+- Exercise the mesh end to end through the GraphQL gateway's edge-TLS Route and read its composed response
+
+## Why this matters
+
 This is where the guide converges. The earlier chapters introduced the pieces one at a
 time: deploying under `restricted-v2`, exposing a Service with an edge-TLS Route,
 packaging with Helm, installing Operators, adding the service mesh, giving workloads
@@ -91,10 +103,30 @@ Every other service stays `ClusterIP`-only, reachable in the cluster but with no
 which is the least-exposure habit from the Routes chapter: a Route is a public door, so
 give one only to what needs it.
 
-**The integrated registry.** The images are built inside the cluster and pushed to
-OpenShift's integrated registry, addressed by its in-cluster Service DNS, with no external
-account. This is the registry the starting-the-cluster chapter noted was part of what came
-up; the final project is where it does real work, holding the nine images the mesh runs.
+**The integrated registry, fed by podman.** The seven service images are built on your host
+with **podman**, from multi-stage Containerfiles (a UBI 10 builder stage that resolves the
+Python dependencies into a virtualenv, then a slim non-root runtime stage that copies only
+that venv and the app), and pushed to OpenShift's **integrated registry** over its exposed
+route. The chart then pulls them back by the registry's in-cluster Service DNS, with no
+external registry account. This is the CRC build path, and it differs from the minikube one
+by design: minikube does a local `docker build` and `minikube image load`, while on CRC you
+`podman build`, `podman login` to the integrated registry, and `podman push`. The multi-stage
+split is what keeps the runtime image small and non-root, which is also what lets it run
+cleanly under `restricted-v2`. This is the registry the starting-the-cluster chapter noted was
+part of what came up; the final project is where it does real work, holding the nine images
+the mesh runs.
+
+Podman is not the only tool for this step; the rest of the Red Hat container toolchain does the
+same job and some of it fits even better. **Buildah** builds OCI images from a Containerfile,
+and `podman build` in fact delegates to it, so `buildah bud` is a direct substitute when you
+want the builder on its own, for example in a CI job with no need for podman's run-time half.
+**Skopeo** copies images between registries without pulling them into local storage, which is a
+cleaner way to mirror the Postgres and Kafka images into the integrated registry than the
+pull-tag-push this chapter uses: `skopeo copy docker://docker.io/library/postgres:18.6-alpine
+docker://$REG/datamesh/postgres:18.6-alpine` moves the image registry to registry in one step.
+All three are daemonless and rootless, which is why they suit a local workflow and a locked-down
+CI runner equally; podman is the one this chapter leads with because it covers build, login, and
+push in a single familiar tool.
 
 **Helm, from the Helm chapter.** The chart carries one data-driven `app-deployment.yaml`
 template and describes the seven workloads as entries in `values.yaml`, each with its port,
@@ -128,15 +160,22 @@ The reference architecture's appendix has the full sequence; the shape of it is 
 through-line of this whole guide:
 
 ```bash
-# size and start CRC (platform target for the full tier)
-crc config set memory 32768; crc config set cpus 14; crc config set disk-size 100
+# size and start CRC
+crc config set memory 32768; crc config set cpus 12; crc config set disk-size 100
 crc setup && crc start --pull-secret-file ~/pull-secret.txt
 eval "$(crc oc-env)"
-# build and push the service images to the integrated registry, then:
-helm install datamesh openshift/helm/datamesh -n datamesh --create-namespace
+# expose the integrated registry and log podman in to it
+oc patch configs.imageregistry.operator.openshift.io/cluster \
+  --type merge -p '{"spec":{"defaultRoute":true}}'
+REG=$(oc get route default-route -n openshift-image-registry -o jsonpath='{.spec.host}')
+podman login -u "$(oc whoami)" -p "$(oc whoami -t)" --tls-verify=false "$REG"
+oc new-project datamesh
+# build the 7 images with podman (multi-stage Containerfiles) and push to the registry,
+# mirroring Postgres and Kafka into it too
+./openshift/build-and-push.sh -r "$REG" -n datamesh --mirror-infra
+# deploy the live core
+helm upgrade --install datamesh openshift/helm/datamesh --namespace datamesh
 oc get route graphql-gateway -n datamesh      # the gateway's edge-TLS hostname
-# optional: bring up the platform tier (mesh, autoscaling, observability)
-./openshift/platform/install-platform.sh
 ```
 
 A detail the reference appendix calls out and worth carrying here: on first start the app
@@ -171,7 +210,29 @@ services lands on OpenShift.
 Once the core is up, the system is observable through the same tools the guide built. The
 gateway's Route is the front door: a request to `graphql-gateway-datamesh.apps-crc.testing`
 over HTTPS reaches the composed API, with TLS terminated at the router exactly as the Routes
-chapter showed. Inside the cluster, `oc get pods -n datamesh` shows the seven services plus
+chapter showed. A single GraphQL query exercises more than the gateway. Asking for an order
+and its stock makes the gateway call the order service over REST and the inventory service
+over gRPC, then fold both into one response:
+
+```bash
+curl -sk https://graphql-gateway-datamesh.apps-crc.testing/graphql \
+  -H 'Content-Type: application/json' \
+  -d '{"query":"{ order(id:\"<id>\"){ itemSku quantity status stock { sku quantityOnHand available } } }"}'
+```
+
+```json
+{ "data": { "order": {
+  "itemSku": "WIDGET-001", "quantity": 3, "status": "placed",
+  "stock": { "sku": "WIDGET-001", "quantityOnHand": 50, "available": true } } } }
+```
+
+The `stock` object came back over gRPC while the rest of the order came back over REST, and
+the client saw neither boundary. Placing an order shows the same gRPC edge enforcing a rule:
+a `POST` for an in-stock item is admitted, and one for an out-of-stock item is rejected with
+a `409` carrying the on-hand count the inventory service reported. The protocol choices from
+the architecture are now behavior you can watch, not claims in a manifest.
+
+Inside the cluster, `oc get pods -n datamesh` shows the seven services plus
 Postgres, Kafka, and Apicurio, and `oc get pvc -n datamesh` shows the claims keeping the
 stateful pieces' data. With the platform tier on, Kiali draws the mesh graph, the services
 as nodes and their calls as edges, with the mTLS lock on each secured connection, so the
@@ -193,6 +254,13 @@ an edge-TLS Route, keep their data on PersistentVolumeClaims, and, with the plat
 run in a mutually authenticated mesh that scales on load and reports its telemetry. Every
 one of those behaviors is a chapter you have already worked. The final project is where they
 stop being exercises and become a system.
+
+## For deeper coverage
+
+- [**Data Mesh**](https://www.oreilly.com/library/view/data-mesh/9781492092384/) (Zhamak Dehghani, O'Reilly) is the source for the architecture this project models: data as a product, domain ownership, and the organizational reasons a mesh looks the way it does.
+- [**Kubernetes Patterns**](https://www.oreilly.com/library/view/-/9781098131678/) (Ibryam and Huß, O'Reilly) names the structural patterns the deployment relies on, from health probes and predictable demands to the stateful-service and configuration patterns the chart puts to work.
+- [**Building Event-Driven Microservices**](https://www.oreilly.com/library/view/building-event-driven-microservices/9798341622180/) (Adam Bellemare, O'Reilly) covers the asynchronous Kafka edges in depth: how services publish and react to domain events without a direct call.
+- Official docs: the [OpenShift Container Platform documentation](https://docs.openshift.com/) for Security Context Constraints, Routes, and the integrated image registry; the [Kubernetes documentation](https://kubernetes.io/docs/) for the underlying Deployment, StatefulSet, and Service objects.
 
 ## Where this fits
 

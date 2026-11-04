@@ -4,6 +4,17 @@ order: 6
 description: "Expose a Service to your host with an OpenShift Route and TLS terminated at the edge, instead of a NodePort."
 ---
 
+## Learning objectives
+
+By the end of this chapter you can:
+
+- Expose a Service to your host with an OpenShift Route
+- Terminate TLS at the edge with a single Route setting
+- Redirect plain HTTP to HTTPS
+- Verify the endpoint over HTTPS with a trusted handshake
+
+## Why this matters
+
 On plain Kubernetes you reach a Service from outside the cluster with a NodePort or
 an Ingress. OpenShift has a built-in router and a first-class object for this: the
 **Route**. A Route gives your Service a stable hostname under `apps-crc.testing`
@@ -290,6 +301,11 @@ docroot) and a redirect from HTTP confirm the Route and edge TLS are working.
 The signal is the trusted-CA handshake succeeding, not the status code: run the
 same `curl` without `--cacert` and it fails with a self-signed-certificate
 error instead.
+
+## For deeper coverage
+
+- [**Kubernetes: Up and Running**](https://www.oreilly.com/library/view/-/9781098110192/) (Burns, Beda, Hightower, Evenson, O'Reilly) covers Services and Ingress, the Kubernetes primitives a Route builds on.
+- Official docs: the [OpenShift Container Platform documentation](https://docs.openshift.com/) for Routes and the ingress router, and the [Kubernetes documentation](https://kubernetes.io/docs/concepts/services-networking/) for Services and Ingress.
 
 ## Where this fits
 

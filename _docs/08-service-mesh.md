@@ -4,6 +4,18 @@ order: 8
 description: "Install OpenShift Service Mesh 3 and Kiali as Operators, bring up the Istio control plane, enable sidecar injection, enforce STRICT mTLS, and split traffic with a canary."
 ---
 
+## Learning objectives
+
+By the end of this chapter you can:
+
+- Install OpenShift Service Mesh 3 and Kiali from OperatorHub
+- Bring up the Istio control plane with the `Istio` custom resource
+- Enroll a namespace for sidecar injection
+- Enforce STRICT mutual TLS between services
+- Split traffic to a second version with a canary
+
+## Why this matters
+
 OpenShift Service Mesh is Red Hat's distribution of Istio. Version 3 is driven by
 the Sail operator, which manages Istio through a small `Istio` custom resource
 instead of the older multi-CR control plane. This chapter installs the mesh and
@@ -360,6 +372,11 @@ the mesh is enforcing mutual TLS. The repository also scripts this as
 `./openshift/platform/install-mesh.sh`, which installs the same operators and control
 plane and then wires the mesh into the Helm release from the Helm chapter, so it
 expects that release already deployed.
+
+## For deeper coverage
+
+- [**Kubernetes Patterns**](https://www.oreilly.com/library/view/-/9781098131678/) (Ibryam and Huß, O'Reilly) covers the Sidecar and Service Discovery patterns a mesh puts to work.
+- Official docs: the [Istio documentation](https://istio.io/latest/docs/) for the mesh concepts and the `Istio` resource, and the [OpenShift Container Platform documentation](https://docs.openshift.com/) for OpenShift Service Mesh 3 and the Sail operator.
 
 ## Where this fits
 

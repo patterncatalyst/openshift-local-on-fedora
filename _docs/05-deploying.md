@@ -4,6 +4,18 @@ order: 5
 description: "Run a first workload with a Deployment and Pods using kubectl, with the oc shortcuts, and meet OpenShift's restricted-v2 security defaults."
 ---
 
+## Learning objectives
+
+By the end of this chapter you can:
+
+- Write a Deployment manifest and apply it with `kubectl`
+- Use the `oc` one-liner shortcuts that do the same work
+- Explain OpenShift's `restricted-v2` default and why a Pod gets an arbitrary non-root UID
+- Build an image that runs cleanly under any assigned UID
+- Inspect Pod, ReplicaSet, and Deployment status
+
+## Why this matters
+
 With the cluster up and both CLIs understood, this chapter deploys a first
 application. It uses the portable `kubectl` workflow (a Deployment that manages
 Pods), shows the `oc` one-liner that does the same thing, and introduces the one
@@ -346,6 +358,12 @@ The `httpd` image ships an empty document root, so a request to `/` answers
 proves. Serving real content is an image or ConfigMap concern, not a cluster one.
 Exposing that Service to your host, rather than reaching it from inside the
 cluster, is the next chapter.
+
+## For deeper coverage
+
+- [**Kubernetes Patterns**](https://www.oreilly.com/library/view/-/9781098131678/) (Ibryam and Huß, O'Reilly) covers the foundational patterns a Deployment relies on, including predictable demands and the health-probe pattern.
+- [**Container Security**](https://www.oreilly.com/library/view/container-security-2nd/9798341627697/) (Liz Rice, O'Reilly) explains why running as a non-root, arbitrary UID matters, which is the reasoning behind `restricted-v2`.
+- Official docs: the [OpenShift Container Platform documentation](https://docs.openshift.com/) for Security Context Constraints, and the [Kubernetes documentation](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/) for Deployments and ReplicaSets.
 
 ## Where this fits
 

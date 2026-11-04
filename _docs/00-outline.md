@@ -24,6 +24,14 @@ Read top to bottom the first time through. Once the cluster is up, each chapter
 stands on its own. Hands-on chapters end with a **Build, run, observe** section
 you can run against your cluster.
 
+This guide is **terminal-first**. Most administrators and developers work with
+OpenShift through the command line, with `kubectl`, `oc`, and `helm`, because that
+is what transfers to a remote cluster, scripts cleanly, and matches the hands-on
+certification exams. Every chapter drives the cluster that way. OpenShift's web
+console is a capable tool, and the guide points to it where it shows something the
+CLI cannot, such as the Kiali mesh graph, but it stays a secondary view rather than
+the main path.
+
 ### The `oc` way
 
 The chapters use `kubectl` for the Kubernetes workflow that OpenShift shares

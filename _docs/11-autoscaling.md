@@ -4,6 +4,18 @@ order: 11
 description: "Scale a workload on load with the Horizontal Pod Autoscaler and the Custom Metrics Autoscaler (KEDA), including scale-to-zero."
 ---
 
+## Learning objectives
+
+By the end of this chapter you can:
+
+- Scale a workload on CPU with the Horizontal Pod Autoscaler
+- Install the Custom Metrics Autoscaler, OpenShift's packaging of KEDA
+- Drive scaling from an external trigger with a `ScaledObject`
+- Scale a workload to zero and back
+- Explain why a workload uses either an HPA or a `ScaledObject`, not both
+
+## Why this matters
+
 A fixed replica count is a guess. Set it too low and the service struggles under load;
 too high and it wastes the node's memory while idle. Autoscaling replaces the guess with
 a rule the cluster enforces for you: run as many Pods as the current demand needs, within
@@ -290,6 +302,11 @@ over and creates its own `keda-hpa-web`, confirm both autoscalers are working. T
 alternatives on one workload, not a stack; driving the replica count from an external trigger
 is the same `ScaledObject` with its trigger swapped, which is the whole reason to install the
 Custom Metrics Autoscaler rather than stop at the built-in HPA.
+
+## For deeper coverage
+
+- [**Kubernetes Patterns**](https://www.oreilly.com/library/view/-/9781098131678/) (Ibryam and Huß, O'Reilly) covers the Elastic Scale pattern that the HPA and KEDA implement.
+- Official docs: the [KEDA documentation](https://keda.sh/docs/) for scalers and the `ScaledObject`, and the [OpenShift Container Platform documentation](https://docs.openshift.com/) for the Custom Metrics Autoscaler and the built-in HPA.
 
 ## Where this fits
 

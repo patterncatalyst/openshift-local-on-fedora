@@ -4,6 +4,17 @@ order: 3
 description: "Set the cluster size, run crc setup, start OpenShift with your pull secret, and log in with oc and the web console."
 ---
 
+## Learning objectives
+
+By the end of this chapter you can:
+
+- Set the cluster size with `crc config` before starting
+- Run `crc setup` to prepare the host and `crc start` with your pull secret
+- Log in from the command line with `oc` using the `crc-admin` context
+- Reach the web console and confirm the node is `Ready` and every cluster operator is healthy
+
+## Why this matters
+
 This is the chapter where OpenShift comes up. You set the cluster size you chose
 earlier, prepare the host with `crc setup`, start the cluster with your pull
 secret, and then log in two ways: with `oc` on the command line and with the web
@@ -286,6 +297,11 @@ oc delete project hello                       # clean it up
 
 If the node is `Ready`, every cluster operator is healthy, and you can create and
 delete a project, the cluster is ready for the chapters that follow.
+
+## For deeper coverage
+
+- [**Kubernetes: Up and Running**](https://www.oreilly.com/library/view/-/9781098110192/) (Burns, Beda, Hightower, Evenson, O'Reilly) explains the control plane and cluster operators that come up when the cluster starts.
+- Official docs: the [Red Hat OpenShift Local documentation](https://developers.redhat.com/products/openshift-local/overview) for start-up and troubleshooting, and the [OpenShift Container Platform documentation](https://docs.openshift.com/) for cluster operators and the web console.
 
 ## Where this fits
 

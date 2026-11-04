@@ -4,6 +4,16 @@ order: 13
 description: "Where OpenShift Local fits next to minikube, kind, the Developer Sandbox, and a real remote OpenShift cluster, and when to reach for each."
 ---
 
+## Learning objectives
+
+By the end of this chapter you can:
+
+- Compare OpenShift Local with minikube, kind, the Developer Sandbox, and a remote cluster
+- Weigh the cost of a full OpenShift VM against lighter local options
+- Choose the right tool for a given task rather than by habit
+
+## Why this matters
+
 OpenShift Local is one way to get a cluster, and it is not always the right one. This
 chapter places it next to the other options a developer on Fedora has, so you can choose
 by what you are actually trying to do rather than by habit. The short version: CRC gives
@@ -184,6 +194,11 @@ not, one of the lighter options will serve you better. It is also normal to use 
 over a project's life: kind in CI, CRC for local OpenShift work, a remote cluster for staging.
 Matching the tool to the task, rather than settling on one for everything, is what keeps both
 your machine and your feedback loop fast.
+
+## For deeper coverage
+
+- [**Kubernetes: Up and Running**](https://www.oreilly.com/library/view/-/9781098110192/) (Burns, Beda, Hightower, Evenson, O'Reilly) gives the broader picture of clusters that the local options all approximate.
+- Official docs: the [Red Hat OpenShift Local documentation](https://developers.redhat.com/products/openshift-local/overview), the [minikube documentation](https://minikube.sigs.k8s.io/docs/), and the [kind documentation](https://kind.sigs.k8s.io/) for the alternatives this chapter weighs.
 
 ## Where this fits
 

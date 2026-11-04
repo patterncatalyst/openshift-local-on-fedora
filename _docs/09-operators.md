@@ -4,6 +4,17 @@ order: 9
 description: "How OperatorHub and OLM work, how to pin an operator version safely, and the operators this guide relies on, including Cluster Observability, Node Tuning, and networking."
 ---
 
+## Learning objectives
+
+By the end of this chapter you can:
+
+- Explain how OperatorHub and OLM install and reconcile software
+- Read the objects OLM creates: Subscription, InstallPlan, and CSV
+- Pin an operator to a specific version with manual approval
+- Identify the operators this guide relies on and why
+
+## Why this matters
+
 An Operator packages the knowledge to run a piece of software on Kubernetes: it
 watches custom resources and reconciles the real objects to match. OpenShift ships
 the Operator Lifecycle Manager (OLM) and a catalog, OperatorHub, so installing one
@@ -277,6 +288,12 @@ oc get crd | grep kafka.strimzi.io                    # CRDs the operator owns
 A CSV in `Succeeded` and the operator's CRDs present confirm the install. The
 `teardown.sh` script removes operators in reverse, reading each CSV's owned CRDs
 before deleting, so the cluster returns to empty.
+
+## For deeper coverage
+
+- [**Kubernetes Patterns**](https://www.oreilly.com/library/view/-/9781098131678/) (Ibryam and Huß, O'Reilly) describes the Operator and Controller patterns that OLM automates.
+- [**GitOps and Kubernetes**](https://www.manning.com/books/gitops-and-kubernetes) (Yuen, Matyushentsev, Ekenstam, Suen, Manning) covers declarative delivery, the mindset behind operator-driven installs.
+- Official docs: the [OpenShift Container Platform documentation](https://docs.openshift.com/) for OLM and OperatorHub, and the [Kubernetes documentation](https://kubernetes.io/docs/concepts/extend-kubernetes/operator/) for the operator pattern and custom resources.
 
 ## Where this fits
 

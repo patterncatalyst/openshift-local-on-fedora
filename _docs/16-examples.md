@@ -4,6 +4,17 @@ order: 16
 description: "The runnable examples that accompany the chapters, where they live, and how their verification status is tracked."
 ---
 
+## Learning objectives
+
+By the end of this chapter you can:
+
+- Find the runnable example for each chapter under `examples/`
+- Understand the example layout and the shared `openshift/` scaffold
+- Check how each example's verification status is tracked
+- Run an example end to end against your own cluster
+
+## Why this matters
+
 Every hands-on chapter has a runnable counterpart you can apply to your own
 cluster. This chapter indexes them, explains the layout, and describes how each
 example's verification status is tracked. The aim is that no chapter is only something to read:

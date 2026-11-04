@@ -4,6 +4,17 @@ order: 10
 description: "Give a workload storage that survives a Pod restart with a PersistentVolumeClaim and OpenShift's dynamic provisioning on CRC."
 ---
 
+## Learning objectives
+
+By the end of this chapter you can:
+
+- Request durable storage with a PersistentVolumeClaim
+- Explain how OpenShift dynamically provisions a volume on CRC
+- Identify the `crc-csi-hostpath-provisioner` StorageClass and its binding mode
+- Prove that data survives the Pod that wrote it
+
+## Why this matters
+
 A Pod's own filesystem is temporary. Delete the Pod, and anything it wrote is gone,
 which is correct for a stateless web server but wrong for a database or anything that
 has to remember. This chapter gives a workload durable storage with a
@@ -313,6 +324,12 @@ oc delete project storage-demo
 
 A claim that binds once a Pod mounts it, and a file that outlives the Pod that wrote it,
 confirm persistent storage is working.
+
+## For deeper coverage
+
+- [**Kubernetes Patterns**](https://www.oreilly.com/library/view/-/9781098131678/) (Ibryam and Huß, O'Reilly) covers the Stateful Service pattern and how persistent storage attaches to a workload.
+- [**Kubernetes: Up and Running**](https://www.oreilly.com/library/view/-/9781098110192/) (Burns, Beda, Hightower, Evenson, O'Reilly) explains volumes, PersistentVolumes, and storage classes from the ground up.
+- Official docs: the [OpenShift Container Platform documentation](https://docs.openshift.com/) for storage and dynamic provisioning, and the [Kubernetes documentation](https://kubernetes.io/docs/concepts/storage/persistent-volumes/) for PersistentVolumes and claims.
 
 ## Where this fits
 

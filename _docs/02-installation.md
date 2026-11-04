@@ -4,6 +4,17 @@ order: 2
 description: "Install the crc binary, put it on your PATH, and wire up the oc and kubectl clients the cluster ships with."
 ---
 
+## Learning objectives
+
+By the end of this chapter you can:
+
+- Install the `crc` binary and put it on your PATH
+- Verify the installed release with `crc version`
+- Wire up the bundled `oc` and `kubectl` clients the cluster ships with
+- Confirm the cluster reports `Stopped` before the first start
+
+## Why this matters
+
 You now have the `crc` archive and a pull secret on disk. This chapter
 installs the `crc` binary and sets up the two clients you drive the cluster with:
 `oc`, the OpenShift CLI, and `kubectl`, the Kubernetes CLI. It still does not
@@ -324,6 +335,11 @@ crc status           # whether the cluster is running, and its disk usage
 `crc config view` lists only values you have changed from their defaults, so an empty
 or short list early on is expected. `crc status` reports `Stopped` until you start the
 cluster, which is the state you should be in at the end of this chapter.
+
+## For deeper coverage
+
+- [**Kubernetes: Up and Running**](https://www.oreilly.com/library/view/-/9781098110192/) (Burns, Beda, Hightower, Evenson, O'Reilly) covers the two clients you just installed and the API they drive.
+- Official docs: the [Red Hat OpenShift Local documentation](https://developers.redhat.com/products/openshift-local/overview) for installation details, and the [Kubernetes documentation](https://kubernetes.io/docs/reference/kubectl/) for the `kubectl` reference.
 
 ## Where this fits
 
