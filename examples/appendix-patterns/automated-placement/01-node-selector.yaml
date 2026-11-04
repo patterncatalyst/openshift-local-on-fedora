@@ -1,0 +1,46 @@
+# A placeholder standing in for shipping-service: placement is independent of
+# what the container does, so a minimal UBI image that just sleeps shows the
+# scheduling outcome a real workload would see. restricted-v2 clean: no
+# runAsUser (OpenShift injects one), drop ALL caps, RuntimeDefault seccomp.
+#
+# nodeSelector is the simplest constraint: the Pod only schedules onto a node
+# carrying zone=warehouse-a. Apply before labeling the node and it stays
+# Pending; label the crc node and it schedules on the next attempt.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: shipping-placeholder
+  namespace: patterns
+  labels:
+    app.kubernetes.io/name: shipping-placeholder
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: shipping-placeholder
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: shipping-placeholder
+    spec:
+      securityContext:
+        runAsNonRoot: true
+      nodeSelector:
+        zone: warehouse-a
+      containers:
+        - name: placeholder
+          image: registry.access.redhat.com/ubi9/ubi-minimal:latest
+          command: ["sleep", "infinity"]
+          resources:
+            requests:
+              cpu: 10m
+              memory: 32Mi
+            limits:
+              memory: 64Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsNonRoot: true
+            capabilities:
+              drop: ["ALL"]
+            seccompProfile:
+              type: RuntimeDefault

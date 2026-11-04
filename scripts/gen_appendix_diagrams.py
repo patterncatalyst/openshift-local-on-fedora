@@ -169,11 +169,43 @@ def managed_lifecycle():
     )
 
 
+def automated_placement():
+    g.emit(
+        "appendix-05-automated-placement", 900, 380,
+        bands=[{"x": 20, "y": 48, "w": 860, "h": 312,
+                "label": "single-node CRC: who may land on the one node",
+                "fill": "#fafafa"}],
+        nodes=[
+            {"x": 340, "y": 135, "w": 220, "h": 140, "style": "accent",
+             "lines": ["crc (only node)", "zone=warehouse-a",
+                       "tier=fulfillment", "taint dedicated=fulfillment"]},
+            {"x": 40, "y": 100, "w": 185, "h": 64, "style": "box",
+             "lines": ["nodeSelector /", "nodeAffinity Pod"]},
+            {"x": 40, "y": 250, "w": 185, "h": 64, "style": "box",
+             "lines": ["tolerating Pod"]},
+            {"x": 660, "y": 108, "w": 200, "h": 64, "style": "ghost",
+             "lines": ["intolerant Pod", "Pending (repelled)"]},
+            {"x": 660, "y": 248, "w": 200, "h": 70, "style": "ghost",
+             "lines": ["2nd replica (anti-affinity)", "Pending: no 2nd node"]},
+        ],
+        edges=[
+            {"x1": 225, "y1": 150, "x2": 340, "y2": 175, "label": "label match"},
+            {"x1": 225, "y1": 280, "x2": 340, "y2": 235, "label": "tolerates taint"},
+            {"x1": 560, "y1": 175, "x2": 660, "y2": 140, "label": "repelled", "amber": True},
+            {"x1": 560, "y1": 235, "x2": 660, "y2": 280, "label": "no room", "amber": True},
+        ],
+        notes=[{"x": 460, "y": 32,
+                "text": "Automated Placement on single-node CRC",
+                "anchor": "middle", "bold": True}],
+    )
+
+
 def main():
     predictable_demands()
     declarative_deployment()
     health_probe()
     managed_lifecycle()
+    automated_placement()
 
 
 if __name__ == "__main__":
