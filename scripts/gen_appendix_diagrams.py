@@ -324,6 +324,42 @@ def ambassador():
     )
 
 
+def stateful_service():
+    g.emit(
+        "appendix-15-stateful-service", 900, 340,
+        bands=[{"x": 20, "y": 48, "w": 860, "h": 272,
+                "label": "StatefulSet shipment-archive (nonroot-v2)",
+                "fill": "#fafafa"}],
+        nodes=[
+            {"x": 40, "y": 120, "w": 170, "h": 90, "style": "accent",
+             "lines": ["headless Service", "clusterIP: None", "per-Pod DNS"]},
+            {"x": 310, "y": 80, "w": 200, "h": 40, "style": "box",
+             "lines": ["shipment-archive-0"]},
+            {"x": 310, "y": 142, "w": 200, "h": 40, "style": "box",
+             "lines": ["shipment-archive-1"]},
+            {"x": 310, "y": 204, "w": 200, "h": 40, "style": "box",
+             "lines": ["shipment-archive-2"]},
+            {"x": 610, "y": 80, "w": 240, "h": 40, "style": "ink",
+             "lines": ["archive-data-...-0 (PVC)"]},
+            {"x": 610, "y": 142, "w": 240, "h": 40, "style": "ink",
+             "lines": ["archive-data-...-1 (PVC)"]},
+            {"x": 610, "y": 204, "w": 240, "h": 40, "style": "ink",
+             "lines": ["archive-data-...-2 (PVC)"]},
+        ],
+        edges=[
+            {"x1": 210, "y1": 150, "x2": 310, "y2": 100},
+            {"x1": 210, "y1": 162, "x2": 310, "y2": 162, "label": "DNS per ordinal"},
+            {"x1": 210, "y1": 174, "x2": 310, "y2": 224},
+            {"x1": 510, "y1": 100, "x2": 610, "y2": 100, "label": "sticky"},
+            {"x1": 510, "y1": 162, "x2": 610, "y2": 162},
+            {"x1": 510, "y1": 224, "x2": 610, "y2": 224},
+        ],
+        notes=[{"x": 450, "y": 32,
+                "text": "Stateful Service: ordinal identity + its own PVC, reattached on restart",
+                "anchor": "middle", "bold": True}],
+    )
+
+
 def stateless_service():
     g.emit(
         "appendix-14-stateless-service", 900, 320,
@@ -497,6 +533,7 @@ def main():
     daemon_service()
     singleton_service()
     stateless_service()
+    stateful_service()
 
 
 if __name__ == "__main__":
