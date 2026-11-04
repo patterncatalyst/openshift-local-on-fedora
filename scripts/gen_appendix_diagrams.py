@@ -324,6 +324,38 @@ def ambassador():
     )
 
 
+def periodic_job():
+    g.emit(
+        "appendix-11-periodic-job", 880, 320,
+        bands=[{"x": 20, "y": 48, "w": 840, "h": 252,
+                "label": "CronJob: one Job per tick (fires once per cluster)",
+                "fill": "#fafafa"}],
+        nodes=[
+            {"x": 50, "y": 120, "w": 180, "h": 80, "style": "accent",
+             "lines": ["CronJob", "*/5 * * * *", "Forbid"]},
+            {"x": 350, "y": 82, "w": 170, "h": 44, "style": "box",
+             "lines": ["Job (tick 0)"]},
+            {"x": 350, "y": 138, "w": 170, "h": 44, "style": "box",
+             "lines": ["Job (tick 1)"]},
+            {"x": 350, "y": 194, "w": 170, "h": 44, "style": "box",
+             "lines": ["Job (tick 2)"]},
+            {"x": 650, "y": 120, "w": 190, "h": 80, "style": "ink",
+             "lines": ["report-*.csv (PVC)", "history: last 3 kept"]},
+        ],
+        edges=[
+            {"x1": 230, "y1": 150, "x2": 350, "y2": 104},
+            {"x1": 230, "y1": 160, "x2": 350, "y2": 160, "label": "creates on tick"},
+            {"x1": 230, "y1": 170, "x2": 350, "y2": 216},
+            {"x1": 520, "y1": 104, "x2": 650, "y2": 150},
+            {"x1": 520, "y1": 160, "x2": 650, "y2": 160},
+            {"x1": 520, "y1": 216, "x2": 650, "y2": 170},
+        ],
+        notes=[{"x": 440, "y": 32,
+                "text": "Periodic Job: Batch Job with a scheduler in front",
+                "anchor": "middle", "bold": True}],
+    )
+
+
 def batch_job():
     g.emit(
         "appendix-10-batch-job", 900, 340,
@@ -368,6 +400,7 @@ def main():
     adapter()
     ambassador()
     batch_job()
+    periodic_job()
 
 
 if __name__ == "__main__":

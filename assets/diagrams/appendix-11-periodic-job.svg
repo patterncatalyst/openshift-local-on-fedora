@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 320" font-family="'Red Hat Text', system-ui, sans-serif" role="img">
+<defs><marker id="a" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#555"/></marker><marker id="am" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#b8650a"/></marker></defs>
+<rect x="20" y="48" width="840" height="252" rx="12" fill="#fafafa" stroke="#ddd"/>
+<text x="32" y="68" font-size="12" font-weight="700" fill="#888">CronJob: one Job per tick (fires once per cluster)</text>
+<rect x="50" y="120" width="180" height="80" rx="9" fill="#fff8ef" stroke="#e8870c" stroke-width="2"/>
+<text x="140.0" y="150.5" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">CronJob</text>
+<text x="140.0" y="167.5" font-size="11.5" fill="#555555" text-anchor="middle">*/5 * * * *</text>
+<text x="140.0" y="182.5" font-size="11.5" fill="#555555" text-anchor="middle">Forbid</text>
+<rect x="350" y="82" width="170" height="44" rx="9" fill="#ffffff" stroke="#111111" stroke-width="2"/>
+<text x="435.0" y="109.5" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">Job (tick 0)</text>
+<rect x="350" y="138" width="170" height="44" rx="9" fill="#ffffff" stroke="#111111" stroke-width="2"/>
+<text x="435.0" y="165.5" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">Job (tick 1)</text>
+<rect x="350" y="194" width="170" height="44" rx="9" fill="#ffffff" stroke="#111111" stroke-width="2"/>
+<text x="435.0" y="221.5" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">Job (tick 2)</text>
+<rect x="650" y="120" width="190" height="80" rx="9" fill="#f1f5f9" stroke="#64748b" stroke-width="2"/>
+<text x="745.0" y="158.0" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">report-*.csv (PVC)</text>
+<text x="745.0" y="175.0" font-size="11.5" fill="#555555" text-anchor="middle">history: last 3 kept</text>
+<path d="M230,150 L350,104" fill="none" stroke="#555" stroke-width="2" marker-end="url(#a)"/>
+<path d="M230,160 L350,160" fill="none" stroke="#555" stroke-width="2" marker-end="url(#a)"/>
+<text x="296.0" y="154.0" font-size="11" fill="#ffffff" stroke="#ffffff" stroke-width="3" paint-order="stroke" text-anchor="middle">creates on tick</text>
+<text x="296.0" y="154.0" font-size="11" fill="#555" text-anchor="middle">creates on tick</text>
+<path d="M230,170 L350,216" fill="none" stroke="#555" stroke-width="2" marker-end="url(#a)"/>
+<path d="M520,104 L650,150" fill="none" stroke="#555" stroke-width="2" marker-end="url(#a)"/>
+<path d="M520,160 L650,160" fill="none" stroke="#555" stroke-width="2" marker-end="url(#a)"/>
+<path d="M520,216 L650,170" fill="none" stroke="#555" stroke-width="2" marker-end="url(#a)"/>
+<text x="440" y="32" font-size="11" fill="#888" text-anchor="middle" font-weight="700">Periodic Job: Batch Job with a scheduler in front</text>
+</svg>
