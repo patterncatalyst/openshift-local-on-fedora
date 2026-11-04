@@ -324,6 +324,34 @@ def ambassador():
     )
 
 
+def singleton_service():
+    g.emit(
+        "appendix-13-singleton-service", 900, 320,
+        bands=[{"x": 20, "y": 56, "w": 860, "h": 210,
+                "label": "replicas: 1 (singleton)", "fill": "#fafafa"}],
+        nodes=[
+            {"x": 50, "y": 92, "w": 180, "h": 56, "style": "box",
+             "lines": ["Eviction API", "drain / autoscaler"]},
+            {"x": 330, "y": 86, "w": 190, "h": 66, "style": "ink",
+             "lines": ["PodDisruptionBudget", "minAvailable 1 / ALLOWED 0"]},
+            {"x": 640, "y": 100, "w": 200, "h": 72, "style": "accent",
+             "lines": ["shipping-service", "the only Pod"]},
+            {"x": 50, "y": 206, "w": 180, "h": 50, "style": "ghost",
+             "lines": ["oc delete pod"]},
+        ],
+        edges=[
+            {"x1": 230, "y1": 120, "x2": 330, "y2": 119, "label": "evict"},
+            {"x1": 520, "y1": 119, "x2": 640, "y2": 130,
+             "label": "429 refused", "amber": True},
+            {"x1": 230, "y1": 228, "x2": 640, "y2": 165,
+             "label": "bypasses PDB (succeeds)", "dashed": True},
+        ],
+        notes=[{"x": 450, "y": 40,
+                "text": "Singleton Service: the PDB stops evictions, not a direct delete",
+                "anchor": "middle", "bold": True}],
+    )
+
+
 def daemon_service():
     g.emit(
         "appendix-12-daemon-service", 900, 300,
@@ -433,6 +461,7 @@ def main():
     batch_job()
     periodic_job()
     daemon_service()
+    singleton_service()
 
 
 if __name__ == "__main__":
