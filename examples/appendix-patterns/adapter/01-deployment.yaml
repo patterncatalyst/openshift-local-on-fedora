@@ -70,7 +70,7 @@ spec:
             capabilities: { drop: ["ALL"] }
             seccompProfile: { type: RuntimeDefault }
         - name: metrics-adapter
-          image: registry.access.redhat.com/ubi10/python-314-minimal:latest
+          image: registry.access.redhat.com/ubi10/python-314-minimal:10.2-1791464217
           command: ["python3", "-c"]
           args:
             - |

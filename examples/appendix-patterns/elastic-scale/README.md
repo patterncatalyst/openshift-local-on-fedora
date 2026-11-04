@@ -54,7 +54,7 @@ oc get hpa shipping-service -n patterns    # cpu: <n>%/50% once metrics flow
 Drive CPU load from an in-cluster Pod and watch the HPA climb from 1 toward 5:
 
 ```bash
-oc -n patterns run load-gen --image=registry.access.redhat.com/ubi9/ubi-minimal:latest --restart=Never -- \
+oc -n patterns run load-gen --image=registry.access.redhat.com/ubi9/ubi-minimal:9.6 --restart=Never -- \
   /bin/sh -c 'for i in $(seq 1 40); do (while true; do curl -s http://shipping-service/health >/dev/null 2>&1; done &); done; sleep 600'
 watch oc get hpa shipping-service -n patterns      # TARGETS climbs past 50%, REPLICAS -> 5
 oc delete pod load-gen -n patterns --force         # stop; HPA settles back to 1 after its window

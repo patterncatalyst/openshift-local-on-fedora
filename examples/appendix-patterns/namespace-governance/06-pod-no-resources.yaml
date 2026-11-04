@@ -13,7 +13,7 @@ spec:
     seccompProfile: { type: RuntimeDefault }
   containers:
     - name: demo
-      image: registry.access.redhat.com/ubi9/ubi-minimal:latest
+      image: registry.access.redhat.com/ubi9/ubi-minimal:9.6
       command: ["sleep", "3600"]
       securityContext:
         allowPrivilegeEscalation: false

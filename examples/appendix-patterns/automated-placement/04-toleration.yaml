@@ -31,7 +31,7 @@ spec:
           effect: NoSchedule
       containers:
         - name: placeholder
-          image: registry.access.redhat.com/ubi9/ubi-minimal:latest
+          image: registry.access.redhat.com/ubi9/ubi-minimal:9.6
           command: ["sleep", "infinity"]
           resources:
             requests: { cpu: 10m, memory: 32Mi }
@@ -65,7 +65,7 @@ spec:
         zone: warehouse-a
       containers:
         - name: placeholder
-          image: registry.access.redhat.com/ubi9/ubi-minimal:latest
+          image: registry.access.redhat.com/ubi9/ubi-minimal:9.6
           command: ["sleep", "infinity"]
           resources:
             requests: { cpu: 10m, memory: 32Mi }
