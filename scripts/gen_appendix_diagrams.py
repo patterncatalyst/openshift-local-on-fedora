@@ -324,6 +324,40 @@ def ambassador():
     )
 
 
+def stateless_service():
+    g.emit(
+        "appendix-14-stateless-service", 900, 320,
+        bands=[{"x": 20, "y": 56, "w": 860, "h": 210,
+                "label": "payment-service (stateless, replicas: 3)",
+                "fill": "#fafafa"}],
+        nodes=[
+            {"x": 50, "y": 112, "w": 160, "h": 80, "style": "accent",
+             "lines": ["Service", "any Pod,", "any request"]},
+            {"x": 340, "y": 80, "w": 190, "h": 40, "style": "box",
+             "lines": ["Pod kd5jb"]},
+            {"x": 340, "y": 128, "w": 190, "h": 40, "style": "box",
+             "lines": ["Pod l5bgn"]},
+            {"x": 340, "y": 176, "w": 190, "h": 44, "style": "ghost",
+             "lines": ["Pod cb77p -> gggn2"]},
+            {"x": 650, "y": 112, "w": 190, "h": 80, "style": "ink",
+             "lines": ["Postgres", "(all shared state)"]},
+        ],
+        edges=[
+            {"x1": 210, "y1": 140, "x2": 340, "y2": 100},
+            {"x1": 210, "y1": 150, "x2": 340, "y2": 148, "label": "load-balance"},
+            {"x1": 210, "y1": 160, "x2": 340, "y2": 196},
+            {"x1": 530, "y1": 148, "x2": 650, "y2": 150, "label": "state external"},
+        ],
+        notes=[
+            {"x": 450, "y": 40,
+             "text": "Stateless Service: interchangeable Pods, state lives in Postgres",
+             "anchor": "middle", "bold": True},
+            {"x": 435, "y": 234, "text": "deleted -> replaced with a new identity, no coordination",
+             "anchor": "middle", "size": 10, "color": "#888"},
+        ],
+    )
+
+
 def singleton_service():
     g.emit(
         "appendix-13-singleton-service", 900, 320,
@@ -462,6 +496,7 @@ def main():
     periodic_job()
     daemon_service()
     singleton_service()
+    stateless_service()
 
 
 if __name__ == "__main__":
