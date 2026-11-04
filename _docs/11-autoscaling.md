@@ -66,7 +66,7 @@ when work arrives. You install it as an Operator, the pattern from the Operators
 ```bash
 source openshift/lib.sh
 require_crc
-install_operator openshift/platform/subscriptions/keda.yaml \
+install_operator openshift/platform/subscriptions/custom-metrics-autoscaler.yaml \
   openshift-keda openshift-custom-metrics-autoscaler-operator \
   custom-metrics-autoscaler.v2.19.0-4
 ```
@@ -76,7 +76,7 @@ As with the service mesh, you then create a custom resource that tells the Opera
 deploy its controller, a `KedaController` in the `openshift-keda` namespace:
 
 ```yaml
-# keda-controller.yaml
+# openshift/platform/keda/kedacontroller.yaml (abridged)
 apiVersion: keda.sh/v1alpha1
 kind: KedaController
 metadata:
@@ -87,7 +87,7 @@ spec:
 ```
 
 ```bash
-oc apply -f keda-controller.yaml
+oc apply -f openshift/platform/keda/kedacontroller.yaml
 oc get pods -n openshift-keda          # the KEDA operator, metrics adapter, and admission Pods
 ```
 

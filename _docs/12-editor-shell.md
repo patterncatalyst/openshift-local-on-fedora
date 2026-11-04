@@ -242,13 +242,20 @@ oc new-project shell-demo 2>/dev/null || oc project shell-demo
 oc apply -f httpd-deployment.yaml
 oc rollout status deployment/web
 oc exec deploy/web -- cat /etc/os-release | head -1    # run one command in the Pod
-oc rsh deploy/web curl -s http://localhost:8080 | head -c 60   # a shell command inside
-oc cp deploy/web:/etc/os-release ./os-release          # copy a file out
+oc rsh deploy/web sh -c 'echo "inside as UID $(id -u)"'   # a shell command inside
+POD=$(oc get pod -l app=web -o jsonpath='{.items[0].metadata.name}')
+oc exec "$POD" -- sh -c 'echo copied > /tmp/f.txt'     # write a regular file in the Pod
+oc cp "$POD":/tmp/f.txt ./f.txt && cat ./f.txt         # copy it out
+oc port-forward svc/web 8080:8080 &                    # forward the port (then Ctrl-C)
+sleep 3; curl -s -o /dev/null -w 'via forward: HTTP %{http_code}\n' http://localhost:8080; kill %1
 oc delete project shell-demo
 ```
 
-Running a command inside the container, reaching its port from within, and copying a file
-out confirm the inside-the-cluster tools are working.
+Running a command inside the container, reading the UID OpenShift assigned, copying a file
+out, and reaching the Service through a forward confirm the inside-the-cluster tools are
+working. The `403` from the forward is the empty `httpd` docroot answering, the same proof of
+reachability the deploying chapter met: the status code shows the request arrived, not that
+anything is wrong.
 
 ## Where this fits
 
