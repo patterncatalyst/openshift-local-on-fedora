@@ -20,6 +20,31 @@ without touching application code, fine-grained traffic control (canaries, retri
 timeouts), and uniform telemetry. On OpenShift the proxies are Envoy, the control
 plane is Istio, and Kiali is the console that visualizes the mesh.
 
+### What the sidecar actually does
+
+The sidecar is an Envoy proxy, and once it is in a Pod, every connection the application
+makes or receives passes through it first. The application still thinks it is talking plain
+HTTP to another service; the proxy is what turns that into a mutually authenticated,
+encrypted call, applies whatever routing rules are in force, and records the metrics. Because
+the proxy sits in the data path for all traffic, the mesh can add encryption, retries,
+timeouts, and telemetry without a line of application code, which is the whole reason a mesh
+exists. The control plane, Istio's `istiod`, never handles your traffic itself; it configures
+the proxies and leaves them to do the work, so the data path stays fast and the control plane
+can restart without dropping connections. This split, a control plane that configures and a
+data plane of proxies that carries traffic, is the shape to hold in mind for the rest of the
+chapter: every object you apply is really an instruction to `istiod` about how to configure the
+proxies, which then enforce it on each connection.
+
+### Revisioned injection, not the old annotation
+
+Service Mesh 3 enrolls a namespace by a *revision label*, `istio.io/rev`, rather than the
+`istio-injection=enabled` annotation older Istio used. The label names a specific control-plane
+revision, which is what makes a safe upgrade possible: you can run two control-plane revisions
+side by side, move namespaces to the new one a few at a time by changing their label, and roll
+back by changing it again. On this single control plane the revision is just `default`, but the
+mechanism is the reason the label replaced the annotation, and it is worth starting with the
+model that scales rather than the one that does not.
+
 ## Install the operators
 
 The mesh needs two operators from OperatorHub: the Sail operator (package
@@ -77,6 +102,14 @@ oc apply -f openshift/platform/mesh/istio.yaml
 oc wait istiocni/default --for=condition=Ready --timeout=300s
 oc wait istio/default   --for=condition=Ready --timeout=600s
 ```
+
+The two resources split a job that older Istio did with an init container. Getting a Pod's
+traffic to flow through its sidecar requires rewriting the Pod's network rules, and doing that
+per Pod needs elevated privileges that sit poorly with `restricted-v2`. `IstioCNI` moves the
+rewrite into a CNI plugin that runs once on the node, so individual Pods no longer need the
+privileged init container, which is a cleaner fit for OpenShift's security model. That is why
+the control plane here is two custom resources rather than one: `IstioCNI` owns the per-node
+networking, and `Istio` owns the control plane the proxies talk to.
 
 The `Istio` CR named `default` serves the revision named `default`: a Pod joins the
 mesh when it carries the label `istio.io/rev=default`. List the exact versions your
@@ -148,6 +181,19 @@ port, or the router's plaintext connection is refused. Keep the namespace STRICT
 and relax only the Route-facing workload. The Helm chart's `mesh.enabled` path adds
 that exception for you.
 
+### How mTLS works under the hood
+
+The reason this needs no application changes is that `istiod` gives every workload an identity
+and keeps its certificates fresh. Each sidecar receives a short-lived certificate tied to the
+workload's ServiceAccount, encoded as a SPIFFE identity, and `istiod` rotates it automatically
+long before it expires. When one sidecar connects to another, the two present these
+certificates and verify each other, so both ends of every in-mesh call are authenticated, not
+just encrypted. STRICT mode says a sidecar must refuse any connection that is not mutual TLS,
+which is why a plaintext caller from outside the mesh is rejected. PERMISSIVE, the exception for
+a Route-facing port, tells the sidecar to accept both, so the router's plaintext hop still
+works while in-mesh traffic stays encrypted. The identities come from the ServiceAccount, which
+is why workloads that run as distinct accounts can be told apart in an authorization policy.
+
 ## Split traffic with a canary
 
 Istio splits traffic with two objects: a `DestinationRule` that names subsets of a
@@ -188,6 +234,91 @@ The subsets resolve only if the Pods carry a `version` label, so the two Deploym
 set `version: v1` and `version: v2` on their templates. With both running, the
 VirtualService sends roughly nine in ten requests to v1. You read the resulting split
 in Kiali's graph once the observability chapter connects Kiali to a metrics source.
+
+## More than a canary: retries, timeouts, and outlier ejection
+
+A weighted split is one use of the `VirtualService` and `DestinationRule` pair; the same two
+objects carry the rest of the mesh's traffic control. A `VirtualService` can set a per-route
+timeout and a retry policy, so a slow or flaky dependency is retried or cut off at the proxy
+rather than in every caller's code:
+
+```yaml
+  http:
+    - route: [{ destination: { host: web } }]
+      timeout: 2s
+      retries: { attempts: 3, perTryTimeout: 1s }
+```
+
+A `DestinationRule` carries the connection-level policy: connection-pool limits that cap how
+much load a caller can pile onto a service, and *outlier detection*, which ejects a Pod from
+the load-balancing pool after it returns a run of errors and brings it back once it recovers.
+That ejection is Istio's form of circuit breaking, and like everything else here it is applied
+by the proxies, so no application changes to add it. These are the controls that make a mesh
+worth running beyond mTLS: the failure handling that would otherwise be copied into every
+service lives in one place, described declaratively.
+
+## Gateways and the OpenShift router
+
+Traffic from outside the cluster needs a way in, and here the mesh and OpenShift overlap. A
+mesh *Gateway* plus a `VirtualService` is Istio's own ingress, letting mesh rules apply to
+north-south traffic the same way they apply inside. OpenShift already has the router and the
+Route, covered earlier, which is the simplest way to expose a mesh service to your host: an
+edge Route to the service, with a PERMISSIVE exception on the Route-facing port so the router's
+plaintext hop is accepted. Use the Route for straightforward exposure, and reach for an Istio
+Gateway only when you need mesh traffic policy applied at the edge itself. Mixing both without
+a reason is the usual way to get confusing double-proxying, so pick the one the task calls for.
+
+## Observability and Kiali
+
+Because every call passes through a proxy, the mesh produces uniform telemetry on its own:
+request counts, error rates, and latencies for each service, and distributed traces across
+the hops of a request, all without instrumenting the application. Kiali is the console that
+turns this into a picture, drawing the services as a graph with live traffic on the edges and
+the mTLS lock on secured connections.
+
+Kiali does not generate those metrics itself; it reads them from a Prometheus-compatible
+source. On this cluster the Kiali custom resource ships with its metrics source disabled,
+because OpenShift Local runs no standalone Prometheus by default. The observability chapter
+installs the Red Hat build of OpenTelemetry and points Kiali at it, and only then does the
+traffic graph fill in. Until that is wired, Kiali still shows the mesh topology and each
+workload's mTLS status, which is enough to confirm a namespace is enrolled and secured; the
+live traffic rates are what wait on the metrics source.
+
+## Authorization policies
+
+STRICT mTLS proves *who* a caller is; an `AuthorizationPolicy` decides *what* that caller may
+do. Once workloads have identities, you can write a policy that allows only a named
+ServiceAccount to reach a service and denies the rest:
+
+```yaml
+apiVersion: security.istio.io/v1
+kind: AuthorizationPolicy
+metadata:
+  name: web-allow-frontend
+  namespace: mesh-demo
+spec:
+  selector: { matchLabels: { app: web } }
+  action: ALLOW
+  rules:
+    - from: [{ source: { principals: ["cluster.local/ns/mesh-demo/sa/frontend"] } }]
+```
+
+This moves access control off the network's IP addresses and onto cryptographic identity, so
+the rule holds even as Pods move and IPs change. It is the layer that turns "traffic is
+encrypted" into "only these callers are allowed," and it is worth knowing the object exists
+even where this guide does not apply one.
+
+## What a mesh costs
+
+The mesh is not free, and on a single-node cluster the cost is visible. Every enrolled Pod
+gains an Envoy sidecar, which adds memory and a small per-request latency, and `istiod` plus
+Kiali are more workloads competing for the one node's resources. That is part of why the
+platform sizing target is larger. The payoff, encryption, traffic control, and telemetry with
+no application changes, is worth it for a system of services talking to each other, and
+overkill for a single app. Enroll the namespaces that benefit, and leave the rest out of the
+mesh rather than meshing everything by reflex. The decision is per namespace, so you can start
+with the one system that most needs mutual TLS or traffic shaping and widen the mesh later as
+the case for it grows, rather than committing the whole cluster at once.
 
 > **🤖 Explore with your agent**
 >
