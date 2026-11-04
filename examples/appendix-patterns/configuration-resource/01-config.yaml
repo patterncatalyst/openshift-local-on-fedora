@@ -1,0 +1,31 @@
+# payment-config does double duty. Three keys match payment-service's Settings
+# field names, so envFrom bulk-exposes them as env vars. The fourth,
+# payment-service.conf, isn't a valid env var name (it has a dot), so envFrom
+# skips it; the Deployment mounts this same ConfigMap as a volume so that key
+# reaches the container as a file instead.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: payment-config
+  namespace: patterns
+data:
+  service_schema: payments
+  pg_host: patterns-postgres.patterns.svc.cluster.local
+  pg_port: "5432"
+  payment-service.conf: |
+    [payment-service]
+    schema=payments
+    note=delivered as a file for tooling that expects a config path, not an env var
+---
+# A Secret whose keys match payment-service's pg_* settings, bulk-exposed via
+# envFrom. Values match the patterns-postgres credentials so the service connects.
+apiVersion: v1
+kind: Secret
+metadata:
+  name: payment-pg-credentials
+  namespace: patterns
+type: Opaque
+stringData:
+  pg_user: patterns_app
+  pg_password: changeme
+  pg_database: patterns

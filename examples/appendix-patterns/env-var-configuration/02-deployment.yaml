@@ -1,0 +1,76 @@
+# notification-service with its environment drawn from three sources at once:
+# literals, a ConfigMap, and a Secret. All three land as plain env vars,
+# resolved once at container start. restricted-v2 clean.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: notification-service
+  namespace: patterns
+  labels:
+    app.kubernetes.io/name: notification-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: notification-service
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: notification-service
+    spec:
+      securityContext:
+        runAsNonRoot: true
+      containers:
+        - name: notification-service
+          image: image-registry.openshift-image-registry.svc:5000/patterns/notification-service:v1
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 8080
+          env:
+            # Literal: fixed for this service, baked straight into the manifest.
+            - name: SERVICE_SCHEMA
+              value: notifications
+            - name: PG_HOST
+              value: patterns-postgres.patterns.svc.cluster.local
+            - name: PG_PORT
+              value: "5432"
+            # Secret key: credentials, resolved at container start.
+            - name: PG_USER
+              valueFrom:
+                secretKeyRef: { name: patterns-postgres-app, key: username }
+            - name: PG_PASSWORD
+              valueFrom:
+                secretKeyRef: { name: patterns-postgres-app, key: password }
+            - name: PG_DATABASE
+              valueFrom:
+                secretKeyRef: { name: patterns-postgres-app, key: dbname }
+            # ConfigMap key: non-secret, environment-shaped values.
+            - name: KAFKA_BOOTSTRAP
+              valueFrom:
+                configMapKeyRef: { name: notification-config, key: kafka_bootstrap }
+            - name: KAFKA_ORDER_TOPIC
+              valueFrom:
+                configMapKeyRef: { name: notification-config, key: kafka_order_topic }
+            - name: KAFKA_GROUP
+              valueFrom:
+                configMapKeyRef: { name: notification-config, key: kafka_group }
+            - name: APICURIO_URL
+              valueFrom:
+                configMapKeyRef: { name: notification-config, key: apicurio_url }
+          resources:
+            requests: { cpu: 100m, memory: 192Mi }
+            limits: { memory: 512Mi }
+          startupProbe:
+            httpGet: { path: /health, port: http }
+            failureThreshold: 30
+            periodSeconds: 2
+          readinessProbe:
+            httpGet: { path: /healthz, port: http }
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsNonRoot: true
+            capabilities: { drop: ["ALL"] }
+            seccompProfile: { type: RuntimeDefault }

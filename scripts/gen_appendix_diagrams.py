@@ -324,6 +324,129 @@ def ambassador():
     )
 
 
+def configuration_template():
+    g.emit(
+        "appendix-20-configuration-template", 900, 300,
+        bands=[{"x": 20, "y": 48, "w": 860, "h": 220,
+                "label": "render once, before the app starts", "fill": "#fafafa"}],
+        nodes=[
+            {"x": 40, "y": 74, "w": 170, "h": 46, "style": "box",
+             "lines": ["template ConfigMap"]},
+            {"x": 40, "y": 150, "w": 170, "h": 46, "style": "box",
+             "lines": ["overlay ConfigMap"]},
+            {"x": 330, "y": 98, "w": 180, "h": 80, "style": "accent",
+             "lines": ["init: render-config", "sed -> /rendered"]},
+            {"x": 620, "y": 72, "w": 220, "h": 50, "style": "ink",
+             "lines": ["emptyDir: app.conf (rendered)"]},
+            {"x": 620, "y": 176, "w": 220, "h": 56, "style": "box",
+             "lines": ["main: inventory-service", "reads /config/app"]},
+        ],
+        edges=[
+            {"x1": 210, "y1": 97, "x2": 330, "y2": 128, "label": "template"},
+            {"x1": 210, "y1": 173, "x2": 330, "y2": 150, "label": "envFrom"},
+            {"x1": 510, "y1": 128, "x2": 620, "y2": 100,
+             "label": "writes once", "amber": True},
+            {"x1": 620, "y1": 150, "x2": 620, "y2": 176},
+        ],
+        notes=[{"x": 450, "y": 32,
+                "text": "Configuration Template: init renders the file; the app only sees the result",
+                "anchor": "middle", "bold": True}],
+    )
+
+
+def immutable_configuration():
+    g.emit(
+        "appendix-21-immutable-configuration", 900, 300,
+        bands=[{"x": 20, "y": 50, "w": 860, "h": 214,
+                "label": "a config change is a new resource + a rollout",
+                "fill": "#fafafa"}],
+        nodes=[
+            {"x": 40, "y": 76, "w": 190, "h": 46, "style": "ink",
+             "lines": ["gateway-config-v1 (immutable)"]},
+            {"x": 40, "y": 152, "w": 190, "h": 46, "style": "ink",
+             "lines": ["gateway-config-v2 (immutable)"]},
+            {"x": 360, "y": 100, "w": 180, "h": 80, "style": "accent",
+             "lines": ["Deployment", "configMapRef", "v1 -> v2"]},
+            {"x": 640, "y": 108, "w": 200, "h": 64, "style": "box",
+             "lines": ["rolling update", "revision 2"]},
+        ],
+        edges=[
+            {"x1": 230, "y1": 99, "x2": 360, "y2": 128, "label": "was", "dashed": True},
+            {"x1": 230, "y1": 175, "x2": 360, "y2": 152, "label": "now", "amber": True},
+            {"x1": 540, "y1": 140, "x2": 640, "y2": 140, "label": "oc rollout"},
+        ],
+        notes=[
+            {"x": 450, "y": 34,
+             "text": "Immutable Configuration: v1 can't be patched; create v2 and roll",
+             "anchor": "middle", "bold": True},
+            {"x": 135, "y": 224,
+             "text": "in-place patch of v1 -> rejected", "anchor": "middle",
+             "size": 10, "color": "#b8650a"},
+        ],
+    )
+
+
+def configuration_resource():
+    g.emit(
+        "appendix-19-configuration-resource", 880, 300,
+        bands=[{"x": 20, "y": 50, "w": 840, "h": 214,
+                "label": "one resource, two shapes", "fill": "#fafafa"}],
+        nodes=[
+            {"x": 50, "y": 110, "w": 200, "h": 94, "style": "box",
+             "lines": ["ConfigMap + Secret",
+                       "keys: service_schema,",
+                       "pg_*, payment-service.conf"]},
+            {"x": 480, "y": 74, "w": 230, "h": 54, "style": "ink",
+             "lines": ["envFrom: every key as env var",
+                       "(resolved once at start)"]},
+            {"x": 480, "y": 184, "w": 230, "h": 60, "style": "ink",
+             "lines": ["volume: keys as files",
+                       "(live update, ~60s)"]},
+        ],
+        edges=[
+            {"x1": 250, "y1": 130, "x2": 480, "y2": 101, "label": "envFrom"},
+            {"x1": 250, "y1": 180, "x2": 480, "y2": 212,
+             "label": "volumeMount", "amber": True},
+        ],
+        notes=[{"x": 440, "y": 34,
+                "text": "Configuration Resource: same ConfigMap/Secret, only the files update live",
+                "anchor": "middle", "bold": True}],
+    )
+
+
+def env_var_configuration():
+    g.emit(
+        "appendix-18-env-var-configuration", 880, 300,
+        bands=[{"x": 20, "y": 48, "w": 840, "h": 216,
+                "label": "notification-service env (resolved once at start)",
+                "fill": "#fafafa"}],
+        nodes=[
+            {"x": 50, "y": 78, "w": 190, "h": 46, "style": "box",
+             "lines": ["literal: SERVICE_SCHEMA"]},
+            {"x": 50, "y": 148, "w": 190, "h": 46, "style": "box",
+             "lines": ["ConfigMap: KAFKA_*"]},
+            {"x": 50, "y": 218, "w": 190, "h": 40, "style": "ink",
+             "lines": ["Secret: PG_USER/PASSWORD"]},
+            {"x": 470, "y": 110, "w": 220, "h": 120, "style": "accent",
+             "lines": ["container env", "all plain strings,",
+                       "indistinguishable"]},
+        ],
+        edges=[
+            {"x1": 240, "y1": 101, "x2": 470, "y2": 140},
+            {"x1": 240, "y1": 171, "x2": 470, "y2": 170, "label": "valueFrom"},
+            {"x1": 240, "y1": 238, "x2": 470, "y2": 200},
+        ],
+        notes=[
+            {"x": 440, "y": 32,
+             "text": "Env Var Configuration: three sources, one env block",
+             "anchor": "middle", "bold": True},
+            {"x": 580, "y": 250,
+             "text": "edit a source after start -> no effect until restart",
+             "anchor": "middle", "size": 10, "color": "#888"},
+        ],
+    )
+
+
 def self_awareness():
     g.emit(
         "appendix-17-self-awareness", 900, 320,
@@ -599,6 +722,10 @@ def main():
     stateful_service()
     service_discovery()
     self_awareness()
+    env_var_configuration()
+    configuration_resource()
+    configuration_template()
+    immutable_configuration()
 
 
 if __name__ == "__main__":

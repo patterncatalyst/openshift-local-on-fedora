@@ -1,0 +1,48 @@
+# graphql-gateway consuming an immutable ConfigMap via envFrom. restricted-v2
+# clean; no Postgres (the gateway is stateless). Rolling a config change means
+# pointing configMapRef at a new ConfigMap name, an ordinary rolling update.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: graphql-gateway
+  namespace: patterns
+  labels:
+    app.kubernetes.io/name: graphql-gateway
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: graphql-gateway
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: graphql-gateway
+    spec:
+      securityContext:
+        runAsNonRoot: true
+      containers:
+        - name: graphql-gateway
+          image: image-registry.openshift-image-registry.svc:5000/patterns/graphql-gateway:v1
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 8080
+          envFrom:
+            - configMapRef:
+                name: gateway-config-v2
+          resources:
+            requests: { cpu: 100m, memory: 192Mi }
+            limits: { memory: 512Mi }
+          startupProbe:
+            httpGet: { path: /health, port: http }
+            failureThreshold: 30
+            periodSeconds: 2
+          readinessProbe:
+            httpGet: { path: /healthz, port: http }
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsNonRoot: true
+            capabilities: { drop: ["ALL"] }
+            seccompProfile: { type: RuntimeDefault }
