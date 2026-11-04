@@ -59,7 +59,13 @@ further on your own cluster:
 | 7 | Helm on OpenShift | The bundled `helm` CLI, restricted-v2-ready charts, and OpenShift's native Helm integration |
 | 8 | OpenShift Service Mesh | Installing the mesh (the Sail/Service Mesh 3 operator) and Kiali, with mTLS |
 | 9 | Operators | OperatorHub and OLM: installing Operators with pinned versions |
-| 10 | Examples | Index of the runnable examples and their verification status |
+| 10 | Persistent storage | PersistentVolumeClaims and dynamic provisioning on CRC |
+| 11 | Autoscaling | Scaling on load with the Custom Metrics Autoscaler (KEDA) |
+| 12 | Editor and shell | The web terminal, `oc rsh`, and `oc debug` for working inside the cluster |
+| 13 | Alternatives | Where CRC fits next to minikube, kind, and a remote cluster |
+| 14 | FAQ | Common questions and fixes for OpenShift Local |
+| 15 | Where to go next | Paths onward: certifications, a remote cluster, and the sibling guides |
+| 16 | Examples | Index of the runnable examples and their verification status |
 
 ## What you need
 

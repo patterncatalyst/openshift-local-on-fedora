@@ -1,6 +1,6 @@
 ---
 title: "Examples"
-order: 10
+order: 16
 description: "The runnable examples that accompany the chapters, where they live, and how their verification status is tracked."
 ---
 
