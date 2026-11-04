@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 330" font-family="'Red Hat Text', system-ui, sans-serif" role="img">
+<defs><marker id="a" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#555"/></marker><marker id="am" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#b8650a"/></marker></defs>
+<rect x="20" y="46" width="860" height="258" rx="12" fill="#fafafa" stroke="#ddd"/>
+<text x="32" y="66" font-size="12" font-weight="700" fill="#888">a CRD plus a controller is an Operator</text>
+<rect x="50" y="108" width="200" height="90" rx="9" fill="#fff8ef" stroke="#e8870c" stroke-width="2"/>
+<text x="150.0" y="143.5" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">ShippingPolicy (CRD)</text>
+<text x="150.0" y="160.5" font-size="11.5" fill="#555555" text-anchor="middle">spec: carrier, replicas</text>
+<text x="150.0" y="175.5" font-size="11.5" fill="#555555" text-anchor="middle">status: Ready, observed</text>
+<rect x="350" y="122" width="170" height="60" rx="9" fill="#ffffff" stroke="#111111" stroke-width="2"/>
+<text x="435.0" y="157.5" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">Reconcile loop</text>
+<rect x="640" y="84" width="200" height="48" rx="9" fill="#f1f5f9" stroke="#64748b" stroke-width="2"/>
+<text x="740.0" y="113.5" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">Deployment</text>
+<rect x="640" y="176" width="200" height="48" rx="9" fill="#f1f5f9" stroke="#64748b" stroke-width="2"/>
+<text x="740.0" y="205.5" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">ConfigMap</text>
+<path d="M250,152 L350,152" fill="none" stroke="#555" stroke-width="2" marker-end="url(#a)"/>
+<text x="306.0" y="146.0" font-size="11" fill="#ffffff" stroke="#ffffff" stroke-width="3" paint-order="stroke" text-anchor="middle">watch (For)</text>
+<text x="306.0" y="146.0" font-size="11" fill="#555" text-anchor="middle">watch (For)</text>
+<path d="M520,140 L640,108" fill="none" stroke="#b8650a" stroke-width="2" marker-end="url(#am)"/>
+<text x="586.0" y="118.0" font-size="11" fill="#ffffff" stroke="#ffffff" stroke-width="3" paint-order="stroke" text-anchor="middle">CreateOrUpdate</text>
+<text x="586.0" y="118.0" font-size="11" fill="#b8650a" text-anchor="middle">CreateOrUpdate</text>
+<path d="M520,164 L640,200" fill="none" stroke="#b8650a" stroke-width="2" marker-end="url(#am)"/>
+<text x="586.0" y="176.0" font-size="11" fill="#ffffff" stroke="#ffffff" stroke-width="3" paint-order="stroke" text-anchor="middle">CreateOrUpdate</text>
+<text x="586.0" y="176.0" font-size="11" fill="#b8650a" text-anchor="middle">CreateOrUpdate</text>
+<path d="M640,120 L250,140" fill="none" stroke="#555" stroke-width="2" stroke-dasharray="5 4" marker-end="url(#a)"/>
+<text x="451.0" y="124.0" font-size="11" fill="#ffffff" stroke="#ffffff" stroke-width="3" paint-order="stroke" text-anchor="middle">status.replicas</text>
+<text x="451.0" y="124.0" font-size="11" fill="#555" text-anchor="middle">status.replicas</text>
+<text x="450" y="32" font-size="11" fill="#888" text-anchor="middle" font-weight="700">Operator: the CRD gives the domain concept a typed place in the API</text>
+<text x="740" y="266" font-size="10" fill="#64748b" text-anchor="middle">owner refs cascade a delete to both children</text>
+</svg>

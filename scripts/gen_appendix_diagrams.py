@@ -704,6 +704,76 @@ def batch_job():
     )
 
 
+def controller():
+    g.emit(
+        "appendix-22-controller", 920, 340,
+        bands=[{"x": 20, "y": 46, "w": 880, "h": 272,
+                "label": "observe, diff, act: the same loop twice",
+                "fill": "#fafafa"}],
+        nodes=[
+            {"x": 60, "y": 96, "w": 190, "h": 50, "style": "box",
+             "lines": ["ReplicaSet", "watched kind"]},
+            {"x": 360, "y": 92, "w": 190, "h": 58, "style": "accent",
+             "lines": ["ReplicaSet controller", "(built-in)"]},
+            {"x": 660, "y": 96, "w": 190, "h": 50, "style": "ink",
+             "lines": ["Pods x2", "owned"]},
+            {"x": 60, "y": 216, "w": 190, "h": 50, "style": "box",
+             "lines": ["ShippingPolicy", "watched kind"]},
+            {"x": 360, "y": 212, "w": 190, "h": 58, "style": "accent",
+             "lines": ["ShippingPolicyReconciler", "(custom)"]},
+            {"x": 660, "y": 212, "w": 190, "h": 50, "style": "ink",
+             "lines": ["Deployment + ConfigMap", "owned"]},
+        ],
+        edges=[
+            {"x1": 250, "y1": 121, "x2": 360, "y2": 121, "label": "watch", "dashed": True},
+            {"x1": 550, "y1": 121, "x2": 660, "y2": 121, "label": "create / delete", "amber": True},
+            {"x1": 250, "y1": 241, "x2": 360, "y2": 241, "label": "watch", "dashed": True},
+            {"x1": 550, "y1": 241, "x2": 660, "y2": 241, "label": "CreateOrUpdate", "amber": True},
+        ],
+        notes=[
+            {"x": 460, "y": 32,
+             "text": "Controller: the loop never changes shape, only the watched kind does",
+             "anchor": "middle", "bold": True},
+            {"x": 755, "y": 290,
+             "text": "owner references drive garbage collection", "anchor": "middle",
+             "size": 10, "color": "#64748b"},
+        ],
+    )
+
+
+def operator():
+    g.emit(
+        "appendix-25-operator", 900, 330,
+        bands=[{"x": 20, "y": 46, "w": 860, "h": 258,
+                "label": "a CRD plus a controller is an Operator", "fill": "#fafafa"}],
+        nodes=[
+            {"x": 50, "y": 108, "w": 200, "h": 90, "style": "accent",
+             "lines": ["ShippingPolicy (CRD)", "spec: carrier, replicas",
+                       "status: Ready, observed"]},
+            {"x": 350, "y": 122, "w": 170, "h": 60, "style": "box",
+             "lines": ["Reconcile loop"]},
+            {"x": 640, "y": 84, "w": 200, "h": 48, "style": "ink",
+             "lines": ["Deployment"]},
+            {"x": 640, "y": 176, "w": 200, "h": 48, "style": "ink",
+             "lines": ["ConfigMap"]},
+        ],
+        edges=[
+            {"x1": 250, "y1": 152, "x2": 350, "y2": 152, "label": "watch (For)"},
+            {"x1": 520, "y1": 140, "x2": 640, "y2": 108, "label": "CreateOrUpdate", "amber": True},
+            {"x1": 520, "y1": 164, "x2": 640, "y2": 200, "label": "CreateOrUpdate", "amber": True},
+            {"x1": 640, "y1": 120, "x2": 250, "y2": 140, "label": "status.replicas", "dashed": True},
+        ],
+        notes=[
+            {"x": 450, "y": 32,
+             "text": "Operator: the CRD gives the domain concept a typed place in the API",
+             "anchor": "middle", "bold": True},
+            {"x": 740, "y": 266,
+             "text": "owner refs cascade a delete to both children", "anchor": "middle",
+             "size": 10, "color": "#64748b"},
+        ],
+    )
+
+
 def main():
     predictable_demands()
     declarative_deployment()
@@ -726,6 +796,8 @@ def main():
     configuration_resource()
     configuration_template()
     immutable_configuration()
+    controller()
+    operator()
 
 
 if __name__ == "__main__":
