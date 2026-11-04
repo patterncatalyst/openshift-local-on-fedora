@@ -324,6 +324,34 @@ def ambassador():
     )
 
 
+def configuration_resource():
+    g.emit(
+        "appendix-19-configuration-resource", 880, 300,
+        bands=[{"x": 20, "y": 50, "w": 840, "h": 214,
+                "label": "one resource, two shapes", "fill": "#fafafa"}],
+        nodes=[
+            {"x": 50, "y": 110, "w": 200, "h": 94, "style": "box",
+             "lines": ["ConfigMap + Secret",
+                       "keys: service_schema,",
+                       "pg_*, payment-service.conf"]},
+            {"x": 480, "y": 74, "w": 230, "h": 54, "style": "ink",
+             "lines": ["envFrom: every key as env var",
+                       "(resolved once at start)"]},
+            {"x": 480, "y": 184, "w": 230, "h": 60, "style": "ink",
+             "lines": ["volume: keys as files",
+                       "(live update, ~60s)"]},
+        ],
+        edges=[
+            {"x1": 250, "y1": 130, "x2": 480, "y2": 101, "label": "envFrom"},
+            {"x1": 250, "y1": 180, "x2": 480, "y2": 212,
+             "label": "volumeMount", "amber": True},
+        ],
+        notes=[{"x": 440, "y": 34,
+                "text": "Configuration Resource: same ConfigMap/Secret, only the files update live",
+                "anchor": "middle", "bold": True}],
+    )
+
+
 def env_var_configuration():
     g.emit(
         "appendix-18-env-var-configuration", 880, 300,
@@ -633,6 +661,7 @@ def main():
     service_discovery()
     self_awareness()
     env_var_configuration()
+    configuration_resource()
 
 
 if __name__ == "__main__":

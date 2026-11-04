@@ -1,0 +1,92 @@
+# payment-service with the Configuration Resource pattern: the same ConfigMap
+# and Secret each reach the container two ways. envFrom bulk-exposes every valid
+# key as an env var; a volumeMount delivers the keys that can't be env vars (or
+# shouldn't) as files. restricted-v2 clean.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: payment-service
+  namespace: patterns
+  labels:
+    app.kubernetes.io/name: payment-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: payment-service
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: payment-service
+    spec:
+      securityContext:
+        runAsNonRoot: true
+      containers:
+        - name: payment-service
+          image: image-registry.openshift-image-registry.svc:5000/patterns/payment-service:v1
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 8080
+          envFrom:
+            # Bulk-exposes service_schema, pg_host, pg_port (payment-service.conf
+            # is skipped: invalid env var name).
+            - configMapRef:
+                name: payment-config
+            # Bulk-exposes pg_user, pg_password, pg_database.
+            - secretRef:
+                name: payment-pg-credentials
+          volumeMounts:
+            - name: payment-config-file
+              mountPath: /config/app
+              readOnly: true
+            - name: payment-pg-password-file
+              mountPath: /config/secrets
+              readOnly: true
+          resources:
+            requests: { cpu: 100m, memory: 192Mi }
+            limits: { memory: 512Mi }
+          startupProbe:
+            httpGet: { path: /health, port: http }
+            failureThreshold: 30
+            periodSeconds: 2
+          readinessProbe:
+            httpGet: { path: /healthz, port: http }
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsNonRoot: true
+            capabilities: { drop: ["ALL"] }
+            seccompProfile: { type: RuntimeDefault }
+      volumes:
+        - name: payment-config-file
+          configMap:
+            name: payment-config
+            items:
+              - key: payment-service.conf
+                path: payment-service.conf
+            # 0440, not 0400: projected volume files are owned root:root, and
+            # under restricted-v2 the container runs as an arbitrary UID in
+            # group 0. 0400 would make the file unreadable by the app itself;
+            # 0440 lets gid 0 read it while blocking world and other groups.
+            defaultMode: 0440
+        - name: payment-pg-password-file
+          secret:
+            secretName: payment-pg-credentials
+            items:
+              - key: pg_password
+                path: pg_password
+            defaultMode: 0440
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: payment-service
+  namespace: patterns
+spec:
+  selector:
+    app.kubernetes.io/name: payment-service
+  ports:
+    - port: 80
+      targetPort: 8080
