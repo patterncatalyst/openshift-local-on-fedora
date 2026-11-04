@@ -90,6 +90,9 @@ exclude:
   - Gemfile.lock
   - vendor/
   - node_modules/
+  - presentation/node_modules/   # deck builder deps; the .pptx files themselves are served
+  - presentation/package.json
+  - presentation/package-lock.json
   - examples/   # ← important: trailing slash; runnable code lives here, not site content
   - scripts/
   - openshift/  # CRC scaffold (lib.sh, operators, helm chart, teardown)
