@@ -177,8 +177,8 @@ if left until a cluster is several releases behind.
 ## Where this fits
 
 This is the last of the core chapters. The examples index gathers the runnable code behind
-them, and later parts of this guide add a data mesh running on OpenShift and the Kubernetes
-design patterns worked entirely on CRC, each arriving the same way the chapters here did: drafted,
-run against a real cluster, and corrected to match. You have a real OpenShift cluster on your own machine
+them, the final project then converges the whole guide into a data mesh running on OpenShift,
+and a later part adds the Kubernetes design patterns worked entirely on CRC, each arriving the
+same way the chapters here did: drafted, run against a real cluster, and corrected to match. You have a real OpenShift cluster on your own machine
 and the grounding to take it anywhere, whether that is a certification, a remote cluster, or a
 platform built one operator at a time on the foundation this guide laid.

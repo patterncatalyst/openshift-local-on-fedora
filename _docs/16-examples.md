@@ -202,10 +202,10 @@ service over TLS, package with Helm, and add platform capabilities through opera
 
 The core now runs from installing OpenShift Local through deploying under its security model,
 exposing a service over TLS, packaging with Helm, adding platform capabilities through Operators,
-giving workloads persistent storage, scaling them on load, and working inside the cluster. What
-remains are the larger builds that assemble these pieces. A data-mesh final project puts a
-multi-service system end to end on OpenShift, and a Kubernetes design-patterns appendix works the
+giving workloads persistent storage, scaling them on load, and working inside the cluster. The
+final project then assembles these pieces into one system: a seven-service data mesh end to end on
+OpenShift. What remains after that is the Kubernetes design-patterns appendix, which works the
 full catalog of patterns entirely on OpenShift, with `restricted-v2` variants of every manifest,
-reframed from the generic Kubernetes certifications to OpenShift's own. Each will arrive as these
+reframed from the generic Kubernetes certifications to OpenShift's own. It will arrive as these
 chapters did: drafted, then run against a real cluster, then corrected to match what the cluster
 did, so the commands you read stay the commands that work.

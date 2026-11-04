@@ -205,4 +205,34 @@ g.emit("editor-shell", 900, 340,
          "anchor":"middle", "bold":True},
     ])
 
-print("wrote 9 diagrams to", g.OUT)
+# 10. Capstone: the seven-service data mesh on one CRC cluster
+g.emit("capstone-datamesh", 960, 470,
+    bands=[
+        {"x":280, "y":150, "w":350, "h":110, "label":"six data-product services (restricted-v2)", "fill":"#fafafa"},
+        {"x":280, "y":300, "w":350, "h":130, "label":"infra (nonroot-v2 SCC + PVCs)", "fill":"#fafafa"},
+    ],
+    nodes=[
+        {"x":40,  "y":70,  "w":170, "h":55, "style":"accent", "lines":["Route (edge TLS)"]},
+        {"x":40,  "y":165, "w":170, "h":80, "style":"accent", "lines":["GraphQL gateway", "the one front door"]},
+        {"x":300, "y":185, "w":310, "h":55, "style":"box",    "lines":["inventory, order, notification, ...", "REST / gRPC / GraphQL / Kafka"]},
+        {"x":300, "y":335, "w":150, "h":60, "style":"kernel", "lines":["Postgres", "UID 70"]},
+        {"x":460, "y":335, "w":150, "h":60, "style":"kernel", "lines":["Kafka", "UID 1000"]},
+        {"x":700, "y":70,  "w":170, "h":55, "style":"accent", "lines":["Route (edge TLS)"]},
+        {"x":700, "y":165, "w":170, "h":80, "style":"sub",    "lines":["Apicurio", "schema registry"]},
+        {"x":700, "y":335, "w":170, "h":60, "style":"sub",    "lines":["integrated registry", "the 9 images"]},
+    ],
+    edges=[
+        {"x1":125, "y1":125, "x2":125, "y2":165, "label":"HTTPS", "amber":True},
+        {"x1":210, "y1":205, "x2":300, "y2":212, "label":"GraphQL, gRPC, REST"},
+        {"x1":455, "y1":240, "x2":455, "y2":300, "label":"SQL + events"},
+        {"x1":785, "y1":125, "x2":785, "y2":165, "label":"HTTPS", "amber":True},
+        {"x1":610, "y1":212, "x2":700, "y2":205, "label":"contracts"},
+    ],
+    notes=[
+        {"x":480, "y":45, "text":"one Helm chart on one CRC cluster: the guide's pieces converging",
+         "anchor":"middle", "bold":True},
+        {"x":480, "y":455, "text":"opt-in platform tier adds the service mesh, autoscaling, and observability",
+         "anchor":"middle", "size":13, "color":"#64748b"},
+    ])
+
+print("wrote 10 diagrams to", g.OUT)
