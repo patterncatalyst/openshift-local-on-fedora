@@ -324,6 +324,36 @@ def ambassador():
     )
 
 
+def configuration_template():
+    g.emit(
+        "appendix-20-configuration-template", 900, 300,
+        bands=[{"x": 20, "y": 48, "w": 860, "h": 220,
+                "label": "render once, before the app starts", "fill": "#fafafa"}],
+        nodes=[
+            {"x": 40, "y": 74, "w": 170, "h": 46, "style": "box",
+             "lines": ["template ConfigMap"]},
+            {"x": 40, "y": 150, "w": 170, "h": 46, "style": "box",
+             "lines": ["overlay ConfigMap"]},
+            {"x": 330, "y": 98, "w": 180, "h": 80, "style": "accent",
+             "lines": ["init: render-config", "sed -> /rendered"]},
+            {"x": 620, "y": 72, "w": 220, "h": 50, "style": "ink",
+             "lines": ["emptyDir: app.conf (rendered)"]},
+            {"x": 620, "y": 176, "w": 220, "h": 56, "style": "box",
+             "lines": ["main: inventory-service", "reads /config/app"]},
+        ],
+        edges=[
+            {"x1": 210, "y1": 97, "x2": 330, "y2": 128, "label": "template"},
+            {"x1": 210, "y1": 173, "x2": 330, "y2": 150, "label": "envFrom"},
+            {"x1": 510, "y1": 128, "x2": 620, "y2": 100,
+             "label": "writes once", "amber": True},
+            {"x1": 620, "y1": 150, "x2": 620, "y2": 176},
+        ],
+        notes=[{"x": 450, "y": 32,
+                "text": "Configuration Template: init renders the file; the app only sees the result",
+                "anchor": "middle", "bold": True}],
+    )
+
+
 def configuration_resource():
     g.emit(
         "appendix-19-configuration-resource", 880, 300,
@@ -662,6 +692,7 @@ def main():
     self_awareness()
     env_var_configuration()
     configuration_resource()
+    configuration_template()
 
 
 if __name__ == "__main__":
