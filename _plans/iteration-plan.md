@@ -28,9 +28,14 @@ chapters, live-verified on CRC.
       Node Tuning/Performance, networking) (verified live; amq-streams pin
       bumped; table channels confirmed; expand to word target)
 - [~] Ch 10 examples index (verified: every path it names exists)
+- [x] Expand every content chapter (01-10) to the 2k prose floor with genuine
+      content (verified facts preserved); all now 2003-2034 prose words, 0 ban-tier
+- [x] Voice pass (lgtm-professional-voice, repo root incl. landing pages): example
+      READMEs de-numbered + de-footered + em-dashes recast; LICENSE-docs preamble
+      em-dashes recast (CC legal text left verbatim)
+- [x] Live verification on CRC; evidence banked here (§1-10 all verified)
 - [ ] Diagrams for new/changed chapters
-- [ ] Live verification on CRC; evidence banked here
-- [ ] Voice pass (lgtm-professional-voice, repo root incl. landing pages)
+- [ ] Open the r01 PR
 
 ## Evidence — live CRC run (CRC 2.64.0, OpenShift 4.22.14, k8s v1.35.6)
 
