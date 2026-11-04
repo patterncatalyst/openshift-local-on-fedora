@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 300" font-family="'Red Hat Text', system-ui, sans-serif" role="img">
+<defs><marker id="a" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#555"/></marker><marker id="am" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#b8650a"/></marker></defs>
+<rect x="20" y="56" width="860" height="190" rx="12" fill="#fafafa" stroke="#ddd"/>
+<text x="32" y="76" font-size="12" font-weight="700" fill="#888">node: crc (one per node; here, one node)</text>
+<rect x="50" y="112" width="180" height="80" rx="9" fill="#fff8ef" stroke="#e8870c" stroke-width="2"/>
+<text x="140.0" y="142.5" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">DaemonSet</text>
+<text x="140.0" y="159.5" font-size="11.5" fill="#555555" text-anchor="middle">1 Pod per node</text>
+<text x="140.0" y="174.5" font-size="11.5" fill="#555555" text-anchor="middle">(no replicas)</text>
+<rect x="360" y="108" width="190" height="88" rx="9" fill="#ffffff" stroke="#111111" stroke-width="2"/>
+<text x="455.0" y="142.5" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">node-collector Pod</text>
+<text x="455.0" y="159.5" font-size="11.5" fill="#555555" text-anchor="middle">UID 0, spc_t</text>
+<text x="455.0" y="174.5" font-size="11.5" fill="#555555" text-anchor="middle">privileged SCC</text>
+<rect x="660" y="112" width="200" height="80" rx="9" fill="#f1f5f9" stroke="#64748b" stroke-width="2"/>
+<text x="760.0" y="150.0" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">node /var/log/pods</text>
+<text x="760.0" y="167.0" font-size="11.5" fill="#555555" text-anchor="middle">root:root, var_log_t</text>
+<path d="M230,152 L360,152" fill="none" stroke="#555" stroke-width="2" marker-end="url(#a)"/>
+<text x="301.0" y="146.0" font-size="11" fill="#ffffff" stroke="#ffffff" stroke-width="3" paint-order="stroke" text-anchor="middle">places 1/node</text>
+<text x="301.0" y="146.0" font-size="11" fill="#555" text-anchor="middle">places 1/node</text>
+<path d="M550,152 L660,152" fill="none" stroke="#b8650a" stroke-width="2" marker-end="url(#am)"/>
+<text x="611.0" y="146.0" font-size="11" fill="#ffffff" stroke="#ffffff" stroke-width="3" paint-order="stroke" text-anchor="middle">hostPath read</text>
+<text x="611.0" y="146.0" font-size="11" fill="#b8650a" text-anchor="middle">hostPath read</text>
+<text x="450" y="40" font-size="11" fill="#888" text-anchor="middle" font-weight="700">Daemon Service: one per node, gated by SCC and SELinux</text>
+<text x="450" y="232" font-size="10" fill="#888" text-anchor="middle">restricted-v2 forbids hostPath; privileged SCC + spc_t permits the read</text>
+</svg>

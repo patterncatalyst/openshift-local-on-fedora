@@ -1,0 +1,102 @@
+# node-collector: a per-node log collector. It mounts the node's own /var/log
+# read-only and logs a per-node summary every 15s: enough to show a DaemonSet
+# running exactly once per node and reading node-local state no single Pod
+# could see.
+#
+# The OpenShift difference, in two layers. First, a hostPath volume is not
+# allowed by the default restricted-v2 SCC. Second, even with a host mount,
+# RHCOS owns /var/log/pods as root:root and SELinux confines an ordinary
+# container type away from the node's var_log_t files. Reading every Pod's
+# node-local logs therefore needs the privileged SCC with the spc_t SELinux
+# type, which is how OpenShift's own cluster log collector runs. That access is
+# granted to this one daemon's ServiceAccount, not to the namespace at large:
+# an infrastructure daemon is the documented exception to the restricted
+# default, and a node-log reader is the clearest case of one.
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: node-collector
+  namespace: patterns
+---
+# CLI equivalent: oc adm policy add-scc-to-user privileged -z node-collector
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: node-collector-privileged
+  namespace: patterns
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: system:openshift:scc:privileged
+subjects:
+  - kind: ServiceAccount
+    name: node-collector
+    namespace: patterns
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: node-collector
+  namespace: patterns
+  labels:
+    app.kubernetes.io/name: node-collector
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: node-collector
+  updateStrategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: node-collector
+    spec:
+      serviceAccountName: node-collector
+      # A control-plane node's NoSchedule taint repels ordinary Pods; an
+      # infrastructure daemon tolerates it so it runs there too. (CRC's single
+      # node is schedulable and untainted, so this is a no-op here but correct
+      # on a multi-node cluster.)
+      tolerations:
+        - key: node-role.kubernetes.io/control-plane
+          operator: Exists
+          effect: NoSchedule
+      containers:
+        - name: node-collector
+          image: registry.access.redhat.com/ubi10/ubi-minimal:latest
+          env:
+            - name: NODE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
+          command:
+            - "sh"
+            - "-c"
+            - |
+              while true; do
+                count=$(find /host-var-log/pods -maxdepth 1 -mindepth 1 -type d 2>/dev/null | wc -l)
+                echo "node=${NODE_NAME} pod-log-dirs=${count}"
+                sleep 15
+              done
+          volumeMounts:
+            - name: varlog
+              mountPath: /host-var-log
+              readOnly: true
+          resources:
+            requests: { cpu: 50m, memory: 64Mi }
+            limits: { memory: 128Mi }
+          # Runs as UID 0 with the spc_t SELinux type so it can actually read
+          # the node's root-owned, SELinux-labeled /var/log/pods. This is the
+          # realistic shape for a node-log collector and the reason it needs the
+          # privileged SCC: an ordinary app has no business reading every Pod's
+          # node-local logs; an infrastructure daemon does.
+          securityContext:
+            runAsUser: 0
+            seLinuxOptions:
+              type: spc_t
+      volumes:
+        - name: varlog
+          hostPath:
+            path: /var/log
+            type: Directory

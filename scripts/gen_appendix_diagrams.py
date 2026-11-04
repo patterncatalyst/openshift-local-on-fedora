@@ -324,6 +324,37 @@ def ambassador():
     )
 
 
+def daemon_service():
+    g.emit(
+        "appendix-12-daemon-service", 900, 300,
+        bands=[{"x": 20, "y": 56, "w": 860, "h": 190,
+                "label": "node: crc (one per node; here, one node)",
+                "fill": "#fafafa"}],
+        nodes=[
+            {"x": 50, "y": 112, "w": 180, "h": 80, "style": "accent",
+             "lines": ["DaemonSet", "1 Pod per node", "(no replicas)"]},
+            {"x": 360, "y": 108, "w": 190, "h": 88, "style": "box",
+             "lines": ["node-collector Pod", "UID 0, spc_t",
+                       "privileged SCC"]},
+            {"x": 660, "y": 112, "w": 200, "h": 80, "style": "ink",
+             "lines": ["node /var/log/pods", "root:root, var_log_t"]},
+        ],
+        edges=[
+            {"x1": 230, "y1": 152, "x2": 360, "y2": 152, "label": "places 1/node"},
+            {"x1": 550, "y1": 152, "x2": 660, "y2": 152,
+             "label": "hostPath read", "amber": True},
+        ],
+        notes=[
+            {"x": 450, "y": 40,
+             "text": "Daemon Service: one per node, gated by SCC and SELinux",
+             "anchor": "middle", "bold": True},
+            {"x": 450, "y": 232,
+             "text": "restricted-v2 forbids hostPath; privileged SCC + spc_t permits the read",
+             "anchor": "middle", "size": 10, "color": "#888"},
+        ],
+    )
+
+
 def periodic_job():
     g.emit(
         "appendix-11-periodic-job", 880, 320,
@@ -401,6 +432,7 @@ def main():
     ambassador()
     batch_job()
     periodic_job()
+    daemon_service()
 
 
 if __name__ == "__main__":
