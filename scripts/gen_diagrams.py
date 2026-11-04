@@ -144,4 +144,65 @@ g.emit("operator-olm", 920, 320,
          "size":13, "color":"#64748b"},
     ])
 
-print("wrote 6 diagrams to", g.OUT)
+# 7. Persistent storage: Pod -> PVC -> PV -> node disk, provisioned by the StorageClass
+g.emit("persistent-storage", 900, 340,
+    nodes=[
+        {"x":40,  "y":120, "w":160, "h":70, "style":"box",    "lines":["Pod", "mounts the claim"]},
+        {"x":300, "y":120, "w":180, "h":70, "style":"accent", "lines":["PersistentVolumeClaim", "1Gi, ReadWriteOnce"]},
+        {"x":560, "y":120, "w":150, "h":70, "style":"box",    "lines":["PersistentVolume"]},
+        {"x":760, "y":120, "w":120, "h":70, "style":"kernel", "lines":["node disk", "dir on the VM"]},
+        {"x":560, "y":245, "w":180, "h":60, "style":"sub",    "lines":["StorageClass", "hostpath (default)"]},
+    ],
+    edges=[
+        {"x1":200, "y1":155, "x2":300, "y2":155, "label":"mounts"},
+        {"x1":480, "y1":155, "x2":560, "y2":155, "label":"bound"},
+        {"x1":710, "y1":155, "x2":760, "y2":155, "label":"backed by"},
+        {"x1":635, "y1":245, "x2":635, "y2":190, "label":"provisions", "amber":True},
+    ],
+    notes=[
+        {"x":450, "y":45, "text":"the claim binds when the first Pod mounts it (WaitForFirstConsumer)",
+         "anchor":"middle", "bold":True},
+    ])
+
+# 8. Autoscaling: a load signal drives the autoscaler, which sets the replica count
+g.emit("autoscaling", 900, 360,
+    bands=[
+        {"x":600, "y":90, "w":280, "h":200, "label":"Deployment (1 to 5)", "fill":"#fafafa"},
+    ],
+    nodes=[
+        {"x":40,  "y":145, "w":180, "h":70, "style":"sub",    "lines":["Load signal", "CPU, queue, cron"]},
+        {"x":300, "y":135, "w":210, "h":90, "style":"accent", "lines":["HPA / ScaledObject", "target vs actual"]},
+        {"x":625, "y":150, "w":70, "h":55, "style":"box", "lines":["Pod"]},
+        {"x":710, "y":150, "w":70, "h":55, "style":"box", "lines":["Pod"]},
+        {"x":795, "y":150, "w":70, "h":55, "style":"box", "lines":["Pod"]},
+    ],
+    edges=[
+        {"x1":220, "y1":180, "x2":300, "y2":180, "label":"reads"},
+        {"x1":510, "y1":180, "x2":600, "y2":180, "label":"sets replicas", "amber":True},
+    ],
+    notes=[
+        {"x":450, "y":45, "text":"run as many Pods as demand needs, within a min and a max",
+         "anchor":"middle", "bold":True},
+    ])
+
+# 9. Editor and shell: the oc verbs that reach into a Pod, plus a debug Pod
+g.emit("editor-shell", 900, 340,
+    bands=[
+        {"x":20,  "y":95, "w":260, "h":205, "label":"your host", "fill":"#fafafa"},
+        {"x":400, "y":95, "w":330, "h":120, "label":"running Pod", "fill":"#ffffff"},
+    ],
+    nodes=[
+        {"x":50,  "y":165, "w":150, "h":70, "style":"user",  "lines":["oc", "your client"]},
+        {"x":425, "y":130, "w":280, "h":55, "style":"box",   "lines":["container (your app)"]},
+        {"x":400, "y":245, "w":330, "h":55, "style":"ghost", "lines":["oc debug: a throwaway Pod from the same spec"]},
+    ],
+    edges=[
+        {"x1":200, "y1":158, "x2":425, "y2":158, "label":"rsh, exec, cp, port-forward"},
+        {"x1":200, "y1":210, "x2":400, "y2":268, "label":"debug", "dashed":True},
+    ],
+    notes=[
+        {"x":450, "y":45, "text":"work inside the cluster without leaving your terminal",
+         "anchor":"middle", "bold":True},
+    ])
+
+print("wrote 9 diagrams to", g.OUT)

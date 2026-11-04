@@ -12,6 +12,11 @@ cluster, from the `oc` verbs that need nothing installed to the browser-based we
 Most of them are everyday debugging tools you will reach for constantly once a workload does
 something you did not expect, so they are worth meeting before you need them in a hurry.
 
+{% include excalidraw.html
+   file="editor-shell"
+   alt="From the host, the oc client reaches into a running Pod's container with rsh, exec, cp, and port-forward, and it starts a separate throwaway debug Pod from the same spec with oc debug."
+   caption="Figure 12.1: oc reaches into a running Pod with rsh, exec, cp, and port-forward, and oc debug starts a throwaway copy for a workload that will not stay up." %}
+
 ## A shell in a running Pod
 
 `oc rsh` opens an interactive shell inside a running container, the fastest way to see a

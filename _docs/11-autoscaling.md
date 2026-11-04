@@ -14,6 +14,11 @@ all the way to zero. The two are not rivals: the HPA is the floor every cluster 
 and the Custom Metrics Autoscaler builds on it to reach the signals the HPA alone cannot
 read.
 
+{% include excalidraw.html
+   file="autoscaling"
+   alt="A load signal (CPU, a queue, or a cron schedule) is read by an autoscaler (an HPA or a KEDA ScaledObject) that compares a target to the actual value and sets the Deployment's replica count between a minimum and a maximum."
+   caption="Figure 11.1: An autoscaler reads a load signal and sets the Deployment's replica count within a min and a max, so the Pod count tracks demand." %}
+
 ## The Horizontal Pod Autoscaler
 
 The Horizontal Pod Autoscaler (HPA) ships with every Kubernetes cluster. It watches a
@@ -160,12 +165,16 @@ spec:
 ```bash
 oc apply -f scaledobject.yaml
 oc get scaledobject web -n scale-demo
-oc get hpa -n scale-demo               # KEDA creates and manages an HPA under the hood
+oc get hpa keda-hpa-web -n scale-demo  # KEDA creates and manages this HPA under the hood
 ```
 
 A detail worth knowing: KEDA does not replace the HPA, it drives one. A `ScaledObject`
-creates an HPA that KEDA keeps in sync with the triggers, so the CPU case above ends up
-looking much like the plain HPA, with KEDA in charge of it. The payoff is that the same
+creates an HPA, named `keda-hpa-<workload>` and owned by the `ScaledObject`, that KEDA keeps
+in sync with the triggers, so the CPU case above ends up looking much like the plain HPA, with
+KEDA in charge of it. Because of that, a workload can be managed by a standalone HPA or by a
+`ScaledObject`, but not both: KEDA's admission webhook rejects a `ScaledObject` whose target
+already has an HPA, with a message saying the workload is already managed. Remove the plain HPA
+before handing a workload to KEDA. The payoff is that the same
 `ScaledObject` can swap the CPU trigger for a Kafka or Prometheus or cron trigger without
 any change to how the workload is scaled, which is what makes KEDA worth installing over
 the bare HPA.
@@ -262,20 +271,23 @@ right at the start.
 ```bash
 oc new-project scale-demo 2>/dev/null || oc project scale-demo
 oc apply -f httpd-deployment.yaml
+oc set resources deployment/web --requests=cpu=50m   # the HPA scales against a CPU request
 oc rollout status deployment/web
-# built-in HPA on CPU
+# Approach 1: the built-in HPA on CPU
 oc autoscale deployment/web --min=1 --max=5 --cpu-percent=70
 oc get hpa web
-# KEDA (installed once, cluster-wide): a ScaledObject driving the same Deployment
+oc delete hpa web                        # remove it before handing the workload to KEDA
+# Approach 2: a KEDA ScaledObject manages its own HPA (KEDA installed once, cluster-wide)
 oc apply -f scaledobject.yaml
-oc get scaledobject web                 # READY / ACTIVE
-oc get hpa web                          # the HPA KEDA now manages
+oc get scaledobject web                  # READY=True once reconciled
+oc get hpa keda-hpa-web                  # the HPA KEDA created and owns
 oc delete scaledobject web
 oc delete project scale-demo
 ```
 
-An HPA that holds a CPU target, and a `ScaledObject` that takes over and reports `READY`,
-confirm both autoscalers are working. Driving the replica count from an external trigger
+An HPA that holds a CPU target, and a `ScaledObject` that, once the plain HPA is removed, takes
+over and creates its own `keda-hpa-web`, confirm both autoscalers are working. The two are
+alternatives on one workload, not a stack; driving the replica count from an external trigger
 is the same `ScaledObject` with its trigger swapped, which is the whole reason to install the
 Custom Metrics Autoscaler rather than stop at the built-in HPA.
 

@@ -12,6 +12,11 @@ proves the data survives the Pod that wrote it. Storage is where a cluster stops
 place to run throwaway processes and starts being able to run a database, a queue, or
 anything else that has to hold state between restarts.
 
+{% include excalidraw.html
+   file="persistent-storage"
+   alt="A Pod mounts a PersistentVolumeClaim, which binds to a PersistentVolume backed by a directory on the CRC node's disk. The default hostpath StorageClass provisions the volume, and the claim binds when the first Pod mounts it."
+   caption="Figure 10.1: A Pod mounts a claim; the default StorageClass provisions a volume on the node's disk, and the claim binds when the first Pod mounts it." %}
+
 ## Volumes, claims, and classes
 
 Three Kubernetes objects work together, and the names are easy to confuse:
